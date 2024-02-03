@@ -79,7 +79,10 @@ class Platform():
 class Account:
     def __init__(self, display_name) -> None:
         self.__display_name = display_name
-        
+        self.__amount = 0
+
+    def add_money(self, amount):
+        pass
         
 class UserAccount(Account):
     def __init__(self, gender, user_name, display_name, user_id) -> None:
@@ -110,7 +113,11 @@ class Mate(Account):
         self.__available = False
         self.__name = name
         self.__time = None
+        self.__cost = 0
 
+    def set_cost(self, cost):
+        pass
+    
     def __set_available(self, logic):
         self.__available = logic
 
