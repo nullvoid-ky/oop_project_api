@@ -38,6 +38,7 @@ class Server:
             pre_message = "Duplicate Data"
         elif type == -1:
             pre_message = "Miss Match Instance"
+            message = None
         elif type == 0:
             pass
         elif type == 1:
@@ -98,7 +99,7 @@ class UserAccount(Account):
     
     @property
     def display_name(self):
-        return self.__display_name
+        return self._Account__display_name
     
     def booking_mate_by_name(self, platform, mate_name, day, start, end):
         if not isinstance(mate_name, str):
@@ -168,14 +169,18 @@ class Log:
             message_type = "Error"
         else:
             message_type = "Success"
+
         self.__message_type = message_type
         
         self.__pre_message = pre_message
         self.__message_id = message.user_id
-        self.__message = message
 
+        self.__message = message
+        self.__message_display_name = self.__message.display_name
+## TOdo Bug fix self.message
     def __str__(self) -> str:
-        return f"{self.__message_type} {self.__pre_message} {self.__message.__class__.__name__}: {self.__message.display_name}#{self.__message_id}"
+        
+        return f"{self.__message_type} {self.__pre_message} {self.__message.__class__.__name__}: {self.__message_display_name}#{self.__message_id}"
 ######################################################################################################
 ######################################################################################################
 ce_rent_a_girlfriend = Platform(Server())
