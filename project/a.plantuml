@@ -1,0 +1,48 @@
+@startuml
+actor Customer
+participant "Controller" as Controller
+participant "Booking" as Booking
+participant "Mate" as Mate
+participant "Payment" as Payment
+participant "Transaction" as Transaction
+
+activate Customer
+
+Customer->Controller: get_self_booking(user_id)
+Controller->Controller: booking_list
+loop in booking_list
+    Controller->Booking: get_booking_user_id()
+    Booking->Controller: booking_user_id
+    alt user_id == booking_user_id
+        Controller->Controller: append_in_self_booking_list()
+        end
+end
+Controller->Customer: self_booking_list
+
+
+deactivate Controller
+
+Customer -> Booking: create_booking(mate, date, time_start, time_end, location)
+activate Booking
+Booking -> Controller: validate_booking_details()
+activate Controller
+Controller --> Booking: Validation successful
+deactivate Controller
+Booking -> Mate: request confirm_booking
+activate Mate
+Mate --> Booking: respond confirm_booking()
+deactivate Mate
+Booking --> Customer: Booking details
+deactivate Booking
+
+Customer -> Booking: initiate_payment()
+activate Booking
+Booking -> Payment: create_payment_request(amount)
+activate Payment
+Payment -> Transaction: pay(amount)
+activate Transaction
+Transaction --> Payment: Payment processed
+deactivate Transaction
+Payment --> Customer: Payment successful and Transaction details
+deactivate Payment
+@enduml
