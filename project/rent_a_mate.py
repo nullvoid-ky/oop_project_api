@@ -1,8 +1,21 @@
-from datetime import datetime
+import time
 
 class Account:
-    def __init__(self):
-        self.chat_list = []
+    def __init__(self) -> None:
+        self._user = None
+        self._username = None
+        self._password = None
+        self._display_name = None
+    
+    @property
+    def display_name(self):
+        return self._display_name
+    
+    def add_display_name(self, nickname):
+        self._display_name = nickname
+
+    def validate_login(self, username, password):
+        return (username == self._username and password == self._password)
     
     def view_transaction(self):
         pass
@@ -14,6 +27,14 @@ class Account:
         self.picture = picture
 
 class Customer(Account):
+    
+    def __init__(self, user, username, password):
+        super().__init__()
+        self._user = user
+        self._username = username
+        self._password = password
+
+
     def rent_mate(self):
         pass
     
@@ -30,18 +51,28 @@ class Customer(Account):
         pass
 
 class Mate(Account):
-    def __init__(self):
+    def __init__(self, user, username, password):
         super().__init__()
         self.__available_list = []
+        self._user = user
+        self._username = username
+        self._password = password
     
-    def free_at(self, date):
+    @property
+    def available_list(self):
+        return self.__available_list
+    
+    def is_available_from_date(self, date):
         for available in self.__available_list:
             if available.date == date:
                 return True
         return False
-
-    def check_available(self):
-        pass
+    
+    def add_available(self, available):
+        if not isinstance(available, Available):
+            raise TypeError(f"Expected available, but got {type(available)} instead.")
+        self.__available_list += [available]
+        return "Success"
     
     def confirm_booking(self):
         pass
@@ -73,13 +104,29 @@ class Booking:
         pass
 
 class Available:
-    def __init__(self):
-        self.location = ""
-        self.time_start = ""
-        self.time_end = ""
-        self.date = ""
+    def __init__(self, loaction, time_start, time_end, date):
+        self.location = loaction
+        self.time_start = time_start
+        self.time_end = time_end
+        self.date = date
         self.is_rent = False
-        self.is_available = False
+        
+    def check_date(self, date):
+        month = {
+            "Jan" : 31,
+            "Feb" : 60,
+            "Mar" : 91,
+            "Apr" : 121
+        }
+        self_days = month[self.date.split()[1]] + int(self.date.split()[0])
+        check_days = month[date.split()[1]] + int(date.split()[0])
+        # print(self_days)
+        # print(check_days)
+
+        return check_days <= self_days
+        # print(self.date.split())
+        # print(date.split())
+
 
 class Transaction:
     def __init__(self):
@@ -87,13 +134,13 @@ class Transaction:
         self.receiver_account = None
         self.amount = 0
         self.total = 0
-        self.timestamp = datetime.now()
+        # self.timestamp = datetime.now()
 
 class Log:
     def __init__(self):
         self.message_type = ""
         self.message = ""
-        self.timestamp = datetime.now()
+        # self.timestamp = datetime.now()
 
 class Leaderboard:
     def __init__(self):
@@ -103,12 +150,12 @@ class Post:
     def __init__(self):
         self.picture = ""
         self.description = ""
-        self.timestamp = datetime.now()
+        # self.timestamp = datetime.now()
 
 class Message:
     def __init__(self):
         self.text = ""
-        self.timestamp = datetime.now()
+        # self.timestamp = datetime.now()
 
 class Chat:
     def __init__(self):
@@ -117,41 +164,93 @@ class Chat:
     def send_message(self):
         pass
 
-class Server:
+class Controller:
 
     def __init__(self) -> None:
-        self.__people_list = []
+        self.__user_list = []
         self.__mate_list = []
+        self.__chat_list = []
 
-    def search_people_by_name(self, name : str):
+    @property
+    def mate_list(self):
+        return self.__mate_list
+    
+    @staticmethod
+    def change_name_to_json(lst):
+        name_dict = {}
+        i = 1
+        for item in lst:
+            name_dict[i] = {"name" : item[0].display_name, "date" : item[1].date }
+            i+=1
+        return name_dict
+
+
+    def print_accounts(self):
+        for user in self.__user_list:
+            print(user.account)
+    def search_user_by_name(self, name : str):
         if not isinstance(name, str):
             return "Error"
-        for people in self.__people_list:
-            if people.check_name(name):
-                return people
+        for user in self.__user_list:
+            if user.check_name(name):
+                return user
         return None
     
-    def add_people(self, people):
-        if not isinstance(people, People):
+    def add_user(self, user):
+        if not isinstance(user, User):
             print("-1")
-        self.__people_list += [people]
+        self.__user_list += [user]
 
-    def sign_up_as_mate(self, people, username, password):
-        if not isinstance(people, People):
-            raise TypeError(f"Expected People, but got {type(people)} instead.")
-        if not people.check_age_valid():
+    def sign_up_as_mate(self, user, username, password):
+        if not isinstance(user, User):
+            raise TypeError(f"Expected user, but got {type(user)} instead.")
+        if not user.check_age_valid():
             raise ValueError("Age must be over 18.")
+        account = Mate(user, username, password)
+        user.add_account(account)
+        self.__mate_list += [account]
         
     
-    def sign_up_as_customer(self, people, username, password):
-        if not isinstance(people, People):
-            raise TypeError(f"Expected People, but got {type(people)} instead.")
-        if not people.check_age_valid():
+    def sign_up_as_customer(self, user, username, password):
+        if not isinstance(user, User):
+            raise TypeError(f"Expected user, but got {type(user)} instead.")
+        if not user.check_age_valid():
             raise ValueError("Age must be over 18.")
+        user.add_account(Customer(user, username, password))
 
     def login(self, username, password):
-        pass 
+        for user in self.__user_list:
+            if user.account.validate_login(username, password):
+                return user.account
+        return None
+    
+    @staticmethod
+    def is_substr(s1, s2):
+        if s1 == None:
+            return True
+        if s2 == None:
+            return False
+        
+        M = len(s1)
+        N = len(s2)
 
+        s1 = s1.lower()
+        s2 = s2.lower()
+
+        # A loop to slide pat[] one by one
+        for i in range(N - M + 1):
+    
+            # For current index i,
+            # check for pattern match
+            for j in range(M):
+                if (s2[i + j] != s1[j]):
+                    break
+    
+            if j + 1 == M:
+                return True
+    
+        return False
+    
     def create_mate_account(self):
         pass
     
@@ -176,8 +275,14 @@ class Server:
     def create_log(self):
         pass
     
-    def search_mate_by_name(self):
-        pass
+    def search_mate_by_name(self, name):
+        new_list = []
+        for mate in self.__mate_list:
+            if Controller.is_substr(name, mate.display_name):
+                    for available in mate.available_list: 
+                        if available.check_date(get_date()):
+                            new_list.append([mate,available])
+        return new_list
     
     def search_mate_by_id(self):
         pass
@@ -185,13 +290,13 @@ class Server:
     def search_mate_by_location(self):
         pass
     
-    def search_mate_by_available(self):
-        this_mate_list = []
-        date = datetime.today()
-        for mate in self.__mate_list:
-            if mate.free_at(date):
-                this_mate_list += [mate]
-        print(this_mate_list)
+    # def search_mate_by_available(self):
+    #     this_mate_list = []
+    #     date = time.today()
+    #     for mate in self.__mate_list:
+    #         if mate.free_at(date):
+    #             this_mate_list += [mate]
+    #     print(this_mate_list)
                 
     
     def search_mate_by_type(self):
@@ -201,37 +306,59 @@ class Server:
         pass
 
 
-class People:
+class User:
     def __init__(self, name, age, gender):
         self.__name = name
         self.__age = age
         self.gender = gender
-    
+        self.__account = None
+
+    @property
+    def account(self):
+        return self.__account
+
+    def add_account(self, account):
+        if not isinstance(account, Account):
+            raise TypeError(f"Expected account, but got {type(account)} instead.")
+        self.__account = account
+        # print(type(account))
+
     def check_name(self, name):
         return name == self.__name
     
     def check_age_valid(self):
         return self.__age >= 18
         
+def get_date():
+    month = time.ctime().split()[1]
+    days = time.ctime().split()[2]
+    year = time.ctime().split()[-1]
+    date = f"{days} {month} {year}"
+    return date
 
-web = Server()
-web.add_people( People("Tamtikorn", 19, 0))
-web.add_people( People("Thanatchaya", 19, 1))
-web.add_people( People("Nakul", 19, 0))
-web.add_people( People("TajIsWomen", 19, 1))
-web.add_people( People("NattapasIsWomen", 20, 1))
+def get_time():
+    hr  = time.ctime().split()[3].split(":")[0]
+    min = time.ctime().split()[3].split(":")[1]
+    return f"{hr}:{min}"
 
-gan_people = web.search_people_by_name("Tamtikorn")
-mook_people = web.search_people_by_name("Thanatchaya")
-porche_people = web.search_people_by_name("Nakul")
-taj_people = web.search_people_by_name("TajIsWomen")
-nat_people = web.search_people_by_name("NattapasIsWomen")
+web = Controller()
+web.add_user( User("Tamtikorn", 19, 0))
+web.add_user( User("Nakul", 19, 0))
+web.add_user( User("Thanatchaya", 19, 1))
+web.add_user( User("TajIsWomen", 19, 1))
+web.add_user( User("NattapasIsWomen", 20, 1))
 
-web.sign_up_as_customer(gan_people, "ganxd123", "Ab12345.")
-web.sign_up_as_customer(porche_people, "porchenarak", "Cd23456.")
-web.sign_up_as_mate(mook_people, "mamoruuko","25032005")
-web.sign_up_as_mate(taj_people, "tajnarak", "password")
-web.sign_up_as_mate(nat_people, "transparent", "qwerty123")
+gan_user = web.search_user_by_name("Tamtikorn")
+porche_user = web.search_user_by_name("Nakul")
+mook_user = web.search_user_by_name("Thanatchaya")
+taj_user = web.search_user_by_name("TajIsWomen")
+nat_user = web.search_user_by_name("NattapasIsWomen")
+
+web.sign_up_as_customer(gan_user, "ganxd123", "Ab12345")
+web.sign_up_as_customer(porche_user, "porchenarak", "Cd23456")
+web.sign_up_as_mate(mook_user, "mamoruuko","25032005")
+web.sign_up_as_mate(taj_user, "tajnarak", "password")
+web.sign_up_as_mate(nat_user, "transparent", "qwerty123")
 
 gan_account = web.login("ganxd123", "Ab12345")
 porche_account = web.login("porchenarak", "Cd23456")
@@ -239,9 +366,46 @@ mook_account = web.login("mamoruuko", "25032005")
 taj_account = web.login("tajnarak", "password")
 nat_account = web.login("transparent", "qwerty123")
 
+local_account_list = [gan_account,porche_account,mook_account,taj_account,nat_account]
+# web.print_accounts()
+# print("=")
+# for acc in local_account_list:
+#     print(acc)
+# print(type(mook_account))
+# print(web.mate_list)
+
+mook_account.add_display_name("Mookjung")
+taj_account.add_display_name("Tajung_kawaii")
+
+mook_account.add_available(Available("ECC", "19:00", "21:00", "19 Feb 2024"))
+mook_account.add_available(Available("ECC", "19:00", "21:00", "18 Feb 2024"))
+mook_account.add_available(Available("ECC", "19:00", "21:00", "22 Feb 2024"))
+mook_account.add_available(Available("ECC", "19:00", "21:00", "23 Feb 2024"))
+
+taj_account.add_available(Available("Dormitory", "19:00", "21:00", "22 Feb 2024"))
+taj_account.add_available(Available("Dormitory", "19:00", "21:00", "15 Feb 2024"))
+taj_account.add_available(Available("Dormitory", "19:00", "21:00", "28 Feb 2024"))
+
+mate_by_name = web.search_mate_by_name("jung")
+print(Controller.change_name_to_json(mate_by_name))
+
+
+# print(mate_by_name)
+# print(get_date())
+# print(get_time())
+exit()
+
+
+self.location = ""
+self.time_start = ""
+self.time_end = ""
+self.date = ""
+self.is_rent = False
+self.is_available = False
+
+nat_account.add_available(Available(time.ctime))
 account_list = web.search_mate_by_available()
 # print(account_list)
-gan_account.rent_mate(account_list[2])
 
 
 
