@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 import time
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="index.html")
+app.mount("/rent-a-mate", StaticFiles(directory="rent-a-mate"), name="rent")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -442,8 +442,8 @@ taj_account.add_available(Available("Dormitory", "19:00", "21:00", "22 Feb 2024"
 taj_account.add_available(Available("Dormitory", "19:00", "21:00", "15 Feb 2024"))
 taj_account.add_available(Available("Dormitory", "19:00", "21:00", "28 Feb 2024"))
 nat_account.add_available(Available("811", "19:00", "21:00", "28 Feb 2024"))
-mate_by_name = web.search_mate_by_name("jun", True)
-print(mate_by_name)
+# mate_by_name = web.search_mate_by_name("jun", True)
+# print(mate_by_name)
 # print(Controller.change_name_to_json(mate_by_name))
 
 @app.get("/")
