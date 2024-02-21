@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 import time
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="lab10.html")
+app.mount("/static", StaticFiles(directory="static"), name="index.html")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -446,11 +446,15 @@ mate_by_name = web.search_mate_by_name("jun", True)
 print(mate_by_name)
 # print(Controller.change_name_to_json(mate_by_name))
 
-@app.get("/search_mate_by_name/{display_name}")
+@app.get("/")
+async def root():
+    return {"page": "home"}
+    
+@app.get("/search_mate/{name}")
 async def get_mate(mate_display_name: str):
     return {"mate_list": web.search_mate_by_name(mate_display_name, True)}
 
-@app.get("/search_mate_by_gender/{gender}")
+@app.get("/search_mate/{gender}")
 async def get_mate(mate_gender: str):
     return {"mate_list": web.search_mate_by_gender(mate_gender, True)}
 
