@@ -1,20 +1,4 @@
 import time
-# from typing import Optional
-# from fastapi import FastAPI
-# from fastapi.middleware.cors import CORSMiddleware
-# from fastapi.staticfiles import StaticFiles
-# import time
-
-# app = FastAPI()
-# app.mount("/rent-a-mate", StaticFiles(directory="rent-a-mate"), name="rent")
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["*"],
-#     allow_credentials=True,
-#     allow_methods=["GET", "POST", "PUT", "DELETE"],
-#     allow_headers=[""],
-# )
-
 class Account:
     def __init__(self) -> None:
         self._user = None
@@ -32,9 +16,6 @@ class Account:
     def validate_login(self, username, password):
         return (username == self._username and password == self._password)
     
-    def view_transaction(self):
-        pass
-    
     def set_name(self, name):
         self.name = name
     
@@ -50,9 +31,6 @@ class Customer(Account):
         self._password = password
         self.gender = user.gender
 
-
-    def rent_mate(self):
-        pass
     
     def cancel_mate(self):
         pass
@@ -74,9 +52,13 @@ class Mate(Account):
         self._username = username
         self._password = password
         self.gender = user.gender
+        self.__count = 0
     
     @property
     def available_list(self):
+        return self.__available_list
+    
+    def show_available(self):
         return self.__available_list
     
     def identify_gender(self, gender):
@@ -101,8 +83,14 @@ class Mate(Account):
     def confirm_booking(self):
         pass
     
-    def update_available(self):
-        pass
+    def delete_available(self, available):
+        if not isinstance(available, Available):
+            raise TypeError(f"Expected available, but got {type(available)} instead.")
+        for item in self.__available_list:
+            if item is available:
+                self.__available_list.remove(item)
+                return "Success"
+        return "Not Found"
     
     def create_post(self):
         pass
@@ -159,7 +147,6 @@ class Available:
         # print(self.date.split())
         # print(date.split())
 
-
 class Transaction:
     def __init__(self):
         self.sender_account = None
@@ -209,12 +196,20 @@ class Controller:
     
     @staticmethod
     def change_name_to_json(lst):
+
         name_dict = {}
-        i = 1
-        for item in lst:
+        for i, item in enumerate(lst):
             name_dict[i] = {"name" : item[0].display_name, "gender" : "Female" if item[0].gender == 1 else "Male", "date" : item[1].date }
-            i+=1
         return name_dict
+    
+        # name_dict = {}
+        # i = 1
+        # for item in lst:
+        #     name_dict[i] = {"name" : item[0].display_name, "gender" : "Female" if item[0].gender == 1 else "Male", "date" : item[1].date }
+        #     i+=1
+        # return name_dict
+
+    def book_mate(self, customer, mate, available):
 
 
     def print_accounts(self):
@@ -377,7 +372,6 @@ class Controller:
         min = time.ctime().split()[3].split(":")[1]
         return f"{hr}:{min}"
 
-
 class User:
     def __init__(self, name, age, gender):
         self.__name = name
@@ -405,43 +399,46 @@ class User:
     def check_age_valid(self):
         return self.__age >= 18
         
+def init_default():
+    web = Controller()
+    web.add_user( User("Tamtikorn", 19, 0))
+    web.add_user( User("Nakul", 19, 0))
+    web.add_user( User("Thanatchaya", 19, 1))
+    web.add_user( User("TajIsMen", 19, 0))
+    web.add_user( User("NattapasIsWomen", 20, 1))
 
-web = Controller()
-web.add_user( User("Tamtikorn", 19, 0))
-web.add_user( User("Nakul", 19, 0))
-web.add_user( User("Thanatchaya", 19, 1))
-web.add_user( User("TajIsMen", 19, 0))
-web.add_user( User("NattapasIsWomen", 20, 1))
+    gan_user = web.search_user_by_name("Tamtikorn")
+    porche_user = web.search_user_by_name("Nakul")
+    mook_user = web.search_user_by_name("Thanatchaya")
+    taj_user = web.search_user_by_name("TajIsMen")
+    nat_user = web.search_user_by_name("NattapasIsWomen")
+    web.sign_up_as_customer(gan_user, "ganxd123", "Ab12345")
+    web.sign_up_as_customer(porche_user, "porchenarak", "Cd23456")
+    web.sign_up_as_mate(mook_user, "mamoruuko","25032005")
+    web.sign_up_as_mate(taj_user, "tajnarak", "password")
+    web.sign_up_as_mate(nat_user, "transparent", "qwerty123")
 
-gan_user = web.search_user_by_name("Tamtikorn")
-porche_user = web.search_user_by_name("Nakul")
-mook_user = web.search_user_by_name("Thanatchaya")
-taj_user = web.search_user_by_name("TajIsMen")
-nat_user = web.search_user_by_name("NattapasIsWomen")
+    gan_account = web.login("ganxd123", "Ab12345")
+    porche_account = web.login("porchenarak", "Cd23456")
+    mook_account = web.login("mamoruuko", "25032005")
+    taj_account = web.login("tajnarak", "password")
+    nat_account = web.login("transparent", "qwerty123")
+    mook_account.add_display_name("Mookjung")
+    taj_account.add_display_name("Tajung_kawaii")
+    nat_account.add_display_name("NatKawaiijung")
+    mook_account.add_available(Available("ECC", "19:00", "21:00", "26 Feb 2024"))
+    mook_account.add_available(Available("ECC", "19:00", "21:00", "27 Feb 2024"))
+    mook_account.add_available(Available("ECC", "19:00", "21:00", "28 Feb 2024"))
+    mook_account.add_available(Available("ECC", "19:00", "21:00", "29 Feb 2024"))
+    taj_account.add_available(Available("Dormitory", "19:00", "21:00", "27 Feb 2024"))
+    taj_account.add_available(Available("Dormitory", "19:00", "21:00", "28 Feb 2024"))
+    taj_account.add_available(Available("Dormitory", "19:00", "21:00", "29 Feb 2024"))
+    nat_account.add_available(Available("811", "19:00", "21:00", "28 Feb 2024"))
 
-web.sign_up_as_customer(gan_user, "ganxd123", "Ab12345")
-web.sign_up_as_customer(porche_user, "porchenarak", "Cd23456")
-web.sign_up_as_mate(mook_user, "mamoruuko","25032005")
-web.sign_up_as_mate(taj_user, "tajnarak", "password")
-web.sign_up_as_mate(nat_user, "transparent", "qwerty123")
-
-gan_account = web.login("ganxd123", "Ab12345")
-porche_account = web.login("porchenarak", "Cd23456")
-mook_account = web.login("mamoruuko", "25032005")
-taj_account = web.login("tajnarak", "password")
-nat_account = web.login("transparent", "qwerty123")
-local_account_list = [gan_account,porche_account,mook_account,taj_account,nat_account]
-mook_account.add_display_name("Mookjung")
-taj_account.add_display_name("Tajung_kawaii")
-nat_account.add_display_name("NatKawaiijung")
-mook_account.add_available(Available("ECC", "19:00", "21:00", "19 Feb 2024"))
-mook_account.add_available(Available("ECC", "19:00", "21:00", "18 Feb 2024"))
-mook_account.add_available(Available("ECC", "19:00", "21:00", "22 Feb 2024"))
-mook_account.add_available(Available("ECC", "19:00", "21:00", "23 Feb 2024"))
-taj_account.add_available(Available("Dormitory", "19:00", "21:00", "22 Feb 2024"))
-taj_account.add_available(Available("Dormitory", "19:00", "21:00", "15 Feb 2024"))
-taj_account.add_available(Available("Dormitory", "19:00", "21:00", "28 Feb 2024"))
-nat_account.add_available(Available("811", "19:00", "21:00", "28 Feb 2024"))
+    local_user_list = [gan_user, porche_user, mook_user, taj_user, nat_user]
+    local_account_list = [gan_account,porche_account,mook_account,taj_account,nat_account]
+    return (web, local_user_list, local_account_list)
+web , user_list, acc_list = init_default()
 # mate_by_name = web.search_mate_by_name("jun", True)
 # print(mate_by_name)
 # print(Controller.change_name_to_json(mate_by_name))
