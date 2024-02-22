@@ -449,12 +449,21 @@ nat_account.add_available(Available("811", "19:00", "21:00", "28 Feb 2024"))
 @app.get("/")
 async def root():
     return {"page": "home"}
-    
-@app.get("/search_mate/{name}")
-async def get_mate(mate_display_name: str):
-    return {"mate_list": web.search_mate_by_name(mate_display_name, True)}
 
-@app.get("/search_mate/{gender}")
-async def get_mate(mate_gender: str):
-    return {"mate_list": web.search_mate_by_gender(mate_gender, True)}
+@app.get("/search_mate/")
+async def get_mate(name: Optional[str] = None, gender: Optional[str] = None):
+    if name:
+        return {"mate_list": web.search_mate_by_name(name, True)}
+    elif gender:
+        return {"mate_list": web.search_mate_by_gender(gender, True)}
+    else:
+        return {"error": "Please provide either 'name' or 'gender' as query parameters."}
+    
+# @app.get("/search_mate/{name}")
+# async def get_mate(mate_display_name: str):
+#     return {"mate_list": web.search_mate_by_name(mate_display_name, True)}
+
+# @app.get("/search_mate/{gender}")
+# async def get_mate(mate_gender: str):
+#     return {"mate_list": web.search_mate_by_gender(mate_gender, True)}
 

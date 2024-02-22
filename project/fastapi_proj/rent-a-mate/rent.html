@@ -11,81 +11,48 @@
         <!-- mate items will be dynamically added here  -->
     </ul>
 
-    <form id="add-mate-form">
+    <form id="search-mate-form">
         <label for="name">Mate Name:</label>
         <input type="text" id="mate_name" name="mate_name"> 
-        <button type="submit">Add</button>
+        <label for="gender">Mate Gender:</label>
+        <select id="mate_gender" name="mate_gender">
+            <option value="F">Female</option>
+            <option value="M">Male</option>
+        </select>
+        <button type="button" onclick="searchMates()">Search</button>
     </form> 
+
     <script>
-          const mate_container = document.getElementById('mate-list');
-          const mate_name = document.getElementById('mate_name');
+        const mate_container = document.getElementById('mate-list');
 
+        function searchMates() {
+            const mate_name = document.getElementById('mate_name').value;
+            const mate_gender = document.getElementById('mate_gender').value;
+            render_mate_list(mate_name, mate_gender);
+        }
 
-          function render_mate_list() {
-                fetch(`/search_mate/`, {
-                        body: JSON.stringify(mate_name)
-                    }    
-                )
-                    .then(response => response.json())
-                    .then(mate_list => {
-                        mate_container.innerHTML = '';
-                        mate_list.forEach(mate => {
-                            const listItem = document.createElement('li');
-                            listItem.textContent = `${mate.name} (Date: ${mate.date})`;
-                            mate_container.appendChild(listItem);
-                        });
-                    });
-
-            //          addTodoForm.addEventListener('submit', function (event) {
-            //     event.preventDefault();
-            //     const newTodoIdInput = document.getElementById('new-todo-id');
-            //     const newTodoActivityInput = document.getElementById('new-todo-activity');
-
-            //     const newTodo = {
-            //         "id": parseInt(newTodoIdInput.value),
-            //         "activity": newTodoActivityInput.value
-            //     };
-
-            //     fetch('/todo', {
-            //         method: 'POST',
-            //         headers: {
-            //             'Content-Type': 'application/json',
-            //         },
-            //         body: JSON.stringify(newTodo),
-            //     })
-            //     .then(response => response.json())
-            //     .then(() => {
-            //         newTodoIdInput.value = '';
-            //         newTodoActivityInput.value = '';
-            //         renderTodoList();
-            //     });
-            // });
-
-            addTodoForm.addEventListener('submit', function (event) {
-                event.preventDefault();
-                const newTodoIdInput = document.getElementById('new-todo-id');
-                const newTodoActivityInput = document.getElementById('new-todo-activity');
-
-                const newTodo = {
-                    "id": parseInt(newTodoIdInput.value),
-                    "activity": newTodoActivityInput.value
-                };
-
-                fetch('/todo', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(newTodo),
-                })
-                .then(response => response.json())
-                .then(() => {
-                    newTodoIdInput.value = '';
-                    newTodoActivityInput.value = '';
-                    renderTodoList();
-                });
-            });
+        function render_mate_list(name, gender) {
+            let url = `/search_mate/`;
+            if (name) {
+                url += `?name=${encodeURIComponent(name)}`;
             }
+            if (gender) {
+                url += `${name ? '&' : '?'}gender=${encodeURIComponent(gender)}`;
+            }
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    mate_container.innerHTML = '';
+                    data.mate_list.forEach(mate => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `${mate.name} (Date: ${mate.date})`;
+                        mate_container.appendChild(listItem);
+                    });
+                });
+        }
+        // Initial render
+        render_mate_list('', '');
     </script> 
 </body>
 </html>
