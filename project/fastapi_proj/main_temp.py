@@ -25,10 +25,7 @@ class Account:
 class Customer(Account):
     
     def __init__(self, user, username, password):
-        super().__init__()
-        self._user = user
-        self._username = username
-        self._password = password
+        super().__init__(user, username, password)
         self.gender = user.gender
 
     
@@ -46,11 +43,8 @@ class Customer(Account):
 
 class Mate(Account):
     def __init__(self, user, username, password):
-        super().__init__()
+        super().__init__(user, username, password)
         self.__available_list = []
-        self._user = user
-        self._username = username
-        self._password = password
         self.gender = user.gender
         self.__count = 0
     
@@ -104,15 +98,26 @@ class Mate(Account):
 class Review:
     pass
 
-class Payment:
+class Booking:
+    def __init__(self, customer, mate, available) -> None:
+        self.__customer = customer
+        self.__mate = mate
+        self.__available = available
+        self.__payment = None
+        self.__status = None
+
+    def create_payment(self):
+        pass
+
+class Payment(Booking):
+    def __init__(self, customer, mate, available) -> None:
+        super().__init__(customer, mate, available)
+        self.__status = None
+
     def create_transaction(self):
         pass
     
     def create_chat(self):
-        pass
-
-class Booking:
-    def create_payment(self):
         pass
 
 class Available:
@@ -210,11 +215,12 @@ class Controller:
         # return name_dict
 
     def book_mate(self, customer, mate, available):
-
+        Booking()
 
     def print_accounts(self):
         for user in self.__user_list:
             print(user.account)
+
     def search_user_by_name(self, name : str):
         if not isinstance(name, str):
             return "Error"
