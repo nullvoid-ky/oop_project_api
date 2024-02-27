@@ -33,6 +33,6 @@ class Mate(Account):
     def set_availablility(self):
         pass
     
-    def create_post(self, title, pic):
-        post = Post(title, pic)
+    # def create_post(self, title, pic):
+    #     post = Post(title, pic)
         
