@@ -1,8 +1,8 @@
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .dependencies import create_token, verify_token
-from .routers import auth
+from dependencies import create_token, verify_token
+from routers import auth
 
 
 app = FastAPI(dependencies=[Depends(verify_token)])
