@@ -21,7 +21,7 @@ async def talking(body : MessageModel):
     if(respond):
         return Responses.success_response_status(status.HTTP_200_OK, "Send message Success", None)
     else:
-        return Responses.error_response_status(status.HTTP_400_BAD_REQUEST, "Send message Error", None)
+        return Responses.error_response_status(status.HTTP_400_BAD_REQUEST, "Send message Error")
     
 
 @router.get("/chat-history")

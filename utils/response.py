@@ -8,8 +8,7 @@ class Responses:
     def success_response_status(status: int, message: str, data):
         return JSONResponse(
             status_code=status,
-            content={"message": message},
-            data=data
+            content={"message": message, "data":data},
         ) 
     @staticmethod
     def error_response_status(status: int, message: str):

@@ -14,16 +14,23 @@ class Controller:
     
     def add_chat_room(self, chat):
         self.__chat_list.append(chat)
+
+    def add_account_instance(self, acc):
+        self.__account_list.append(acc)
+        print("\nAdd acc success : len ", len(self.__account_list))
     
     def search_account_by_id(self, id):
+        print("\n\n")
+        print(len(self.__account_list))
         for acc in self.__account_list:
-            acc_id = acc.id()
-            if(id == acc_id):
+            print(acc.get_account_details())
+            if(id == str(acc.id)):
                 return acc
         return None
 
     def get_chat_by_owner_pair(self, owner1, owner2):
         if not (isinstance(owner1, Account) and isinstance(owner2, Account)):
+            print(type(owner1), type(owner2))
             raise TypeError("owner1, owner2 must be Account instances")
         
         for chat in self.__chat_list:
@@ -36,8 +43,10 @@ class Controller:
         return None
 
     def talk(self, sender_id, receiver_id, text):
+        print(sender_id, receiver_id)
         sender = self.search_account_by_id(sender_id)
         receiver = self.search_account_by_id(receiver_id)
+        print(type(sender), type(receiver))
         chat = self.get_chat_by_owner_pair(sender, receiver)
 
         if(chat != None):
