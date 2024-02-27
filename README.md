@@ -1,2 +1,3 @@
-# oop_project
-Project for OOP
+01076106 Object Oriented Programming Project : 2/2566
+ภาควิชาวิศวกรรมคอมพิวเตอร์ คณะวิศวกรรมศาสตร์
+สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง
