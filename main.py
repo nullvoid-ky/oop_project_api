@@ -1,16 +1,12 @@
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from dependencies import create_token, verify_token
 from routers import auth, payment
 from internal.controller import Controller
 from internal.response import Responses
-from utils.create_instance import create_instance
 
 responses = Responses()
 controller = Controller()
-
-create_instance()
 
 app = FastAPI()
 app.add_middleware(
