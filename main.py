@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dependencies import create_token, verify_token
 from routers import auth
 from internal.controller import Controller
+from models.message import MessageModel
 
 controller = Controller()
 
@@ -25,8 +26,8 @@ app.include_router(
 controller = Controller()
 
 @app.post("/talk")
-async def talking(sender_id: str, receiver_id: str, text: str):
-    controller.talk(sender_id, receiver_id, text)
+async def talking(message : MessageModel):
+    controller.talk(message.sender_id, message.receiver_id, message.text)
     return "Sending msg success!!!"
 
 @app.get("/chat_history")
