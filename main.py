@@ -19,3 +19,7 @@ app.include_router(
     prefix="/api",
     tags=["auth"]
 )
+
+@app.get("/")
+async def read_root():
+  return {"message": "This is API for Athletix website."}

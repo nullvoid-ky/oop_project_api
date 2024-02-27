@@ -1,4 +1,6 @@
 from internal.account import Account
+from internal.mate import Mate
+from internal.customer import Customer
 
 class Controller:
     def __init__(self) -> None:
@@ -14,4 +16,24 @@ class Controller:
         for account in self.__account_list:
             if account.username == username:
                 return account
+        return None
+    
+    def get_account_by_name(self, name: str) -> Account | None:
+        for account in self.__account_list:
+            if name in account.name:
+                return account
+        return None
+
+    def get_mates(self) -> Account | None:
+        mate_list = []
+        for account in self.__account_list:
+            if isinstance(account, Mate):
+                mate_list.append(account)
+        return None
+
+    def get_customers(self) -> Account | None:
+        customer_list = []
+        for account in self.__account_list:
+            if isinstance(account, Customer):
+                customer_list.append(account)
         return None
