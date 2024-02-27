@@ -1,6 +1,6 @@
 from internal.account import Account
 from internal.mate import Mate
-from internal.customer import Customer
+# from internal.customer import Customer
 from internal.review import Review
 
 class Controller:
@@ -32,12 +32,12 @@ class Controller:
                 mate_list.append(account)
         return mate_list
 
-    def get_customers(self) -> Account | None:
-        customer_list = []
-        for account in self.__account_list:
-            if isinstance(account, Customer):
-                customer_list.append(account)
-        return None
+    # def get_customers(self) -> Account | None:
+    #     customer_list = []
+    #     for account in self.__account_list:
+    #         if isinstance(account, Customer):
+    #             customer_list.append(account)
+    #     return None
     
     def add_review_mate(self, customer_id, mate_id, message, star) -> Review | None:
         for mate in self.get_mates():

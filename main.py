@@ -1,11 +1,11 @@
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from internal.controller import Controller
+# from .dependencies import verify_token
+from .routers import *
 
-from .dependencies import create_token, verify_token
-from .routers import auth
-
-
-app = FastAPI(dependencies=[Depends(verify_token)])
+controller = Controller()
+app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -14,10 +14,16 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+# app.include_router(
+#     auth.router,
+#     prefix="/api",
+#     tags=["auth"]
+# )
+
 app.include_router(
-    auth.router,
-    prefix="/api",
-    tags=["auth"]
+    controller.router,
+    prefix="/controller",
+    tags=["controller"]
 )
 
 @app.get("/")
