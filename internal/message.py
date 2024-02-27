@@ -8,6 +8,9 @@ class Message:
     def get_sender_name(self):
         return self.__sender.get_username()
     
+    def get_sender_account(self):
+        return self.__sender
+    
     def get_text(self):
         return self.__text
     

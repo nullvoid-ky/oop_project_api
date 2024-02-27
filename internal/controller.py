@@ -65,7 +65,36 @@ class Controller:
             }
             all_chat_data.append(chat_data)
 
-        return all_chat_data
+        return all_chat_data   
+
+    def get_receiver_chat_room_detail(self, sender_acc):
+        detail = []
+        if not (isinstance(sender_acc, Account)):
+            raise TypeError("receiver_acc must be Account instances")
+        
+        for chat in self.__chat_list:
+            chat_owner1 = chat.get_owner1()
+            chat_owner2 = chat.get_owner2()
+            
+            if((sender_acc in [chat_owner1, chat_owner2])):
+                latest_chat = chat.get_message_list()[-1]
+                detail.append({
+                        'account_detail' : latest_chat.get_sender_account().get_account_details(),
+                        'latest_timestamp' : latest_chat.get_timestamp(),
+                        'latest_text' : latest_chat.get_text(),
+                })
+        
+        return detail
+    
+
+    def retrieve_chat_room(self, sender_id):
+        sender_acc = self.search_account_by_id(sender_id)
+
+        if not (isinstance(sender_acc, Account)):
+            raise "No Acc found"
+        detail = self.get_receiver_chat_room_detail(sender_acc)
+
+        return detail
     
     def add_account(self, username: str, password: str) -> Account:
         account: Account = Account(username, password)
