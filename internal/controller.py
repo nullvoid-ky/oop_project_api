@@ -1,6 +1,7 @@
 from internal.account import Account
 from internal.message import Message
 import datetime
+import bcrypt
 
 class Controller:
     def __init__(self) -> None:
@@ -71,8 +72,30 @@ class Controller:
         self.__account_list.append(account)
         return account
 
-    def get_account_by_username(self, username: str) -> Account | None:
+    async def get_account_by_username(self, username: str) -> Account | None:
         for account in self.__account_list:
             if account.username == username:
                 return account
         return None
+    
+    class Auth:
+        def __init__(self, username: str, password: str) -> None:
+            self.__user = username
+            self.__password = password
+
+        async def register(self) -> dict | None:
+            account: Account = await self.get_account_by_username(self.__user)
+            if account == None:
+                # return None
+                hashed_password = bcrypt.hashpw(self.__password.encode('utf-8'), bcrypt.gensalt())
+                new_account: Account = self.add_account(self.__user, str(hashed_password))
+                return new_account.get_account_details()
+            return None
+
+        async def login(self):
+            account: Account = await self.get_account_by_username(self.__user)
+            if account == None:
+                return None
+            if bcrypt.checkpw(self.__password.encode('utf-8'), account.password):
+                return account.get_account_details()
+            return None

@@ -5,8 +5,9 @@ from dependencies import create_token, verify_token
 from routers import auth
 from internal.controller import Controller
 
+controller = Controller()
 
-app = FastAPI(dependencies=[Depends(verify_token)])
+app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
