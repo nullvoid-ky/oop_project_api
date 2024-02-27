@@ -43,6 +43,8 @@ class Controller:
         if(chat != None):
             timestamp = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
             chat.save_chat_log(Message(sender, receiver, text, timestamp))
+            return chat
+        return None
 
     def retrieve_chat_log(self, sender_id, receiver_id):
         sender_acc = self.search_account_by_id(sender_id)
