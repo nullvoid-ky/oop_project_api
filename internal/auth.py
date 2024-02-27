@@ -3,23 +3,28 @@ import bcrypt
 
 class Auth:
     def __init__(self, username: str, password: str) -> None:
-        self.__user = username
+        self.__username = username
         self.__password = password
     
-    async def register(self) -> dict | None:
+    async def register(self, role: str) -> dict | None:
         from main import controller
-        account: Account = await controller.get_account_by_username(self.__user)
+        account: Account = await controller.get_account_by_username(self.__username)
         if account == None:
             hashed_password = bcrypt.hashpw(self.__password.encode('utf-8'), bcrypt.gensalt())
-            new_account: Account = controller.add_account(self.__user, str(hashed_password))
+            if role == "customer":
+                new_account: Account = await controller.add_customer(self.__username, hashed_password)
+            elif role == "mate":
+                new_account: Account = await controller.add_mate(self.__username, hashed_password)
+            else:
+                return None
             return new_account.get_account_details()
         return None
 
-    async def login(self):
+    async def login(self) -> dict | None:
         from main import controller
-        account: Account = await controller.get_account_by_username(self.__user)
+        account: Account = await controller.get_account_by_username(self.__username)
         if account == None:
             return None
-        if bcrypt.checkpw(self.__password.encode('utf-8'), account.password):
+        if bcrypt.checkpw(self.__password.encode('utf-8'), bytes(account.password)):
             return account.get_account_details()
         return None
