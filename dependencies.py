@@ -8,7 +8,6 @@ from fastapi import Header, HTTPException
 load_dotenv()
 
 def create_token(user_id: str = Annotated[str, "user_id"]) -> str:
-    print(os.environ['JWT_SECRET'])
     token: str = jwt.encode(payload={ "user_id": user_id }, key=os.environ['JWT_SECRET'], algorithm="HS256")
     return token
 
