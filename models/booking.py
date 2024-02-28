@@ -1,4 +1,4 @@
 from pydantic import BaseModel
 
-class PaymentModel(BaseModel):
+class BookingModel(BaseModel):
     booking_id: str

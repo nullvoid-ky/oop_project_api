@@ -50,6 +50,7 @@ class Controller:
     def add_booking(self, customer: Customer, mate: Mate, amount: int) -> Booking:
         booking: Booking = Booking(customer, mate, Payment(amount))
         self.__booking_list.append(booking)
+        print(booking.id)
         return booking
 
     async def get_account_by_username(self, username: str) -> Account | None:
@@ -75,6 +76,12 @@ class Controller:
             if str(account.id) == mate_id:
                 return account
         return None
+    
+    async def search_booking(self, booking_id: str) -> dict:
+        for booking in self.__booking_list:
+            if str(booking.id) == booking_id:
+                print(booking.get_booking_detail())
+                return booking.get_booking_detail()
 
     async def create_payment(self, booking_id: str) -> dict:
         booking: Booking = await self.search_booking_by_id(booking_id)

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from fastapi import status
 
 from dependencies import verify_token
-from models.payment import PaymentModel
+from models.booking import BookingModel
 
 router = APIRouter(
     prefix="/payment",
@@ -11,7 +11,7 @@ router = APIRouter(
 )
 
 @router.post("/create-payment")
-async def create_payment(body: PaymentModel):
+async def create_payment(body: BookingModel):
     from main import responses, controller
     transaction: dict = await controller.create_payment(body.booking_id)
     if transaction == None:

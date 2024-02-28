@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import auth, payment
+from routers import auth, payment, booking
 from internal.controller import Controller
 from internal.response import Responses
 
@@ -26,4 +26,9 @@ app.include_router(
     payment.router,
     prefix="/api",
     tags=["payment"]
+)
+app.include_router(
+    booking.router,
+    prefix="/api",
+    tags=["booking"]
 )

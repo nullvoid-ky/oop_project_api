@@ -24,7 +24,7 @@ class Account:
         return self.__money
     def get_account_details(self) -> dict:
         return {
-            "id": self.__id,
+            "id": str(self.__id),
             "username": self.__username,
             "pic_url": self.__pic_url
         }
