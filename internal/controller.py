@@ -80,7 +80,6 @@ class Controller:
     async def search_booking(self, booking_id: str) -> dict:
         for booking in self.__booking_list:
             if str(booking.id) == booking_id:
-                print(booking.get_booking_detail())
                 return booking.get_booking_detail()
 
     async def create_payment(self, booking_id: str) -> dict:
