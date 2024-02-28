@@ -1,4 +1,4 @@
-from internal.account import Account
+from ..internal.account import Account
 
 class Controller:
     def __init__(self) -> None:

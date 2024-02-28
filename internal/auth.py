@@ -1,5 +1,5 @@
-from internal.controller import Controller
-from internal.account import Account  
+from ..internal.controller import Controller
+from ..internal.account import Account  
 import bcrypt 
 
 controller = Controller() 
