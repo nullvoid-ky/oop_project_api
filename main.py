@@ -22,6 +22,8 @@ customer_acc = Account("Kan", "1234")
 print(customer_acc.id)
 mate_acc = Account("Gan", "1234")
 print(mate_acc.id)
+mate_acc2 = Account("Nan", "1234")
+print(mate_acc2.id)
 # controller.__account_list = [
 #     customer_acc,
 #     mate_acc
@@ -29,8 +31,10 @@ print(mate_acc.id)
 
 controller.add_account_instance(customer_acc)
 controller.add_account_instance(mate_acc)
+controller.add_account_instance(mate_acc2)
 
 controller.add_chat_room(Chat(customer_acc, mate_acc))
+controller.add_chat_room(Chat(customer_acc, mate_acc2))
 
 app.include_router(
     auth.router,

@@ -6,7 +6,7 @@ class Message:
         self.__timestamp = timestamp
     
     def get_sender_name(self):
-        return self.__sender.get_username()
+        return self.__sender.username
     
     def get_sender_account(self):
         return self.__sender

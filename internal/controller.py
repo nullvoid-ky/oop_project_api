@@ -87,7 +87,7 @@ class Controller:
             chat_owner1 = chat.get_owner1()
             chat_owner2 = chat.get_owner2()
             
-            if((sender_acc in [chat_owner1, chat_owner2])):
+            if((sender_acc in [chat_owner1, chat_owner2]) and len(chat.get_message_list()) >= 1):
                 latest_chat = chat.get_message_list()[-1]
                 detail.append({
                         'account_detail' : latest_chat.get_sender_account().get_account_details(),
