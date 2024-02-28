@@ -11,9 +11,9 @@ router = APIRouter(
 )
 
 @router.post("/create-payment")
-async def create_payment(body: BookingModel):
+async def add_payment(body: BookingModel):
     from main import responses, controller
-    transaction: dict = await controller.create_payment(body.booking_id)
+    transaction: dict = await controller.add_payment(body.booking_id)
     if transaction == None:
         return responses.error_response_status(status.HTTP_404_NOT_FOUND, "Booking not found")
     return responses.success_response_status(status.HTTP_201_CREATED, "Payment created", transaction)

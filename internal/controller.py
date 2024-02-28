@@ -31,7 +31,7 @@ class Controller:
         self.add_booking(self.account_list[6], self.account_list[7], 400)
 
     async def add_customer(self, username: str, password: bytes) -> Customer:
-        existed_account: Account = await self.get_account_by_username(username)
+        existed_account: Account = await self.search_account_by_username(username)
         if existed_account != None:
             return None
         customer: Customer = Customer(username, password)
@@ -40,7 +40,7 @@ class Controller:
         return customer
 
     async def add_mate(self, username: str, password: str) -> Mate:
-        existed_account: Account = await self.get_account_by_username(username)
+        existed_account: Account = await self.search_account_by_username(username)
         if existed_account != None:
             return None
         mate: Mate = Mate(username, password)
@@ -53,7 +53,7 @@ class Controller:
         print(booking.id)
         return booking
 
-    async def get_account_by_username(self, username: str) -> Account | None:
+    async def search_account_by_username(self, username: str) -> Account | None:
         for account in self.__account_list:
             if account.username == username:
                 return account
@@ -82,7 +82,7 @@ class Controller:
             if str(booking.id) == booking_id:
                 return booking.get_booking_detail()
 
-    async def create_payment(self, booking_id: str) -> dict:
+    async def add_payment(self, booking_id: str) -> dict:
         booking: Booking = await self.search_booking_by_id(booking_id)
         if booking == None:
             return "Booking not found"

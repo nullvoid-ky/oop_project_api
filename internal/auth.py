@@ -8,7 +8,7 @@ class Auth:
     
     async def register(self, role: str) -> dict | None:
         from main import controller
-        account: Account = await controller.get_account_by_username(self.__username)
+        account: Account = await controller.search_account_by_username(self.__username)
         if account == None:
             hashed_password = bcrypt.hashpw(self.__password.encode('utf-8'), bcrypt.gensalt())
             if role == "customer":
@@ -22,7 +22,7 @@ class Auth:
 
     async def login(self) -> dict | None:
         from main import controller
-        account: Account = await controller.get_account_by_username(self.__username)
+        account: Account = await controller.search_account_by_username(self.__username)
         if account == None:
             return None
         if bcrypt.checkpw(self.__password.encode('utf-8'), bytes(account.password)):
