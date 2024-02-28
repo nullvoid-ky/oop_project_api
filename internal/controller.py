@@ -1,5 +1,6 @@
 from internal.account import Account
 from internal.message import Message
+from internal.chat import Chat
 import datetime
 import bcrypt
 
@@ -13,6 +14,9 @@ class Controller:
         return self.__chat_list
     
     def add_chat_room(self, chat):
+        if not (isinstance(chat, Chat)):
+            raise TypeError("chat must be Chat instances")
+
         self.__chat_list.append(chat)
 
     def add_account_instance(self, acc):
@@ -30,7 +34,6 @@ class Controller:
 
     def get_chat_by_owner_pair(self, owner1, owner2):
         if not (isinstance(owner1, Account) and isinstance(owner2, Account)):
-            print(type(owner1), type(owner2))
             raise TypeError("owner1, owner2 must be Account instances")
         
         for chat in self.__chat_list:
