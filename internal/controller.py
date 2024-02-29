@@ -109,7 +109,7 @@ class Controller:
         sender_acc = self.search_account_by_id(sender_id)
 
         if not (isinstance(sender_acc, Account)):
-            raise "No Acc found"
+            raise TypeError("No Acc found")
         detail = self.get_receiver_chat_room_detail(sender_acc)
 
         return detail
