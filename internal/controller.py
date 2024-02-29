@@ -120,7 +120,7 @@ class Controller:
     def booking_list(self) -> list:
         return self.__booking_list
 
-    async def create_instance(self):
+    async def add_instance(self):
         await self.add_customer("test1", "test1")
         await self.add_mate("test2", "test2")
         await self.add_customer("test3", "test3")
@@ -160,7 +160,7 @@ class Controller:
         return mate
 
     def add_booking(self, customer: Customer, mate: Mate, amount: int) -> Booking:
-        booking: Booking = Booking(customer, mate)
+        booking: Booking = Booking(customer, mate, Payment(amount, False))
         self.__booking_list.append(booking)
         return booking
 
