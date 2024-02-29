@@ -26,10 +26,7 @@ class Controller:
 
         self.__chat_list.append(chat)
 
-    # def add_account_instance(self, acc):
-    #     self.__account_list.append(acc)
-    #     print("\nAdd acc success : len ", len(self.__account_list))
-    
+  
     def search_account_by_id(self, id):
         # print("\n\n")
         # print(len(self.__account_list))

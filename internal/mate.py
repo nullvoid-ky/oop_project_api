@@ -4,8 +4,8 @@ from internal.review import Review
 import datetime
 
 class Mate(Account):
-    def __init__(self, user, username, password):
-        super().__init__(user, username, password)
+    def __init__(self, username, password):
+        super().__init__(username, password)
         self.__availablility_list = []
         self.__review_list = []    
     @property
@@ -32,9 +32,6 @@ class Mate(Account):
     
     def set_availablility(self):
         pass
-    
-    # def create_post(self, title, pic):
-    #     post = Post(title, pic)
     
     def add_review_mate(self, customer_id, message, star) -> Review | None:
         if not isinstance(customer_id , str):
