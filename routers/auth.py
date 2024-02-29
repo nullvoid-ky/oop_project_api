@@ -29,6 +29,6 @@ async def register(body: RegisterModel):
     account: dict = await auth.register(body.role)
     if account:
         token: str = create_token(str(account["id"]))
-        return responses.success_response_status(status=status.HTTP_201_addD, message="Account addd", data={"token": token, "username": account["username"], "pic_url": account["pic_url"]})
+        return responses.success_response_status(status=status.HTTP_201_CREATED, message="Account added", data={"token": token, "username": account["username"], "pic_url": account["pic_url"]})
     else:
         return responses.error_response_status(status.HTTP_400_BAD_REQUEST, "Account already exists")

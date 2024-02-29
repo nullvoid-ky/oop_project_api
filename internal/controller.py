@@ -126,7 +126,7 @@ class Controller:
         self.add_chat_room(Chat(customer_acc, mate_acc))
         self.add_chat_room(Chat(customer_acc, mate_acc2))
 
-    async def add_customer(self, username: str, password: bytes) -> Customer:
+    async def add_customer(self, username: str, password: str) -> Customer:
         existed_account: Account = await self.search_account_by_username(username)
         if existed_account != None:
             return None
@@ -134,7 +134,7 @@ class Controller:
         self.__account_list.append(customer)
         return customer
 
-    async def add_mate(self, username: str, password: bytes) -> Mate:
+    async def add_mate(self, username: str, password: str) -> Mate:
         existed_account: Account = await self.search_account_by_username(username)
         if existed_account != None:
             return None

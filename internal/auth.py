@@ -1,6 +1,8 @@
-from internal.controller import Controller
 from internal.account import Account  
-import bcrypt 
+import bcrypt
+from argon2 import PasswordHasher 
+
+ph = PasswordHasher()
 
 class Auth:
     def __init__(self, username: str, password: str) -> None:
@@ -11,7 +13,7 @@ class Auth:
         from main import controller
         account: Account = await controller.search_account_by_username(self.__username)
         if account == None:
-            hashed_password = bcrypt.hashpw(self.__password.encode('utf-8'), bcrypt.gensalt())
+            hashed_password: str = ph.hash(self.__password)
             if role == "customer":
                 new_account: Account = await controller.add_customer(self.__username, hashed_password)
             elif role == "mate":
@@ -27,6 +29,8 @@ class Auth:
         account: Account = await controller.search_account_by_username(self.__username)
         if account == None:
             return None
-        if bcrypt.checkpw(self.__password.encode('utf-8'), bytes(account.password)):
+        try:
+            ph.verify(account.password, self.__password)
             return account.get_account_details()
-        return None
+        except:
+            return None
