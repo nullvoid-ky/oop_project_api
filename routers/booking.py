@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends
 from fastapi import status
-
 from dependencies import verify_token
 
 router = APIRouter(
