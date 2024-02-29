@@ -20,9 +20,9 @@ app.add_middleware(
 controller = Controller()
 
 app.include_router(
-    auth.router,
-    prefix="/api",
-    tags=["auth"]
+    controller.router,
+    prefix="/controller",
+    tags=["controller"]
 )
 app.include_router(
     chat.router,

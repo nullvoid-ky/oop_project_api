@@ -7,6 +7,9 @@ from internal.mate import Mate
 from internal.customer import Customer
 from internal.payment import Payment
 from internal.transaction import Transaction
+from internal.mate import Mate
+# from internal.customer import Customer
+from internal.review import Review
 
 class Controller:
     def __init__(self) -> None:
@@ -23,10 +26,7 @@ class Controller:
 
         self.__chat_list.append(chat)
 
-    # def add_account_instance(self, acc):
-    #     self.__account_list.append(acc)
-    #     print("\nAdd acc success : len ", len(self.__account_list))
-    
+  
     def search_account_by_id(self, id):
         # print("\n\n")
         # print(len(self.__account_list))
@@ -208,3 +208,30 @@ class Controller:
         self.add_chat_room(Chat(customer, mate))
         transaction: Transaction = Transaction(customer, mate, payment.amount)
         return transaction.get_transaction_details()
+    
+    def get_account_by_name(self, name: str) -> Account | None:
+        for account in self.__account_list:
+            if name in account.name:
+                return account
+        return None
+
+    def get_mates(self) -> Account | None:
+        mate_list = []
+        for account in self.__account_list:
+            if isinstance(account, Mate):
+                mate_list.append(account)
+        return mate_list
+
+    # def get_customers(self) -> Account | None:
+    #     customer_list = []
+    #     for account in self.__account_list:
+    #         if isinstance(account, Customer):
+    #             customer_list.append(account)
+    #     return None
+    
+    def add_review_mate(self, customer_id, mate_id, message, star) -> Review | None:
+        for mate in self.get_mates():
+            if (mate.id == mate_id):
+                review = mate.add_review_mate(customer_id, message, star)
+                return review
+        return None

@@ -3,6 +3,7 @@ from uuid import uuid4, UUID
 class Account:
     def __init__(self, username: str, password: str, pic_url: str = None, money: int = None) -> None:
         self.__id: UUID = uuid4()
+        self.__display_name : str = username
         self.__username: str = username
         self.__password: str = password
         self.__pic_url: str = ""
@@ -17,11 +18,12 @@ class Account:
     def password(self) -> str:
         return self.__password
     @property
-    def id(self) -> str:
-        return str(self.__id)
-    @property   
-    def money(self) -> int:
-        return self.__money
+    def display_name(self) -> str:
+        return self.__display_name
+    @property
+    def id(self) -> uuid:
+        return self.__id
+    
     def get_account_details(self) -> dict:
         return {
             "id": str(self.__id),
