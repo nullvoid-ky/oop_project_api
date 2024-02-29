@@ -21,7 +21,7 @@ class Account:
     def display_name(self) -> str:
         return self.__display_name
     @property
-    def id(self) -> uuid:
+    def id(self) -> UUID:
         return self.__id
     
     def get_account_details(self) -> dict:
