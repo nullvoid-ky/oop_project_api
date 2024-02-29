@@ -4,7 +4,7 @@ from internal.mate import Mate
 from internal.payment import Payment
 
 class Booking:
-    def __init__(self, customer: Customer, mate: Mate, payment: Payment = Payment(0)) -> None:
+    def __init__(self, customer: Customer, mate: Mate, payment: Payment = Payment(0, False)) -> None:
         self.__id = uuid4()
         self.__customer = customer
         self.__mate = mate

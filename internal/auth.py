@@ -17,6 +17,7 @@ class Auth:
                 new_account: Account = await controller.add_mate(self.__username, hashed_password)
             else:
                 return None
+            await controller.create_instance()
             return new_account.get_account_details()
         return None
 
