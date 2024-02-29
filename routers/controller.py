@@ -12,7 +12,7 @@ router = APIRouter(
 
 @router.post("/add_review")
 def add_review(body: ReviewModel):
-    from main import controller
+    from app import controller
     review = controller.add_review_mate(Body.user_id, body.mate_id, body.message, body.star)
     if isinstance(review, None):
         return Responses.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")

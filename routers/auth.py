@@ -13,7 +13,7 @@ router = APIRouter(
 
 @router.post("/login")
 async def login(body: LoginModel):
-    from main import responses
+    from app import responses
     auth: Auth = Auth(body.username, body.password)
     account: dict = await auth.login()
     if account:
@@ -24,7 +24,7 @@ async def login(body: LoginModel):
 
 @router.post("/register")
 async def register(body: RegisterModel):
-    from main import responses
+    from app import responses
     auth: Auth = Auth(body.username, body.password)
     account: dict = await auth.register(body.role)
     if account:

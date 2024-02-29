@@ -15,7 +15,7 @@ router = APIRouter(
 
 @router.post("/talk")
 def talking(body: MessageModel):
-    from main import controller
+    from app import controller
     respond = controller.talk(Body.user_id, body.receiver_id, body.text)
     if respond:
         return Responses.success_response_status(status.HTTP_200_OK, "Send message Success", None)
@@ -25,7 +25,7 @@ def talking(body: MessageModel):
 
 @router.get("/chat-history/{receiver_id}")
 def get_chat_history_by_id(receiver_id: str):
-    from main import controller
+    from app import controller
     all_chat_data = controller.retrieve_chat_log(Body.user_id, receiver_id)
     
     if len(all_chat_data) != 0:
@@ -35,7 +35,7 @@ def get_chat_history_by_id(receiver_id: str):
     
 @router.get("/chat-room")
 def get_chat_room_by_id():
-    from main import controller
+    from app import controller
     all_chat_room = controller.retrieve_chat_room(Body.user_id)
     if len(all_chat_room) != 0:
         return all_chat_room

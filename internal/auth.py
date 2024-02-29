@@ -9,7 +9,7 @@ class Auth:
         self.__password = password
     
     async def register(self, role: str) -> dict | None:
-        from main import controller
+        from app import controller
         account: Account = await controller.search_account_by_username(self.__username)
         if account == None:
             hashed_password: str = ph.hash(self.__password)
@@ -24,7 +24,7 @@ class Auth:
         return None
 
     async def login(self) -> dict | None:
-        from main import controller
+        from app import controller
         account: Account = await controller.search_account_by_username(self.__username)
         if account == None:
             return None

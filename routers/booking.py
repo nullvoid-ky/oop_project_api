@@ -15,7 +15,7 @@ router = APIRouter(
 
 @router.get("/search-booking/{booking_id}")
 async def search_booking(booking_id: str):
-    from main import controller, responses
+    from app import controller, responses
     result: dict = await controller.search_booking(booking_id)
     if result:
         return responses.success_response_status(status=status.HTTP_200_OK, message="Booking found", data=result)
@@ -24,7 +24,7 @@ async def search_booking(booking_id: str):
     
 @router.post("/add-booking")
 async def add_booking(body: AddBookingModel):
-    from main import controller, responses
+    from app import controller, responses
     customer: Customer = await controller.search_customer_by_id(Body.user_id)
     if customer == None:
         return responses.error_response_status(status.HTTP_404_NOT_FOUND, "Customer not found")

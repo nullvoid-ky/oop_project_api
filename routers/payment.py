@@ -12,7 +12,7 @@ router = APIRouter(
 
 @router.post("/add-payment")
 async def add_payment(body: BookingModel):
-    from main import responses, controller
+    from app import responses, controller
     transaction: dict = await controller.add_payment(body.booking_id)
     if transaction == None:
         return responses.error_response_status(status.HTTP_404_NOT_FOUND, "Error in adding payment")
