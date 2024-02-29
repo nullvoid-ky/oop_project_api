@@ -9,7 +9,7 @@ class Payment:
     def pay(self, customer: Customer, mate: Mate) -> None:
         customer.remove_money(self.__amount)
         mate.add_money(self.__amount)
-        # create_chat
+        # add_chat
     @property
     def amount(self) -> int:
         return self.__amount

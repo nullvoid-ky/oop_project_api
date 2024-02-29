@@ -3,7 +3,7 @@ import jwt
 import os
 from dotenv import load_dotenv
 
-from fastapi import Header, HTTPException
+from fastapi import Header, HTTPException, Body
 
 load_dotenv()
 
@@ -14,6 +14,7 @@ def create_token(user_id: str = Annotated[str, "user_id"]) -> str:
 def verify_token(x_token: str = Header(...)) -> dict:
     try:
         payload: dict = jwt.decode(x_token, os.getenv('JWT_SECRET'), algorithms=["HS256"])
+        Body.user_id = payload["user_id"]
         return payload
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=400, detail="Token has expired")
