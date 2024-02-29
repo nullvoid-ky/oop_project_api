@@ -1,5 +1,5 @@
 from fastapi import APIRouter,status
-from ..models.review import reviewMateModel
+from ..models.review import ReviewModel
 from ..internal.response import Responses 
 import uvicorn
 
@@ -9,7 +9,7 @@ router = APIRouter(
 )
 
 @router.post("/add_review")
-async def add_review(body: reviewMateModel):
+async def add_review(body: ReviewModel):
     from main import controller
     result : dict = controller.add_review_mate(body.customer_id, body.mate_id, body.message, body.star)
     if result:
