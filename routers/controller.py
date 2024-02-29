@@ -1,17 +1,19 @@
-from fastapi import APIRouter,status
-from ..models.controller import reviewMateModel
-from ..internal.response import Responses 
-from main import controller
-import uvicorn
+from fastapi import APIRouter, status, Depends, Body
+
+from models.controller import ReviewModel
+from internal.response import Responses
+from dependencies import verify_token 
 
 router = APIRouter(
     prefix="/controller",
     tags=["controller"],
+    dependencies=[Depends(verify_token)]
 )
 
 @router.post("/add_review")
-async def add_review(body: reviewMateModel):
-    review = controller.add_review_mate(body.customer_id, body.mate_id, body.message, body.star)
+def add_review(body: ReviewModel):
+    from main import controller
+    review = controller.add_review_mate(Body.user_id, body.mate_id, body.message, body.star)
     if isinstance(review, None):
         return Responses.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")
-    return Responses.success_response_status(status.HTTP_200_OK, "Added Review Successfully", review)
+    return Responses.success_response_status(status.HTTP_200_OK, "Added Review Successfully", data=review)
