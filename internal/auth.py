@@ -1,5 +1,4 @@
 from internal.account import Account  
-import bcrypt
 from argon2 import PasswordHasher 
 
 ph = PasswordHasher()
