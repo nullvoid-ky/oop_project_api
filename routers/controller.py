@@ -1,6 +1,6 @@
 from fastapi import APIRouter,status
 from ..models.controller import reviewMateModel
-from ..utils.response import Responses 
+from ..internal.response import Responses 
 from main import controller
 import uvicorn
 
