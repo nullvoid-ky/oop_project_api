@@ -1,10 +1,9 @@
 from uuid import uuid4, UUID
 
 class Message:
-    def __init__(self, sender, receiver, text, timestamp) -> None:
+    def __init__(self, sender, text, timestamp) -> None:
         self.__id: UUID = uuid4()
         self.__sender = sender
-        self.__reciever = receiver
         self.__text = text
         self.__timestamp = timestamp
     
@@ -22,4 +21,4 @@ class Message:
         return self.__text
     
     def get_timestamp(self):
-        return self.__timestamp
+        return self.__timestamp.strftime("%d/%m/%Y %H:%M:%S")

@@ -48,8 +48,8 @@ class Controller:
         receiver = self.search_account_by_id(receiver_id)
         chat = self.get_chat_by_owner_pair(sender, receiver)
         if(chat != None):
-            timestamp = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-            msg = chat.save_chat_log(Message(sender, receiver, text, timestamp))
+            timestamp = datetime.datetime.now()
+            msg = chat.save_chat_log(Message(sender, text, timestamp))
             return msg
         return None
     
