@@ -24,3 +24,7 @@ class Chat:
     
     def get_message_list(self):
         return self.__message_list
+    
+    def delete_message(self, message_id) -> list:
+        self.__message_list = [message for message in self.__message_list if str(message.id) != message_id]
+        return self.__message_list

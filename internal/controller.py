@@ -52,6 +52,15 @@ class Controller:
             msg = chat.save_chat_log(Message(sender, receiver, text, timestamp))
             return msg
         return None
+    
+    def delete_message(self, sender_id: str, receiver_id: str, message_id: str):
+        sender = self.search_account_by_id(sender_id)
+        receiver = self.search_account_by_id(receiver_id)
+        chat = self.get_chat_by_owner_pair(sender, receiver)
+        if(chat != None):
+            msg_list = chat.delete_message(message_id)
+            return msg_list
+        return None
 
     def retrieve_chat_log(self, sender_id, receiver_id):
         sender_acc = self.search_account_by_id(sender_id)

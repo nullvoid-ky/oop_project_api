@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Body
 from fastapi import status
 
 from internal.response import Responses 
-from models.message import MessageModel
+from models.message import MessageModel, DeleteMessageModel
 from dependencies import verify_token
 
 responses = Responses()
@@ -19,6 +19,15 @@ def talking(body: MessageModel):
     msg = controller.talk(Body.user_id, body.receiver_id, body.text)
     if msg:
         return Responses.success_response_status(status.HTTP_200_OK, "Send message Success", {'id': str(msg.id), "text": msg.get_text(), "timestamp": msg.get_timestamp()})
+    else:
+        return Responses.error_response_status(status.HTTP_400_BAD_REQUEST, "Send message Error")
+    
+@router.delete("/delete-message")
+def talking(body: DeleteMessageModel):
+    from app import controller
+    msg_list = controller.delete_message(Body.user_id, body.receiver_id, body.message_id)
+    if msg_list:
+        return Responses.success_response_status(status.HTTP_200_OK, "Send message Success", [{'id': str(msg.id), "text": msg.get_text(), "timestamp": msg.get_timestamp()} for msg in msg_list])
     else:
         return Responses.error_response_status(status.HTTP_400_BAD_REQUEST, "Send message Error")
     
