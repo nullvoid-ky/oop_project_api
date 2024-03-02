@@ -61,6 +61,15 @@ class Controller:
             msg_list = chat.delete_message(message_id)
             return msg_list
         return None
+    
+    def edit_message(self, sender_id: str, receiver_id: str, message_id: str, new_text: str):
+        sender = self.search_account_by_id(sender_id)
+        receiver = self.search_account_by_id(receiver_id)
+        chat = self.get_chat_by_owner_pair(sender, receiver)
+        if(chat != None):
+            msg_list = chat.edit_message(message_id, new_text)
+            return msg_list
+        return None
 
     def retrieve_chat_log(self, sender_id, receiver_id):
         sender_acc = self.search_account_by_id(sender_id)
@@ -76,7 +85,8 @@ class Controller:
                 sender_name : {
                     "id" : msg.id,
                     "text" : msg.get_text(),
-                    "timestamp" : msg.get_timestamp()
+                    "timestamp" : msg.get_timestamp(),
+                    "is_edit": msg.is_edit
                 }
             }
             all_chat_data.append(chat_data)

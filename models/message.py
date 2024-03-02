@@ -7,3 +7,8 @@ class MessageModel(BaseModel):
 class DeleteMessageModel(BaseModel):
     receiver_id: str
     message_id: str
+
+class EditMessageModel(BaseModel):
+    receiver_id: str
+    message_id: str
+    new_text: str

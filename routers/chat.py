@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Body
 from fastapi import status
 
 from internal.response import Responses 
-from models.message import MessageModel, DeleteMessageModel
+from models.message import MessageModel, DeleteMessageModel, EditMessageModel
 from dependencies import verify_token
 
 responses = Responses()
@@ -18,16 +18,25 @@ def talking(body: MessageModel):
     from app import controller
     msg = controller.talk(Body.user_id, body.receiver_id, body.text)
     if msg:
-        return Responses.success_response_status(status.HTTP_200_OK, "Send message Success", {'id': str(msg.id), "text": msg.get_text(), "timestamp": msg.get_timestamp()})
+        return Responses.success_response_status(status.HTTP_200_OK, "Send message Success", {'id': str(msg.id), "text": msg.get_text(), "timestamp": msg.get_timestamp(), "is_edit": msg.is_edit})
     else:
         return Responses.error_response_status(status.HTTP_400_BAD_REQUEST, "Send message Error")
     
 @router.delete("/delete-message")
-def talking(body: DeleteMessageModel):
+def delete_message(body: DeleteMessageModel):
     from app import controller
     msg_list = controller.delete_message(Body.user_id, body.receiver_id, body.message_id)
+    if isinstance(msg_list, list):
+        return Responses.success_response_status(status.HTTP_200_OK, "Delete message Success", [{'id': str(msg.id), "text": msg.get_text(), "timestamp": msg.get_timestamp(), "is_edit": msg.is_edit} for msg in msg_list])
+    else:
+        return Responses.error_response_status(status.HTTP_400_BAD_REQUEST, "Send message Error")
+    
+@router.put("/edit-message")
+def edit_message(body: EditMessageModel):
+    from app import controller
+    msg_list = controller.edit_message(Body.user_id, body.receiver_id, body.message_id, body.new_text)
     if msg_list:
-        return Responses.success_response_status(status.HTTP_200_OK, "Send message Success", [{'id': str(msg.id), "text": msg.get_text(), "timestamp": msg.get_timestamp()} for msg in msg_list])
+        return Responses.success_response_status(status.HTTP_200_OK, "Edit message Success", [{'id': str(msg.id), "text": msg.get_text(), "timestamp": msg.get_timestamp(), "is_edit": msg.is_edit} for msg in msg_list])
     else:
         return Responses.error_response_status(status.HTTP_400_BAD_REQUEST, "Send message Error")
     

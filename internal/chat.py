@@ -28,3 +28,10 @@ class Chat:
     def delete_message(self, message_id) -> list:
         self.__message_list = [message for message in self.__message_list if str(message.id) != message_id]
         return self.__message_list
+    
+    def edit_message(self, message_id, new_text) -> list:
+        for message in self.__message_list:
+            if str(message.id) == message_id:
+                message.set_text(new_text)
+                break
+        return self.__message_list
