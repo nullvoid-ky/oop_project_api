@@ -16,9 +16,9 @@ router = APIRouter(
 @router.post("/talk")
 def talking(body: MessageModel):
     from app import controller
-    respond = controller.talk(Body.user_id, body.receiver_id, body.text)
-    if respond:
-        return Responses.success_response_status(status.HTTP_200_OK, "Send message Success", None)
+    msg = controller.talk(Body.user_id, body.receiver_id, body.text)
+    if msg:
+        return Responses.success_response_status(status.HTTP_200_OK, "Send message Success", {'id': str(msg.id), "text": msg.get_text(), "timestamp": msg.get_timestamp()})
     else:
         return Responses.error_response_status(status.HTTP_400_BAD_REQUEST, "Send message Error")
     

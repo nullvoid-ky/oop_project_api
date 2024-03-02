@@ -49,8 +49,8 @@ class Controller:
         chat = self.get_chat_by_owner_pair(sender, receiver)
         if(chat != None):
             timestamp = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-            chat.save_chat_log(Message(sender, receiver, text, timestamp))
-            return chat
+            msg = chat.save_chat_log(Message(sender, receiver, text, timestamp))
+            return msg
         return None
 
     def retrieve_chat_log(self, sender_id, receiver_id):
@@ -116,15 +116,15 @@ class Controller:
         self.add_booking(self.account_list[2], self.account_list[3], 200)
         self.add_booking(self.account_list[4], self.account_list[5], 300)
         self.add_booking(self.account_list[6], self.account_list[7], 400)
-        customer_acc = await self.add_customer("Kan", "1234")
-        print(customer_acc.id)
-        mate_acc = await self.add_mate("Gan", "1234")
-        print(mate_acc.id)
-        mate_acc2 = await self.add_mate("Nan", "1234")
-        print(mate_acc2.id)
+        my_acc = await self.search_account_by_username("ganThepro")
 
-        self.add_chat_room(Chat(customer_acc, mate_acc))
-        self.add_chat_room(Chat(customer_acc, mate_acc2))
+        mate_acc = await self.add_mate("Mate1", "1234")
+        mate_acc2 = await self.add_mate("Mate2", "1234")
+        print("mate_acc: ", mate_acc.id)
+        print("mate_acc: ", mate_acc2.id)
+
+        self.add_chat_room(Chat(my_acc, mate_acc))
+        self.add_chat_room(Chat(my_acc, mate_acc2))
 
     async def add_customer(self, username: str, password: str) -> Customer:
         existed_account: Account = await self.search_account_by_username(username)

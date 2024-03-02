@@ -18,6 +18,9 @@ class Chat:
     def save_chat_log(self, message):
         if(isinstance(message, Message)):
             self.__message_list.append(message)
+            return message
+        else:
+            raise TypeError("Chat.save_chat_log() must receive message instance")
     
     def get_message_list(self):
         return self.__message_list
