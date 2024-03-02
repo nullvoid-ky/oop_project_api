@@ -3,6 +3,7 @@ from fastapi import status
 
 from internal.response import Responses 
 from models.message import MessageModel, DeleteMessageModel, EditMessageModel
+from models.chat_room import DeleteChatRoomModel
 from dependencies import verify_token
 
 responses = Responses()
@@ -59,3 +60,12 @@ def get_chat_room_by_id():
         return all_chat_room
     else:
         return "No History"
+    
+@router.delete("/delete-chat-room")
+def delete_chat_room(body: DeleteChatRoomModel):
+    from app import controller
+    chat = controller.delete_chat_room(Body.user_id, body.receiver_id)
+    if chat:
+        return Responses.success_response_status(status.HTTP_200_OK, "Delete Chat Room Success", chat)
+    else:
+        return Responses.error_response_status(status.HTTP_400_BAD_REQUEST, "No Chat Room To Delete")

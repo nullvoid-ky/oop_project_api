@@ -116,6 +116,19 @@ class Controller:
             raise TypeError("No Acc found")
         detail = self.get_receiver_chat_room_detail(sender_acc)
         return detail
+    
+    def delete_chat_room(self, sender_id, receiver_id) -> list | None:
+        sender_acc = self.search_account_by_id(sender_id)
+        receiver_acc = self.search_account_by_id(receiver_id)
+        if not (isinstance(sender_acc, Account) and isinstance(receiver_acc, Account)):
+            raise "No Acc found"
+        chat = self.get_chat_by_owner_pair(sender_acc, receiver_acc)
+        if chat:
+            self.__chat_list = [c for c in self.__chat_list if c != chat]
+            return self.get_receiver_chat_room_detail(sender_acc)
+        else:
+            return None
+
     @property
     def account_list(self) -> list:
         return self.__account_list

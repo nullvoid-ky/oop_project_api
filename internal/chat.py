@@ -1,13 +1,19 @@
 from internal.message import Message
+from uuid import uuid4, UUID
 
 class Chat:
     def __init__(self, owner1, owner2) -> None:
         """เก็บผู้ส่ง / รับ ใน msg
             เปลี่ยน sender, reciever เป็น acc ที่คู่กัน
         """
+        self.__id: UUID = uuid4()
         self.__owner1 = owner1
         self.__owner2 = owner2
         self.__message_list = []
+
+    @property
+    def id(self):
+        return self.__id
     
     def get_owner1(self):
         return self.__owner1
