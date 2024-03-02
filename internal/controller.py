@@ -74,6 +74,7 @@ class Controller:
             sender_name = msg.get_sender_name()
             chat_data = {
                 sender_name : {
+                    "id" : msg.id,
                     "text" : msg.get_text(),
                     "timestamp" : msg.get_timestamp()
                 }
