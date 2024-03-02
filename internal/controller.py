@@ -99,13 +99,20 @@ class Controller:
         for chat in self.__chat_list:
             chat_owner1 = chat.get_owner1()
             chat_owner2 = chat.get_owner2()
-            if((sender_acc in [chat_owner1, chat_owner2]) and len(chat.get_message_list()) >= 1):
-                latest_chat = chat.get_message_list()[-1]
-                detail.append({
-                        'account_detail' : latest_chat.get_sender_account().get_account_details(),
-                        'latest_timestamp' : latest_chat.get_timestamp(),
-                        'latest_text' : latest_chat.get_text(),
-                })
+            if((sender_acc in [chat_owner1, chat_owner2])):
+                if(len(chat.get_message_list()) >= 1):
+                    latest_chat = chat.get_message_list()[-1]
+                    detail.append({
+                            'account_detail' : chat_owner1.get_account_details() if sender_acc != chat_owner1 else chat_owner2.get_account_details(),
+                            'latest_timestamp' : latest_chat.get_timestamp(),
+                            'latest_text' : latest_chat.get_text(),
+                    })
+                else:
+                    detail.append({
+                            'account_detail' : chat_owner1.get_account_details() if sender_acc != chat_owner1 else chat_owner2.get_account_details(),
+                            'latest_timestamp' : "",
+                            'latest_text' : "",
+                    })
         
         return detail
     

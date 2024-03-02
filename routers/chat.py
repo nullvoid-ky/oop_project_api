@@ -57,15 +57,15 @@ def get_chat_room_by_id():
     from app import controller
     all_chat_room = controller.retrieve_chat_room(Body.user_id)
     if len(all_chat_room) != 0:
-        return all_chat_room
+        return Responses.success_response_status(status.HTTP_200_OK, "Get Chat Room Success", all_chat_room)
     else:
-        return "No History"
+        return Responses.error_response_status(status.HTTP_400_BAD_REQUEST, "No Chat Room")
     
 @router.delete("/delete-chat-room")
 def delete_chat_room(body: DeleteChatRoomModel):
     from app import controller
     chat = controller.delete_chat_room(Body.user_id, body.receiver_id)
-    if chat:
+    if isinstance(chat, list):
         return Responses.success_response_status(status.HTTP_200_OK, "Delete Chat Room Success", chat)
     else:
         return Responses.error_response_status(status.HTTP_400_BAD_REQUEST, "No Chat Room To Delete")
