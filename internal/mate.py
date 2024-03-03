@@ -24,7 +24,7 @@ class Mate(Account):
     def update_availablility(self):
         pass
     
-    def create_post(self):
+    def add_post(self):
         pass
     
     def withdraw(self):
