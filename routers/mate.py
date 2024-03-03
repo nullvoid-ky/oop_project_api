@@ -15,4 +15,3 @@ mate = Mate()
 async def add_post(body: PostModel):
     mate.add_post(body.description, body.picture, body.timestamp)
     return res.success_response_status(status.HTTP_201_CREATED, "Post created")
-    

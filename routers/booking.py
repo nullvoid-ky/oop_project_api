@@ -15,9 +15,9 @@ router = APIRouter(
 )
 
 @router.get("/search-booking/{booking_id}")
-async def search_booking(booking_id: str):
+def search_booking(booking_id: str):
     from app import controller
-    result: dict = await controller.search_booking(booking_id)
+    result: dict = controller.search_booking(booking_id)
     if result:
         return res.success_response_status(status=status.HTTP_200_OK, message="Booking found", data=result)
     else:
