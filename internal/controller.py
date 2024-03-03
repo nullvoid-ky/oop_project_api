@@ -7,7 +7,6 @@ from internal.customer import Customer
 from internal.payment import Payment
 from internal.transaction import Transaction
 from internal.mate import Mate
-# from internal.customer import Customer
 from internal.review import Review
 import datetime
 
@@ -34,13 +33,11 @@ class Controller:
     def get_chat_by_owner_pair(self, owner1, owner2):
         if not (isinstance(owner1, Account) and isinstance(owner2, Account)):
             raise TypeError("owner1, owner2 must be Account instances")
-        
         for chat in self.__chat_list:
             chat_owner1 = chat.get_owner1()
             chat_owner2 = chat.get_owner2()
             if((owner1 in [chat_owner1, chat_owner2]) and (owner2 in [chat_owner1, chat_owner2]) and (chat_owner1 != chat_owner2)):
                 return chat
-        
         return None
 
     def talk(self, sender_id: str, receiver_id: str, text: str):
@@ -103,15 +100,15 @@ class Controller:
                 if(len(chat.get_message_list()) >= 1):
                     latest_chat = chat.get_message_list()[-1]
                     detail.append({
-                            'account_detail' : chat_owner1.get_account_details() if sender_acc != chat_owner1 else chat_owner2.get_account_details(),
-                            'latest_timestamp' : latest_chat.get_timestamp(),
-                            'latest_text' : latest_chat.get_text(),
+                        'account_detail' : chat_owner1.get_account_details() if sender_acc != chat_owner1 else chat_owner2.get_account_details(),
+                        'latest_timestamp' : latest_chat.get_timestamp(),
+                        'latest_text' : latest_chat.get_text(),
                     })
                 else:
                     detail.append({
-                            'account_detail' : chat_owner1.get_account_details() if sender_acc != chat_owner1 else chat_owner2.get_account_details(),
-                            'latest_timestamp' : "",
-                            'latest_text' : "",
+                        'account_detail' : chat_owner1.get_account_details() if sender_acc != chat_owner1 else chat_owner2.get_account_details(),
+                        'latest_timestamp' : "",
+                        'latest_text' : "",
                     })
         
         return detail
@@ -193,44 +190,46 @@ class Controller:
                 return account
         return None
     
-    async def search_booking_by_id(self, booking_id: str) -> Booking | None:
+    def search_booking_by_id(self, booking_id: str) -> Booking | None:
         for booking in self.__booking_list:
             if str(booking.id) == booking_id:
                 return booking
         return None
     
-    async def search_customer_by_id(self, customer_id: str) -> Account | None:
-        for account in self.__account_list:
+    def search_customer_by_id(self, customer_id: str) -> Account | None:
+        for account in self.get_customers():
             if str(account.id) == customer_id:
                 return account
         return None
 
-    async def search_mate_by_id(self, mate_id: str) -> Mate | None:
-        for account in self.__account_list:
+    def search_mate_by_id(self, mate_id: str) -> Mate | None:
+        for account in self.get_mates():
             if str(account.id) == mate_id:
                 return account
         return None
     
-    async def search_booking(self, booking_id: str) -> dict:
+    def search_booking(self, booking_id: str) -> dict:
         for booking in self.__booking_list:
             if str(booking.id) == booking_id:
                 return booking.get_booking_detail()
 
-    async def add_payment(self, booking_id: str) -> dict:
-        booking: Booking = await self.search_booking_by_id(booking_id)
+    def add_payment(self, booking_id: str) -> Transaction:
+        booking: Booking = self.search_booking_by_id(booking_id)
         if booking == None:
-            return "Booking not found"
-        customer: Customer = await self.search_customer_by_id(str(booking.customer.id))
+            return None
+        customer: Customer = self.search_customer_by_id(str(booking.customer.id))
         if customer == None:
-            return "Customer not found"
-        mate: Mate = await self.search_mate_by_id(str(booking.mate.id))
+            return None
+        mate: Mate = self.search_mate_by_id(str(booking.mate.id))
         if mate == None:
-            return "Mate not found"
+            return None
         payment: Payment = booking.payment
         payment.pay(customer, mate)
         self.add_chat_room(Chat(customer, mate))
         transaction: Transaction = Transaction(customer, mate, payment.amount)
-        return transaction.get_transaction_details()
+        customer.add_transaction(transaction)
+        mate.add_transaction(transaction)
+        return transaction
     
     def get_account_by_name(self, name: str) -> Account | None:
         for account in self.__account_list:
@@ -238,23 +237,31 @@ class Controller:
                 return account
         return None
 
-    def get_mates(self) -> Account | None:
+    def get_mates(self) -> list:
         mate_list = []
         for account in self.__account_list:
             if isinstance(account, Mate):
                 mate_list.append(account)
         return mate_list
 
-    # def get_customers(self) -> Account | None:
-    #     customer_list = []
-    #     for account in self.__account_list:
-    #         if isinstance(account, Customer):
-    #             customer_list.append(account)
-    #     return None
+    def get_customers(self) -> list:
+        customer_list = []
+        for account in self.__account_list:
+            if isinstance(account, Customer):
+                customer_list.append(account)
+        return customer_list
     
     def add_review_mate(self, customer_id, mate_id, message, star) -> Review | None:
         for mate in self.get_mates():
             if (mate.id == mate_id):
                 review = mate.add_review_mate(customer_id, message, star)
                 return review
+        return None
+    
+    async def book_mate(self, customer_id: str, mate_id: str) -> Booking | None:
+        for mate in self.get_mates():
+            if (str(mate.id) == mate_id):
+                customer: Account = self.search_customer_by_id(customer_id)
+                mate.book(customer)
+                return self.add_booking(customer, mate, mate.amount)
         return None

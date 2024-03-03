@@ -8,6 +8,7 @@ class Account:
         self.__password: str = password
         self.__pic_url: str = ""
         self.__money: int = 0
+        self.__transaction_list = []
     @property
     def username(self) -> str:
         return self.__username
@@ -23,6 +24,9 @@ class Account:
     @property
     def id(self) -> UUID:
         return self.__id
+    @property
+    def transaction_list(self) -> list:
+        return self.__transaction_list
     
     def get_account_details(self) -> dict:
         return {
@@ -31,11 +35,17 @@ class Account:
             "pic_url": self.__pic_url
         }
     
-    def add_money(self, amount: int) -> int:
+    def add_transaction(self, transaction) -> None:
+        from internal.transaction import Transaction
+        if not isinstance(transaction, Transaction):
+            raise TypeError(f"Expected transaction, but got {type(transaction)} instead.")
+        self.__transaction_list.append(transaction)
+    
+    def __add__(self, amount: int) -> int:
         self.__money += amount
         return self.__money
-    
-    def remove_money(self, amount: int) -> int:
+
+    def __sub__(self, amount: int) -> int:
         if self.__money - amount < 0:
             self.__money = 0
         else:

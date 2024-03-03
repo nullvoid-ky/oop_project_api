@@ -1,4 +1,7 @@
 from pydantic import BaseModel
 
-class add_review_mate_model(BaseModel):
+class AddReviewMateModel(BaseModel):
     customer_id: str
+
+class MateModel(BaseModel):
+    mate_id: str
