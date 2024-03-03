@@ -8,9 +8,9 @@ class Chat:
             เปลี่ยน sender, reciever เป็น acc ที่คู่กัน
         """
         self.__id: UUID = uuid4()
-        self.__owner1 = owner1
-        self.__owner2 = owner2
-        self.__message_list = []
+        self.__owner1: Account = owner1
+        self.__owner2: Account = owner2
+        self.__message_list: list = []
 
     @property
     def id(self) -> UUID:

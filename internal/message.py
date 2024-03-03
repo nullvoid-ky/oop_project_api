@@ -1,13 +1,14 @@
 from internal.account import Account
 from uuid import uuid4, UUID
+from datetime import datetime
 
 class Message:
     def __init__(self, sender, text, timestamp) -> None:
         self.__id: UUID = uuid4()
-        self.__sender = sender
-        self.__text = text
-        self.__timestamp = timestamp
-        self.__is_edit = False
+        self.__sender: Account = sender
+        self.__text: str = text
+        self.__timestamp: datetime = timestamp
+        self.__is_edit: bool = False
     
     @property
     def id(self) -> UUID:
