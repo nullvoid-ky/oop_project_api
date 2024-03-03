@@ -3,9 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from routers import auth, payment, booking, chat
 from internal.controller import Controller
-from utils.response import Responses
 
-responses = Responses()
 controller = Controller()
 
 app = FastAPI()
