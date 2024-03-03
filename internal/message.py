@@ -1,3 +1,4 @@
+from internal.account import Account
 from uuid import uuid4, UUID
 
 class Message:
@@ -13,19 +14,19 @@ class Message:
         return self.__id
     
     @property
-    def is_edit(self):
+    def is_edit(self) -> bool:
         return self.__is_edit
 
-    def get_sender_name(self):
+    def get_sender_name(self) -> str:
         return self.__sender.username
     
-    def get_sender_account(self):
+    def get_sender_account(self) -> Account:
         return self.__sender
     
-    def get_text(self):
+    def get_text(self) -> str:
         return self.__text
     
-    def get_timestamp(self):
+    def get_timestamp(self) -> str:
         return self.__timestamp.strftime("%d/%m/%Y %H:%M:%S")
     
     def set_text(self, text):
