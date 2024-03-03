@@ -6,7 +6,7 @@ from internal.controller import Controller
 
 controller = Controller()
 
-app = FastAPI()
+app = FastAPI(openapi_prefix="/api")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -19,21 +19,17 @@ controller = Controller()
 
 app.include_router(
     auth.router,
-    prefix="/api",
     tags=["auth"]
 )
 app.include_router(
     chat.router,
-    prefix="/api",
     tags=["chat"]
 )
 app.include_router(
     payment.router,
-    prefix="/api",
     tags=["payment"]
 )
 app.include_router(
     booking.router,
-    prefix="/api",
     tags=["booking"]
 )
