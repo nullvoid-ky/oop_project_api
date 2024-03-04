@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Body
 from fastapi import status
 
-from dependencies import verify_token
+from dependencies import verify_token, verify_customer
 from models.booking import AddBookingModel
 from internal.customer import Customer
 from internal.mate import Mate
@@ -23,7 +23,7 @@ def search_booking(booking_id: str):
     else:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Booking not found")
     
-@router.post("/add-booking")
+@router.post("/add-booking", dependencies=[Depends(verify_customer)])
 async def add_booking(body: AddBookingModel):
     from app import controller
     customer: Customer = await controller.search_customer_by_id(Body.user_id)
