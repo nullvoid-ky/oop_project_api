@@ -215,6 +215,10 @@ class Controller:
         if booking == None:
             return None
         customer: Customer = self.search_customer_by_id(str(booking.customer.id))
+        
+        # customer : Customer = self.validate_customer(booking.customer)
+        # todo : make validate function to all instances
+        
         if customer == None:
             return None
         mate: Mate = self.search_mate_by_id(str(booking.mate.id))
