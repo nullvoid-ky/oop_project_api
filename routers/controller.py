@@ -30,10 +30,10 @@ async def book_mate(body: MateModel):
         return res.success_response_status(status.HTTP_200_OK, "Booked Successfully", data=booking.get_booking_detail())
     return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")
 
-@router.post("/add-payment")
+@router.post("/pay")
 def add_payment(body: BookingModel):
     from app import controller
-    transaction: Transaction = controller.add_payment(body.booking_id)
+    transaction: Transaction = controller.pay(body.booking_id)
     if isinstance(transaction, Transaction):
         return res.success_response_status(status.HTTP_201_CREATED, "Payment added", data=transaction.get_transaction_details())
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in adding payment")
