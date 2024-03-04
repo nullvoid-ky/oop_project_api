@@ -1,12 +1,13 @@
+import datetime
+
 from internal.account import Account
-from internal.availablility import Availablility
+from internal.availability import Availablility
 from internal.review import Review
-# import datetime
 
 class Mate(Account):
     def __init__(self, username: str, password: str, amount: int=0):
         super().__init__(username, password)
-        self.__availablility_list = []
+        self.__availablility_list: list[Availablility] = []
         self.__review_list = []
         self.__booked_customer = None
         self.__amount = amount
@@ -20,16 +21,23 @@ class Mate(Account):
     def amount(self) -> int:
         return self.__amount
     
-    def add_availablility(self, availablility):
-        if not isinstance(availablility, Availablility):
-            raise TypeError(f"Expected availablility, but got {type(availablility)} instead.")
-        self.__available_list += [availablility]
-        return "Success"
+    def add_availablility(self, date: datetime, detail: str) -> Availablility:
+        availablility: Availablility = Availablility(date, detail)
+        self.__availablility_list.append(availablility)
+        return availablility
     
-    def book(self, customer: Account) -> Account | None:
+    def search_availablility(self, year: int, month: int, day: int) -> Availablility | None:
+        for availablility in self.__availablility_list:
+            if availablility.check_available(year, month, day):
+                return availablility
+        return None
+    
+    def book(self, customer: Account, year: int, month: int, day: int) -> Account | None:
         if isinstance(self.__booked_customer, type(None)):
-            self.__booked_customer: Account = customer
-            return self.__booked_customer
+            for availablility in self.__availablility_list:
+                if availablility.check_available(year, month, day):
+                    self.__booked_customer: Account = customer
+                    return self.__booked_customer
         return None
 
     def confirm_booking(self):

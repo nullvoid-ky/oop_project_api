@@ -8,6 +8,7 @@ from internal.payment import Payment
 from internal.transaction import Transaction
 from internal.mate import Mate
 from internal.review import Review
+from models.mate import Date
 import datetime
 
 class Controller:
@@ -159,6 +160,7 @@ class Controller:
         mate_acc2 = await self.add_mate("Mate2", "1234")
         print("mate_acc: ", mate_acc.id)
         print("mate_acc: ", mate_acc2.id)
+        mate_acc.add_availablility(datetime.date(2024, 3, 4), "I'm available")
 
         self.add_chat_room(Chat(my_acc, mate_acc))
         self.add_chat_room(Chat(my_acc, mate_acc2))
@@ -207,13 +209,8 @@ class Controller:
             if str(account.id) == mate_id:
                 return account
         return None
-    
-    def search_booking(self, booking_id: str) -> dict:
-        for booking in self.__booking_list:
-            if str(booking.id) == booking_id:
-                return booking.get_booking_detail()
 
-    def add_payment(self, booking_id: str) -> Transaction:
+    def pay(self, booking_id: str) -> Transaction:
         booking: Booking = self.search_booking_by_id(booking_id)
         if booking == None:
             return None
@@ -258,10 +255,12 @@ class Controller:
                 return review
         return None
     
-    async def book_mate(self, customer_id: str, mate_id: str) -> Booking | None:
+    async def book_mate(self, customer_id: str, mate_id: str, date: Date) -> Booking | None:
         for mate in self.get_mates():
-            if (str(mate.id) == mate_id):
+            if str(mate.id) == mate_id:
                 customer: Account = self.search_customer_by_id(customer_id)
-                mate.book(customer)
+                booked_customer: Account = mate.book(customer, date.year, date.month, date.day)
+                if booked_customer == None:
+                    return None
                 return self.add_booking(customer, mate, mate.amount)
         return None
