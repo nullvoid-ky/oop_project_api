@@ -150,10 +150,6 @@ class Controller:
         await self.add_mate("test6", "test6")
         await self.add_customer("test7", "test7")
         await self.add_mate("test8", "test8")
-        self.add_booking(self.account_list[0], self.account_list[1], 100)
-        self.add_booking(self.account_list[2], self.account_list[3], 200)
-        self.add_booking(self.account_list[4], self.account_list[5], 300)
-        self.add_booking(self.account_list[6], self.account_list[7], 400)
         my_acc = await self.search_account_by_username("ganThepro")
 
         mate_acc = await self.add_mate("Mate1", "1234")
@@ -180,11 +176,6 @@ class Controller:
         mate: Mate = Mate(username, password)
         self.__account_list.append(mate)
         return mate
-
-    def add_booking(self, customer: Customer, mate: Mate, amount: int) -> Booking:
-        booking: Booking = Booking(customer, mate, Payment(amount, False))
-        self.__booking_list.append(booking)
-        return booking
 
     async def search_account_by_username(self, username: str) -> Account | None:
         for account in self.__account_list:
@@ -255,12 +246,11 @@ class Controller:
                 return review
         return None
     
-    async def book_mate(self, customer_id: str, mate_id: str, date: Date) -> Booking | None:
-        for mate in self.get_mates():
-            if str(mate.id) == mate_id:
-                customer: Account = self.search_customer_by_id(customer_id)
-                booked_customer: Account = mate.book(customer, date.year, date.month, date.day)
-                if booked_customer == None:
-                    return None
-                return self.add_booking(customer, mate, mate.amount)
-        return None
+    def add_booking(self, customer: Customer, mate: Mate, date: Date) -> Booking | None:
+        booked_customer: Account = mate.book(customer, date.year, date.month, date.day)
+        print("booked_customer: ", booked_customer) 
+        if booked_customer == None:
+            return None
+        booking: Booking = Booking(customer, mate, Payment(mate.amount))
+        self.__booking_list.append(booking)
+        return booking
