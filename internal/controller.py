@@ -213,7 +213,7 @@ class Controller:
             if str(booking.id) == booking_id:
                 return booking.get_booking_detail()
 
-    def add_payment(self, booking_id: str) -> Transaction:
+    def pay(self, booking_id: str) -> Transaction:
         booking: Booking = self.search_booking_by_id(booking_id)
         if booking == None:
             return None
