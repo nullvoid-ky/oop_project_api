@@ -20,7 +20,7 @@ class Review:
     def timestamp(self):
         return self.__timestamp
     
-    def get_review_details(self):
+    def get_review_details(self) -> dict:
         return {
             "id" : str(self.__id),
             "message" : str(self.__message),

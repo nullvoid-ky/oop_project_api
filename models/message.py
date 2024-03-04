@@ -1,6 +1,14 @@
 from pydantic import BaseModel
 
 class MessageModel(BaseModel):
-    sender_id: str
     receiver_id: str
     text: str
+
+class DeleteMessageModel(BaseModel):
+    receiver_id: str
+    message_id: str
+
+class EditMessageModel(BaseModel):
+    receiver_id: str
+    message_id: str
+    new_text: str

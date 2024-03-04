@@ -1,13 +1,32 @@
-from fastapi import APIRouter
-from internal.mate import Mate 
+from fastapi import APIRouter, Depends, status, Body
+import datetime
+
+from internal.account import Account 
+from internal.mate import Mate
+from internal.availability import Availablility
 from models.post import PostModel
+from models.availability import AvailabilityModel 
+from dependencies import verify_token
+import utils.response as res
 
 router = APIRouter(
-    prefix="/post",
-    tags=["post"],
+    prefix="/mate",
+    tags=["mate"],
+    dependencies=[Depends(verify_token)]
 )
 
-mate = Mate()
 @router.post("/create-post")
-async def create_post(body: PostModel):
-    return mate.create_post(body.description, body.picture, body.timestamp)
+def add_post(body: PostModel):
+    from app import controller
+    mate: Account = controller.search_mate_by_id(Body.user_id)
+    mate.add_post(body.description, body.picture, body.timestamp)
+    return res.success_response_status(status.HTTP_201_CREATED, "Post created")
+
+@router.post("/add-available")
+def add_availablility(body: AvailabilityModel):
+    from app import controller
+    mate: Account = controller.search_mate_by_id(Body.user_id)
+    if mate.search_availablility(body.date.year, body.date.month, body.date.day):
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Availablility already exists")
+    mate.add_availablility(Availablility(datetime.date(body.date.year, body.date.month, body.date.day), body.detail))
+    return res.success_response_status(status.HTTP_201_CREATED, "Availablility added")

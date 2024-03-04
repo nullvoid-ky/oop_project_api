@@ -2,6 +2,7 @@ from uuid import uuid4, UUID
 from internal.customer import Customer
 from internal.mate import Mate
 from internal.payment import Payment
+from datetime import datetime
 
 class Booking:
     def __init__(self, customer: Customer, mate: Mate, payment: Payment = Payment(0, False)) -> None:
@@ -9,6 +10,7 @@ class Booking:
         self.__customer = customer
         self.__mate = mate
         self.__payment = payment
+        self.__timestamp = datetime.now()
     @property
     def customer(self) -> Customer:
         return self.__customer
@@ -27,5 +29,6 @@ class Booking:
             "id": str(self.__id),
             "customer": self.__customer.get_account_details(),
             "mate": self.__mate.get_account_details(),
-            "payment": self.__payment.amount
+            "payment": self.__payment.amount,
+            "timestamp": self.__timestamp.strftime("%Y-%m-%d %H:%M:%S")
         }
