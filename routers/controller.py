@@ -37,3 +37,11 @@ def add_payment(body: BookingModel):
     if isinstance(transaction, Transaction):
         return res.success_response_status(status.HTTP_201_CREATED, "Payment added", data=transaction.get_transaction_details())
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in adding payment")
+
+@router.get("/get-mates")
+def get_mates():
+    from app import controller
+    mate_list = controller.get_mates()
+    if isinstance(mate_list, list):
+        return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in mate_list])
+    return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in add mate")
