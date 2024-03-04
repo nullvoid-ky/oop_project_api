@@ -25,7 +25,7 @@ def add_review(body: ReviewModel):
 @router.post("/book-mate")
 async def book_mate(body: MateModel):
     from app import controller
-    booking: Booking = await controller.book_mate(Body.user_id, body.mate_id)
+    booking: Booking = await controller.book_mate(Body.user_id, body.mate_id, body.date)
     if isinstance(booking, Booking):
         return res.success_response_status(status.HTTP_200_OK, "Booked Successfully", data=booking.get_booking_detail())
     return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")

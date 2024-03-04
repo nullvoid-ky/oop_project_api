@@ -17,9 +17,9 @@ router = APIRouter(
 @router.get("/search-booking/{booking_id}")
 def search_booking(booking_id: str):
     from app import controller
-    result: dict = controller.search_booking(booking_id)
+    result: Booking = controller.search_booking_by_id(booking_id)
     if result:
-        return res.success_response_status(status=status.HTTP_200_OK, message="Booking found", data=result)
+        return res.success_response_status(status=status.HTTP_200_OK, message="Booking found", data=result.get_booking_detail())
     else:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Booking not found")
     
