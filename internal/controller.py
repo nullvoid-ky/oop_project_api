@@ -257,11 +257,9 @@ class Controller:
         self.__booking_list.append(booking)
         return booking
 
-    def add_post(self, description, picture):
-        if not isinstance(description, str):
+    def add_post(self, description: str, picture: str) -> Post | None:
+        if not isinstance(description, str) or not isinstance(picture, str):
             return None
-        if not isinstance(picture, str):
-             return None
         post = Post(description, picture)
         self.__post_list.append(Post)
         return post

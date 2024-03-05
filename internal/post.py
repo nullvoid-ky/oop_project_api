@@ -23,7 +23,7 @@ class Post:
     def id(self):
         return self.__id
         
-    def get_post_detail(self) -> dict:
+    def get_post_details(self) -> dict:
         return {
             "description": self.__description,
             "picture": self.__picture,
