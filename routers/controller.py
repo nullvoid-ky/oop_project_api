@@ -1,13 +1,15 @@
 from fastapi import APIRouter, status, Depends, Body
 
 from models.controller import ReviewModel
+from models.post import PostModel
 import utils.response as res
 from models.mate import MateModel
 from internal.booking import Booking
 from internal.transaction import Transaction
 from internal.account import Account
+from internal.post import Post
 from models.booking import BookingModel
-from dependencies import verify_token, verify_customer
+from dependencies import verify_token, verify_customer, verify_mate
 
 router = APIRouter(
     prefix="/controller",
@@ -52,3 +54,11 @@ def get_mates():
     if isinstance(mate_list, list):
         return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in mate_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in add mate")
+
+@router.post("/add-post", dependencies=[Depends(verify_mate)])
+def add_post(body: PostModel):
+    from app import controller
+    post: Post = controller.add_post(body.description, body.picture)
+    if post == None:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in add post")
+    return res.success_response_status(status.HTTP_200_OK, "Add Post Success", data=post.get_post_details())
