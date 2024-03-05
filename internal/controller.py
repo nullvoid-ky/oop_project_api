@@ -26,7 +26,12 @@ class Controller:
         if not isinstance(chat, Chat):
             raise TypeError("chat must be Chat instances")
         self.__chat_list.append(chat)
-    
+
+    def add_chat_room_by_id(self, sender_id: str, receiver_id: str):
+        sender = self.search_account_by_id(sender_id)
+        receiver = self.search_account_by_id(receiver_id)
+        self.add_chat_room(Chat(sender, receiver))
+
     def search_account_by_id(self, id: str):
         for acc in self.__account_list:
             if(id == str(acc.id)):
