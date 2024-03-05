@@ -6,6 +6,7 @@ from models.register import RegisterModel
 from models.login import LoginModel
 import utils.auth as auth
 import utils.response as res
+from internal.account import Account
 
 router = APIRouter(
     prefix="/auth",

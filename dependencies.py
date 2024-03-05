@@ -8,7 +8,7 @@ from fastapi import Header, HTTPException, Body, Depends
 load_dotenv()
 
 def create_token(user_id: str = Annotated[str, "user_id"], role: str = Annotated[str, "role"]) -> str:
-    token: str = jwt.encode(payload={"user_id": user_id, "role": role}, key=os.environ['JWT_SECRET'], algorithm="HS256")
+    token: str = jwt.encode(payload={ "user_id": user_id, "role": role }, key=os.environ['JWT_SECRET'], algorithm="HS256")
     return token
 
 def verify_token(x_token: str = Header(...)) -> dict:

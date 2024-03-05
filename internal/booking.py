@@ -1,8 +1,9 @@
+from datetime import datetime
+
 from uuid import uuid4, UUID
 from internal.customer import Customer
 from internal.mate import Mate
 from internal.payment import Payment
-from datetime import datetime
 
 class Booking:
     def __init__(self, customer: Customer, mate: Mate, payment: Payment = Payment(0, False)) -> None:

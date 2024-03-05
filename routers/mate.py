@@ -1,13 +1,12 @@
 from fastapi import APIRouter, Depends, status, Body
 import datetime
 
-from internal.account import Account 
-from internal.mate import Mate
+from internal.account import Account
 from internal.availability import Availablility
 from models.post import PostModel
 from models.availability import AvailabilityModel 
-from dependencies import verify_token
 import utils.response as res
+from dependencies import verify_token, verify_mate
 
 router = APIRouter(
     prefix="/mate",
@@ -15,14 +14,14 @@ router = APIRouter(
     dependencies=[Depends(verify_token)]
 )
 
-@router.post("/create-post")
+@router.post("/create-post", dependencies=[Depends(verify_mate)])
 def add_post(body: PostModel):
     from app import controller
     mate: Account = controller.search_mate_by_id(Body.user_id)
     mate.add_post(body.description, body.picture, body.timestamp)
     return res.success_response_status(status.HTTP_201_CREATED, "Post created")
 
-@router.post("/add-available")
+@router.post("/add-available", dependencies=[Depends(verify_mate)])
 def add_availablility(body: AvailabilityModel):
     from app import controller
     mate: Account = controller.search_mate_by_id(Body.user_id)
