@@ -10,11 +10,13 @@ from internal.mate import Mate
 from internal.review import Review
 from models.mate import Date
 import datetime
+from internal.post import Post
 
 class Controller:
     def __init__(self) -> None:
         self.__account_list: list = []
         self.__booking_list: list = []
+        self.__post_list: list = []
         self.__chat_list = []
 
     def get_chat_list(self):
@@ -254,3 +256,12 @@ class Controller:
         booking: Booking = Booking(customer, mate, Payment(mate.amount))
         self.__booking_list.append(booking)
         return booking
+
+    def add_post(self, description, picture):
+        if not isinstance(description, str):
+            return None
+        if not isinstance(picture, str):
+             return None
+        post = Post(description, picture)
+        self.__post_list.append(Post)
+        return post
