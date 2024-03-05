@@ -80,12 +80,11 @@ class Controller:
         for msg in message_list:
             sender_name = msg.get_sender_name()
             chat_data = {
-                sender_name : {
-                    "id" : msg.id,
-                    "text" : msg.get_text(),
-                    "timestamp" : msg.get_timestamp(),
-                    "is_edit": msg.is_edit
-                }
+                "sender_username" : sender_name,
+                "message_id" : msg.id,
+                "text" : msg.get_text(),
+                "timestamp" : msg.get_timestamp(),
+                "is_edit": msg.is_edit
             }
             all_chat_data.append(chat_data)
         return all_chat_data   
