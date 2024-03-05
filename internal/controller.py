@@ -243,12 +243,6 @@ class Controller:
                 customer_list.append(account)
         return customer_list
     
-    def add_review_mate(self, customer_id, mate_id, message, star) -> Review | None:
-        for mate in self.get_mates():
-            if (mate.id == mate_id):
-                review = mate.add_review_mate(customer_id, message, star)
-                return review
-        return None
     
     def add_booking(self, customer: Customer, mate: Mate, date: Date) -> Booking | None:
         booked_customer: Account = mate.book(customer, date.year, date.month, date.day)
@@ -258,3 +252,21 @@ class Controller:
         booking: Booking = Booking(customer, mate, Payment(mate.amount))
         self.__booking_list.append(booking)
         return booking
+    
+
+    def add_review_mate(self, customer_id, mate_id, message, star) -> Review | None:
+        mate = self.search_mate_by_id(mate_id)
+        review = mate.add_review_mate(customer_id, message, star)
+        return review
+    
+    def del_review_mate(self, mate_id, review_id):
+        mate = self.search_mate_by_id(mate_id)
+        review = mate.search_review_by_id(review_id)
+        if mate == None or review == None: 
+            return None
+        mate.del_review(review)
+        return review
+    
+    def search_review(self, mate_id):
+        mate = self.search_mate_by_id(mate_id)    
+        return mate.review__review_list
