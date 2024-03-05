@@ -34,3 +34,4 @@ app.include_router(
 )
 
 controller = Controller()
+controller.add_instance()

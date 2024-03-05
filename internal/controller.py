@@ -143,19 +143,19 @@ class Controller:
     def booking_list(self) -> list:
         return self.__booking_list
 
-    async def add_instance(self):
-        await self.add_customer("test1", "test1")
-        await self.add_mate("test2", "test2")
-        await self.add_customer("test3", "test3")
-        await self.add_mate("test4", "test4")
-        await self.add_customer("test5", "test5")
-        await self.add_mate("test6", "test6")
-        await self.add_customer("test7", "test7")
-        await self.add_mate("test8", "test8")
-        my_acc = await self.search_account_by_username("ganThepro")
+    def add_instance(self):
+        self.add_customer("test1", "test1")
+        self.add_mate("test2", "test2")
+        self.add_customer("test3", "test3")
+        self.add_mate("test4", "test4")
+        self.add_customer("test5", "test5")
+        self.add_mate("test6", "test6")
+        self.add_customer("test7", "test7")
+        self.add_mate("test8", "test8")
+        my_acc = self.search_account_by_username("ganThepro")
 
-        mate_acc = await self.add_mate("Mate1", "1234")
-        mate_acc2 = await self.add_mate("Mate2", "1234")
+        mate_acc = self.add_mate("Mate1", "1234")
+        mate_acc2 = self.add_mate("Mate2", "1234")
         print("mate_acc: ", mate_acc.id)
         print("mate_acc: ", mate_acc2.id)
         mate_acc.add_availablility(datetime.date(2024, 3, 4), "I'm available")
@@ -163,23 +163,23 @@ class Controller:
         self.add_chat_room(Chat(my_acc, mate_acc))
         self.add_chat_room(Chat(my_acc, mate_acc2))
 
-    async def add_customer(self, username: str, password: str) -> Customer:
-        existed_account: Account = await self.search_account_by_username(username)
+    def add_customer(self, username: str, password: str) -> Customer:
+        existed_account: Account = self.search_account_by_username(username)
         if existed_account != None:
             return None
         customer: Customer = Customer(username, password)
         self.__account_list.append(customer)
         return customer
 
-    async def add_mate(self, username: str, password: str) -> Mate:
-        existed_account: Account = await self.search_account_by_username(username)
+    def add_mate(self, username: str, password: str) -> Mate:
+        existed_account: Account = self.search_account_by_username(username)
         if existed_account != None:
             return None
         mate: Mate = Mate(username, password)
         self.__account_list.append(mate)
         return mate
 
-    async def search_account_by_username(self, username: str) -> Account | None:
+    def search_account_by_username(self, username: str) -> Account | None:
         for account in self.__account_list:
             if account.username == username:
                 return account
