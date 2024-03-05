@@ -1,11 +1,14 @@
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .dependencies import create_token, verify_token
-from .routers import auth
+from routers import auth, payment, booking, chat
+from internal.controller import Controller
+from internal.response import Responses
 
+responses = Responses()
+controller = Controller()
 
-app = FastAPI(dependencies=[Depends(verify_token)])
+app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -14,8 +17,25 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+controller = Controller()
+
 app.include_router(
-    auth.router,
+    controller.router,
+    prefix="/controller",
+    tags=["controller"]
+)
+app.include_router(
+    chat.router,
     prefix="/api",
-    tags=["auth"]
+    tags=["chat"]
+)
+app.include_router(
+    payment.router,
+    prefix="/api",
+    tags=["payment"]
+)
+app.include_router(
+    booking.router,
+    prefix="/api",
+    tags=["booking"]
 )
