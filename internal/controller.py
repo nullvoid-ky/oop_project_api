@@ -10,11 +10,13 @@ from internal.mate import Mate
 from internal.review import Review
 from models.mate import Date
 import datetime
+from internal.post import Post
 
 class Controller:
     def __init__(self) -> None:
         self.__account_list: list = []
         self.__booking_list: list = []
+        self.__post_list: list = []
         self.__chat_list = []
 
     def get_chat_list(self):
@@ -140,23 +142,19 @@ class Controller:
     def booking_list(self) -> list:
         return self.__booking_list
 
-    async def add_instance(self):
-        await self.add_customer("test1", "test1")
-        await self.add_mate("test2", "test2")
-        await self.add_customer("test3", "test3")
-        await self.add_mate("test4", "test4")
-        await self.add_customer("test5", "test5")
-        await self.add_mate("test6", "test6")
-        await self.add_customer("test7", "test7")
-        await self.add_mate("test8", "test8")
-        self.add_booking(self.account_list[0], self.account_list[1], 100)
-        self.add_booking(self.account_list[2], self.account_list[3], 200)
-        self.add_booking(self.account_list[4], self.account_list[5], 300)
-        self.add_booking(self.account_list[6], self.account_list[7], 400)
-        my_acc = await self.search_account_by_username("ganThepro")
+    def add_instance(self):
+        self.add_customer("test1", "test1")
+        self.add_mate("test2", "test2")
+        self.add_customer("test3", "test3")
+        self.add_mate("test4", "test4")
+        self.add_customer("test5", "test5")
+        self.add_mate("test6", "test6")
+        self.add_customer("test7", "test7")
+        self.add_mate("test8", "test8")
+        my_acc = self.search_account_by_username("ganThepro")
 
-        mate_acc = await self.add_mate("Mate1", "1234")
-        mate_acc2 = await self.add_mate("Mate2", "1234")
+        mate_acc = self.add_mate("Mate1", "1234")
+        mate_acc2 = self.add_mate("Mate2", "1234")
         print("mate_acc: ", mate_acc.id)
         print("mate_acc: ", mate_acc2.id)
         mate_acc.add_availablility(datetime.date(2024, 3, 4), "I'm available")
@@ -164,28 +162,23 @@ class Controller:
         self.add_chat_room(Chat(my_acc, mate_acc))
         self.add_chat_room(Chat(my_acc, mate_acc2))
 
-    async def add_customer(self, username: str, password: str) -> Customer:
-        existed_account: Account = await self.search_account_by_username(username)
+    def add_customer(self, username: str, password: str) -> Customer:
+        existed_account: Account = self.search_account_by_username(username)
         if existed_account != None:
             return None
         customer: Customer = Customer(username, password)
         self.__account_list.append(customer)
         return customer
 
-    async def add_mate(self, username: str, password: str) -> Mate:
-        existed_account: Account = await self.search_account_by_username(username)
+    def add_mate(self, username: str, password: str) -> Mate:
+        existed_account: Account = self.search_account_by_username(username)
         if existed_account != None:
             return None
         mate: Mate = Mate(username, password)
         self.__account_list.append(mate)
         return mate
 
-    def add_booking(self, customer: Customer, mate: Mate, amount: int) -> Booking:
-        booking: Booking = Booking(customer, mate, Payment(amount, False))
-        self.__booking_list.append(booking)
-        return booking
-
-    async def search_account_by_username(self, username: str) -> Account | None:
+    def search_account_by_username(self, username: str) -> Account | None:
         for account in self.__account_list:
             if account.username == username:
                 return account
@@ -254,12 +247,18 @@ class Controller:
                 return review
         return None
     
-    async def book_mate(self, customer_id: str, mate_id: str, date: Date) -> Booking | None:
-        for mate in self.get_mates():
-            if str(mate.id) == mate_id:
-                customer: Account = self.search_customer_by_id(customer_id)
-                booked_customer: Account = mate.book(customer, date.year, date.month, date.day)
-                if booked_customer == None:
-                    return None
-                return self.add_booking(customer, mate, mate.amount)
-        return None
+    def add_booking(self, customer: Customer, mate: Mate, date: Date) -> Booking | None:
+        booked_customer: Account = mate.book(customer, date.year, date.month, date.day)
+        print("booked_customer: ", booked_customer) 
+        if booked_customer == None:
+            return None
+        booking: Booking = Booking(customer, mate, Payment(mate.amount))
+        self.__booking_list.append(booking)
+        return booking
+
+    def add_post(self, description: str, picture: str) -> Post | None:
+        if not isinstance(description, str) or not isinstance(picture, str):
+            return None
+        post = Post(description, picture)
+        self.__post_list.append(Post)
+        return post
