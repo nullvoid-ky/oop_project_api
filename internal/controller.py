@@ -157,6 +157,8 @@ class Controller:
         self.add_customer("test7", "test7")
         self.add_mate("test8", "test8")
         my_acc = self.search_account_by_username("ganThepro")
+        self.add_booking(my_acc, self.search_account_by_username("test2"), Date(year=2024, month=3, day=4))
+        self.add_booking(my_acc, self.search_account_by_username("test4"), Date(year=2024, month=3, day=4))
 
         mate_acc = self.add_mate("Mate1", "1234")
         mate_acc2 = self.add_mate("Mate2", "1234")
@@ -260,6 +262,13 @@ class Controller:
         booking: Booking = Booking(customer, mate, Payment(mate.amount))
         self.__booking_list.append(booking)
         return booking
+    
+    def get_booking(self, customer: Customer) -> list[Booking]:
+        booking_list = []
+        for booking in self.__booking_list:
+            if booking.customer == customer:
+                booking_list.append(booking)
+        return booking_list
 
     def add_post(self, description: str, picture: str) -> Post | None:
         if not isinstance(description, str) or not isinstance(picture, str):
