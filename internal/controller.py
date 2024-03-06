@@ -1,3 +1,5 @@
+import datetime
+
 from internal.account import Account
 from internal.message import Message
 from internal.chat import Chat
@@ -8,29 +10,68 @@ from internal.payment import Payment
 from internal.transaction import Transaction
 from internal.mate import Mate
 from internal.review import Review
-from models.mate import Date
-import datetime
+from internal.chat_room_manager import ChatRoomManeger
 from internal.post import Post
+from models.mate import Date
+from utils.auth import register
+from dependencies import create_token
 
 class Controller:
     def __init__(self) -> None:
         self.__account_list: list = []
         self.__booking_list: list = []
         self.__post_list: list = []
-        self.__chat_list = []
+        self.__chat_room_list: list[ChatRoomManeger] = []
+
+    def add_instance(self):
+        account_1 = register("ganThepro", "1234", "customer")
+        print("account_1_token :", create_token(str(account_1['id']), "customer"))
+        account_2 = register("ganThepro2", "1234", "mate")
+        print("account_2_token :", create_token(str(account_2['id']), "mate"))
+        chat_room = self.add_chat_room(account_1['id'], account_2['id'])
+        print("chat_room: ", chat_room.get_chat_room_details())
+        # self.add_customer("test1", "test1")
+        # self.add_mate("test2", "test2")
+        # self.add_customer("test3", "test3")
+        # self.add_mate("test4", "test4")
+        # self.add_customer("test5", "test5")
+        # self.add_mate("test6", "test6")
+        # self.add_customer("test7", "test7")
+        # self.add_mate("test8", "test8")
+        # my_acc = self.search_account_by_username("ganThepro")
+
+        # mate_acc = self.add_mate("Mate1", "1234")
+        # mate_acc2 = self.add_mate("Mate2", "1234")
+        # # print("mate_acc: ", mate_acc.id)
+        # # print("mate_acc: ", mate_acc2.id)
+        # mate_acc.add_availablility(datetime.date(2024, 3, 4), "I'm available")
+        # mate_acc2.add_availablility(datetime.date(2024, 3, 4), "I'm available")
+        # self.add_booking(my_acc, mate_acc, Date(year=2024, month=3, day=4))
+
+        # self.add_chat_room(Chat(my_acc, mate_acc))
+        # self.add_chat_room(Chat(my_acc, mate_acc2))
 
     def get_chat_list(self):
-        return self.__chat_list
+        return self.__chat_room_list
     
-    def add_chat_room(self, chat):
-        if not isinstance(chat, Chat):
-            raise TypeError("chat must be Chat instances")
-        self.__chat_list.append(chat)
+    # def add_chat_room(self, chat):
+    #     if not isinstance(chat, Chat):
+    #         raise TypeError("chat must be Chat instances")
+    #     self.__chat_room_list.append(chat)
 
-    def add_chat_room_by_id(self, sender_id: str, receiver_id: str):
-        sender = self.search_account_by_id(sender_id)
-        receiver = self.search_account_by_id(receiver_id)
-        self.add_chat_room(Chat(sender, receiver))
+    # def add_chat_room_by_id(self, sender_id: str, receiver_id: str):
+    #     sender = self.search_account_by_id(sender_id)
+    #     receiver = self.search_account_by_id(receiver_id)
+    #     self.add_chat_room(Chat(sender, receiver))
+        
+    def add_chat_room(self, account_1_id: str, account_2_id: str) -> ChatRoomManeger | None:
+        account_1: Account = self.search_account_by_id(account_1_id)
+        account_2: Account = self.search_account_by_id(account_2_id)
+        if not (isinstance(account_1, Account) and isinstance(account_2, Account)):
+            return None
+        chat_room: ChatRoomManeger = ChatRoomManeger(account_1, account_2)
+        self.__chat_room_list.append(chat_room)
+        return chat_room
 
     def search_account_by_id(self, id: str):
         for acc in self.__account_list:
@@ -41,7 +82,7 @@ class Controller:
     def get_chat_by_owner_pair(self, owner1, owner2):
         if not (isinstance(owner1, Account) and isinstance(owner2, Account)):
             raise TypeError("owner1, owner2 must be Account instances")
-        for chat in self.__chat_list:
+        for chat in self.__chat_room_list:
             chat_owner1 = chat.get_owner1()
             chat_owner2 = chat.get_owner2()
             if((owner1 in [chat_owner1, chat_owner2]) and (owner2 in [chat_owner1, chat_owner2]) and (chat_owner1 != chat_owner2)):
@@ -100,7 +141,7 @@ class Controller:
         detail = []
         if not (isinstance(sender_acc, Account)):
             raise TypeError("receiver_acc must be Account instances")
-        for chat in self.__chat_list:
+        for chat in self.__chat_room_list:
             chat_owner1 = chat.get_owner1()
             chat_owner2 = chat.get_owner2()
             if((sender_acc in [chat_owner1, chat_owner2])):
@@ -119,7 +160,6 @@ class Controller:
                     })
         
         return detail
-    
 
     def retrieve_chat_room(self, sender_id):
         sender_acc = self.search_account_by_id(sender_id)
@@ -135,7 +175,7 @@ class Controller:
             raise "No Acc found"
         chat = self.get_chat_by_owner_pair(sender_acc, receiver_acc)
         if chat:
-            self.__chat_list = [c for c in self.__chat_list if c != chat]
+            self.__chat_room_list = [c for c in self.__chat_room_list if c != chat]
             return self.get_receiver_chat_room_detail(sender_acc)
         else:
             return None
@@ -146,28 +186,6 @@ class Controller:
     @property
     def booking_list(self) -> list:
         return self.__booking_list
-
-    def add_instance(self):
-        self.add_customer("test1", "test1")
-        self.add_mate("test2", "test2")
-        self.add_customer("test3", "test3")
-        self.add_mate("test4", "test4")
-        self.add_customer("test5", "test5")
-        self.add_mate("test6", "test6")
-        self.add_customer("test7", "test7")
-        self.add_mate("test8", "test8")
-        my_acc = self.search_account_by_username("ganThepro")
-
-        mate_acc = self.add_mate("Mate1", "1234")
-        mate_acc2 = self.add_mate("Mate2", "1234")
-        print("mate_acc: ", mate_acc.id)
-        print("mate_acc: ", mate_acc2.id)
-        mate_acc.add_availablility(datetime.date(2024, 3, 4), "I'm available")
-        mate_acc2.add_availablility(datetime.date(2024, 3, 4), "I'm available")
-        self.add_booking(my_acc, mate_acc, Date(year=2024, month=3, day=4))
-
-        self.add_chat_room(Chat(my_acc, mate_acc))
-        self.add_chat_room(Chat(my_acc, mate_acc2))
 
     def add_customer(self, username: str, password: str) -> Customer:
         existed_account: Account = self.search_account_by_username(username)
@@ -207,6 +225,12 @@ class Controller:
         for account in self.get_mates():
             if str(account.id) == mate_id:
                 return account
+        return None
+    
+    def search_chat_room_by_id(self, chat_room_id: str) -> ChatRoomManeger | None:
+        for chat_room in self.__chat_room_list:
+            if str(chat_room.id) == chat_room_id:
+                return chat_room
         return None
 
     def pay(self, booking_id: str) -> Transaction:

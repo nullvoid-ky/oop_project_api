@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Body
+from fastapi import APIRouter, Depends, Body, WebSocket
 from fastapi import status
 
 from models.message import MessageModel, DeleteMessageModel, EditMessageModel
@@ -25,10 +25,7 @@ def talking(body: MessageModel):
 def add_chat_room(body: AddChatRoomModel):
     from app import controller
     controller.add_chat_room_by_id(body.sender_id, body.receiver_id)
-    if True:
-        return res.success_response_status(status.HTTP_200_OK, "Send message Success", None)
-    else:
-        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Send message Error")
+    return res.success_response_status(status.HTTP_200_OK, "Send message Success", None)
     
 @router.delete("/delete-message")
 def delete_message(body: DeleteMessageModel):

@@ -4,7 +4,7 @@ from models.mate import Date
 
 ph = PasswordHasher()
     
-async def register(username: str, password: str, role: str) -> dict | None:
+def register(username: str, password: str, role: str) -> dict | None:
     from app import controller
     account: Account = controller.search_account_by_username(username)
     if account == None:
@@ -15,13 +15,12 @@ async def register(username: str, password: str, role: str) -> dict | None:
             new_account: Account = controller.add_mate(username, hashed_password)
         else:
             return None
-        mate = controller.search_account_by_username("Mate2")
-        booking = controller.add_booking(new_account, mate, Date(year=2024, month=3, day=4))
-        print(booking.id)
+        # mate = controller.search_account_by_username("Mate2")
+        # booking = controller.add_booking(new_account, mate, Date(year=2024, month=3, day=4))
         return new_account.get_account_details()
     return None
 
-async def login(username: str, password: str) -> dict | None:
+def login(username: str, password: str) -> dict | None:
     from app import controller
     account: Account = controller.search_account_by_username(username)
     if account == None:
