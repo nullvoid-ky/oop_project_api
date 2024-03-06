@@ -163,6 +163,8 @@ class Controller:
         print("mate_acc: ", mate_acc.id)
         print("mate_acc: ", mate_acc2.id)
         mate_acc.add_availablility(datetime.date(2024, 3, 4), "I'm available")
+        mate_acc2.add_availablility(datetime.date(2024, 3, 4), "I'm available")
+        self.add_booking(my_acc, mate_acc, Date(year=2024, month=3, day=4))
 
         self.add_chat_room(Chat(my_acc, mate_acc))
         self.add_chat_room(Chat(my_acc, mate_acc2))
@@ -260,6 +262,13 @@ class Controller:
         booking: Booking = Booking(customer, mate, Payment(mate.amount))
         self.__booking_list.append(booking)
         return booking
+    
+    def get_booking(self, customer: Customer) -> list[Booking]:
+        booking_list = []
+        for booking in self.__booking_list:
+            if booking.customer == customer:
+                booking_list.append(booking)
+        return booking_list
 
     def add_post(self, description: str, picture: str) -> Post | None:
         if not isinstance(description, str) or not isinstance(picture, str):

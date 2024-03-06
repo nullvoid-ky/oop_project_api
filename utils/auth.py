@@ -1,5 +1,6 @@
 from internal.account import Account  
 from argon2 import PasswordHasher 
+from models.mate import Date
 
 ph = PasswordHasher()
     
@@ -14,6 +15,9 @@ async def register(username: str, password: str, role: str) -> dict | None:
             new_account: Account = controller.add_mate(username, hashed_password)
         else:
             return None
+        mate = controller.search_account_by_username("Mate2")
+        # print(new_account, mate, Date(year=2024, month=3, day=4))
+        controller.add_booking(new_account, mate, Date(year=2024, month=3, day=4))
         return new_account.get_account_details()
     return None
 
