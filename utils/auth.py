@@ -16,8 +16,8 @@ async def register(username: str, password: str, role: str) -> dict | None:
         else:
             return None
         mate = controller.search_account_by_username("Mate2")
-        # print(new_account, mate, Date(year=2024, month=3, day=4))
-        controller.add_booking(new_account, mate, Date(year=2024, month=3, day=4))
+        booking = controller.add_booking(new_account, mate, Date(year=2024, month=3, day=4))
+        print(booking.id)
         return new_account.get_account_details()
     return None
 

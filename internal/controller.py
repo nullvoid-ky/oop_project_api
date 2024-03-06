@@ -256,7 +256,6 @@ class Controller:
     
     def add_booking(self, customer: Customer, mate: Mate, date: Date) -> Booking | None:
         booked_customer: Account = mate.book(customer, date.year, date.month, date.day)
-        print("booked_customer: ", booked_customer) 
         if booked_customer == None:
             return None
         booking: Booking = Booking(customer, mate, Payment(mate.amount))
@@ -269,6 +268,14 @@ class Controller:
             if booking.customer == customer:
                 booking_list.append(booking)
         return booking_list
+
+    def delete_booking(self, booking_id: str) -> Booking | None:
+        booking: Booking = self.search_booking_by_id(booking_id)
+        if booking:
+            self.__booking_list.remove(booking)
+            return booking
+        else:
+            return None
 
     def add_post(self, description: str, picture: str) -> Post | None:
         if not isinstance(description, str) or not isinstance(picture, str):
