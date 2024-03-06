@@ -71,3 +71,11 @@ def get_booking():
     if isinstance(booking_list, list):
         return res.success_response_status(status.HTTP_200_OK, "Get Booking Success", data=[booking.get_booking_detail() for booking in booking_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in get booking")
+
+@router.get("/get-user-profile")
+def get_profile():
+    from app import controller
+    account: Account = controller.search_account_by_id(Body.user_id)
+    if account == None:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
+    return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())

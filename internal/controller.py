@@ -157,14 +157,14 @@ class Controller:
         self.add_customer("test7", "test7")
         self.add_mate("test8", "test8")
         my_acc = self.search_account_by_username("ganThepro")
-        self.add_booking(my_acc, self.search_account_by_username("test2"), Date(year=2024, month=3, day=4))
-        self.add_booking(my_acc, self.search_account_by_username("test4"), Date(year=2024, month=3, day=4))
 
         mate_acc = self.add_mate("Mate1", "1234")
         mate_acc2 = self.add_mate("Mate2", "1234")
         print("mate_acc: ", mate_acc.id)
         print("mate_acc: ", mate_acc2.id)
         mate_acc.add_availablility(datetime.date(2024, 3, 4), "I'm available")
+        mate_acc2.add_availablility(datetime.date(2024, 3, 4), "I'm available")
+        self.add_booking(my_acc, mate_acc, Date(year=2024, month=3, day=4))
 
         self.add_chat_room(Chat(my_acc, mate_acc))
         self.add_chat_room(Chat(my_acc, mate_acc2))
