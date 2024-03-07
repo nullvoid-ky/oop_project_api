@@ -296,22 +296,9 @@ class Controller:
     
     def search_leaderboard(self):
         mate_list = self.get_mates()
-        my_list = []
-        top_mate = []
-        for mate in mate_list:
-            score = mate.get_average_review_star()
-            my_list.append(score)
-        new_list = sorted(my_list)[::-1]
-        for score in new_list:
-            most_mate = None
-            most_amount = 0
-            for mate in mate_list:
-                if mate.get_average_review_star() == score:
-                    if mate.get_review_amount() > most_amount:
-                        most_mate = mate
-                        most_amount = mate.get_average_review_amount()
-            new_tuple = (score, most_mate)
-            top_mate.append(new_tuple)
+
+        sorted_mates = sorted(mate_list, key=lambda mate: (mate.get_average_review_star(), mate.get_review_amount(), mate.get_account_created()), reverse=True)
+
 
 
 

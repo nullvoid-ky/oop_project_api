@@ -11,6 +11,7 @@ class Mate(Account):
         self.__review_list = []
         self.__booked_customer = None
         self.__amount = amount
+
     @property
     def availablility_list(self) -> list[Availablility]:
         return self.__availablility_list
@@ -72,3 +73,6 @@ class Mate(Account):
 
     def get_review_amount(self):
         return len(self.__review_list)
+    
+    def get_account_created(self):
+        return
