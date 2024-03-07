@@ -276,6 +276,17 @@ class Controller:
         self.__post_list.append(Post)
         return post
     
+    def edit_username(self, customer_id: str, new_username: str):
+        customer_acc: Account = self.search_account_by_id(customer_id)
+        customer_acc.username = new_username
+        return customer_acc
+    
+    def edit_pic_url(self, customer_id: str, new_pic_url: str):
+        customer_acc: Account = self.search_account_by_id(customer_id)
+        customer_acc.pic_url = new_pic_url
+        return customer_acc
+
+    
 
     def add_review_mate(self, customer_id, mate_id, message, star) -> Review | None:
         mate = self.search_mate_by_id(mate_id)
