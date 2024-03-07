@@ -12,6 +12,7 @@ from internal.mate import Mate
 from internal.review import Review
 from internal.chat_room_manager import ChatRoomManeger
 from internal.post import Post
+from internal.message import Message
 from models.mate import Date
 from utils.auth import register
 from dependencies import create_token
@@ -54,15 +55,11 @@ class Controller:
     def get_chat_list(self):
         return self.__chat_room_list
     
-    # def add_chat_room(self, chat):
-    #     if not isinstance(chat, Chat):
-    #         raise TypeError("chat must be Chat instances")
-    #     self.__chat_room_list.append(chat)
-
-    # def add_chat_room_by_id(self, sender_id: str, receiver_id: str):
-    #     sender = self.search_account_by_id(sender_id)
-    #     receiver = self.search_account_by_id(receiver_id)
-    #     self.add_chat_room(Chat(sender, receiver))
+    def get_chat_history_by_id(self, chat_room_id: str) -> list | None:
+        chat_room = self.search_chat_room_by_id(chat_room_id)
+        if chat_room:
+            return chat_room.message_list
+        return None
         
     def add_chat_room(self, account_1_id: str, account_2_id: str) -> ChatRoomManeger | None:
         account_1: Account = self.search_account_by_id(account_1_id)
@@ -77,16 +74,6 @@ class Controller:
         for acc in self.__account_list:
             if(id == str(acc.id)):
                 return acc
-        return None
-
-    def get_chat_by_owner_pair(self, owner1, owner2):
-        if not (isinstance(owner1, Account) and isinstance(owner2, Account)):
-            raise TypeError("owner1, owner2 must be Account instances")
-        for chat in self.__chat_room_list:
-            chat_owner1 = chat.get_owner1()
-            chat_owner2 = chat.get_owner2()
-            if((owner1 in [chat_owner1, chat_owner2]) and (owner2 in [chat_owner1, chat_owner2]) and (chat_owner1 != chat_owner2)):
-                return chat
         return None
 
     def talk(self, sender_id: str, receiver_id: str, text: str):
@@ -105,15 +92,6 @@ class Controller:
         chat = self.get_chat_by_owner_pair(sender, receiver)
         if(chat != None):
             msg_list = chat.delete_message(message_id)
-            return msg_list
-        return None
-    
-    def edit_message(self, sender_id: str, receiver_id: str, message_id: str, new_text: str):
-        sender = self.search_account_by_id(sender_id)
-        receiver = self.search_account_by_id(receiver_id)
-        chat = self.get_chat_by_owner_pair(sender, receiver)
-        if(chat != None):
-            msg_list = chat.edit_message(message_id, new_text)
             return msg_list
         return None
 

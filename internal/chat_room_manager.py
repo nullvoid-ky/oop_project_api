@@ -1,16 +1,18 @@
 from fastapi import WebSocket  
 from uuid import uuid4, UUID
+from internal.message import Message
 
 from internal.account import Account
 
 class ChatRoomManeger:
     def __init__(self, account_1: Account, account_2: Account) -> None:
-        # self.__active_connections: list[WebSocket] = []
         self.__id: UUID = uuid4()
         self.__account_1: Account = account_1
         self.__account_2: Account = account_2
         self.__account_1_connection: WebSocket = None
         self.__account_2_connection: WebSocket = None
+        self.__message_list: list[Message] = []
+
     @property
     def id(self) -> UUID:
         return self.__id
@@ -20,6 +22,9 @@ class ChatRoomManeger:
     @property
     def account_2(self) -> Account:
         return self.__account_2
+    @property
+    def message_list(self) -> list:
+        return self.__message_list
     
     async def connect(self, websocket: WebSocket, account: Account):
         connection: WebSocket = websocket
@@ -36,14 +41,20 @@ class ChatRoomManeger:
         elif self.__account_2 == account and self.__account_2_connection == websocket:
             self.__account_2_connection = None
 
-    async def send_personal_message(self, message: str, websocket: WebSocket):
-        await websocket.send_text(message)
+    async def add_message(self, message: str, account: Account):
+        self.__message_list.append(Message(account, message))
 
     async def broadcast(self, message: str):
         if self.__account_1_connection:
             await self.__account_1_connection.send_text(message)
         if self.__account_2_connection:
             await self.__account_2_connection.send_text(message)
+
+    def search_message_by_id(self, message_id: str) -> Message | None:
+        for message in self.__message_list:
+            if message.id == message_id:
+                return message
+        return None
 
     def get_chat_room_details(self) -> dict:
         return {
