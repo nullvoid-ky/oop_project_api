@@ -50,6 +50,15 @@ class Controller:
 
         # self.add_chat_room(Chat(my_acc, mate_acc))
         # self.add_chat_room(Chat(my_acc, mate_acc2))
+    def get_chat_by_owner_pair(self, owner1, owner2):
+        if not (isinstance(owner1, Account) and isinstance(owner2, Account)):
+            raise TypeError("owner1, owner2 must be Account instances")
+        for chat in self.__chat_room_list:
+            chat_owner1 = chat.get_owner1()
+            chat_owner2 = chat.get_owner2()
+            if((owner1 in [chat_owner1, chat_owner2]) and (owner2 in [chat_owner1, chat_owner2]) and (chat_owner1 != chat_owner2)):
+                return chat
+        return None
 
     def get_chat_list(self):
         return self.__chat_room_list
@@ -119,21 +128,23 @@ class Controller:
         if not (isinstance(sender_acc, Account)):
             raise TypeError("receiver_acc must be Account instances")
         for chat in self.__chat_room_list:
-            chat_owner1 = chat.get_owner1()
-            chat_owner2 = chat.get_owner2()
+            chat_owner1 = chat.account_1
+            chat_owner2 = chat.account_2
             if((sender_acc in [chat_owner1, chat_owner2])):
-                if(len(chat.get_message_list()) >= 1):
-                    latest_chat = chat.get_message_list()[-1]
+                if(len(chat.message_list) >= 1):
+                    latest_chat = chat.message_list[-1]
                     detail.append({
                         'account_detail' : chat_owner1.get_account_details() if sender_acc != chat_owner1 else chat_owner2.get_account_details(),
-                        'latest_timestamp' : latest_chat.get_timestamp(),
-                        'latest_text' : latest_chat.get_text(),
+                        'latest_timestamp' : latest_chat.get_message_details()['timestamp'],
+                        'latest_text' : latest_chat.get_message_details()['text'],
+                        'chat_room_id': str(chat.id)
                     })
                 else:
                     detail.append({
                         'account_detail' : chat_owner1.get_account_details() if sender_acc != chat_owner1 else chat_owner2.get_account_details(),
                         'latest_timestamp' : "",
                         'latest_text' : "",
+                        'chat_room_id': str(chat.id)
                     })
         
         return detail
@@ -222,7 +233,7 @@ class Controller:
             return None
         payment: Payment = booking.payment
         payment.pay(customer, mate)
-        self.add_chat_room(Chat(customer, mate))
+        self.add_chat_room(customer, mate)
         transaction: Transaction = Transaction(customer, mate, payment.amount)
         customer.add_transaction(transaction)
         mate.add_transaction(transaction)
