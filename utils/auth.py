@@ -1,26 +1,29 @@
 from internal.account import Account  
 from argon2 import PasswordHasher 
+from models.mate import Date
 
 ph = PasswordHasher()
     
 async def register(username: str, password: str, role: str) -> dict | None:
     from app import controller
-    account: Account = await controller.search_account_by_username(username)
+    account: Account = controller.search_account_by_username(username)
     if account == None:
         hashed_password: str = ph.hash(password)
         if role == "customer":
-            new_account: Account = await controller.add_customer(username, hashed_password)
+            new_account: Account = controller.add_customer(username, hashed_password)
         elif role == "mate":
-            new_account: Account = await controller.add_mate(username, hashed_password)
+            new_account: Account = controller.add_mate(username, hashed_password)
         else:
             return None
-        await controller.add_instance()
+        mate = controller.search_account_by_username("Mate2")
+        # print(new_account, mate, Date(year=2024, month=3, day=4))
+        controller.add_booking(new_account, mate, Date(year=2024, month=3, day=4))
         return new_account.get_account_details()
     return None
 
 async def login(username: str, password: str) -> dict | None:
     from app import controller
-    account: Account = await controller.search_account_by_username(username)
+    account: Account = controller.search_account_by_username(username)
     if account == None:
         return None
     try:

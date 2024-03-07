@@ -1,6 +1,4 @@
 from uuid import uuid4, UUID
-# from internal.mate import Mate
-# from internal.customer import Customer
 
 class Account:
     def __init__(self, username: str, password: str, pic_url: str = None, money: int = None) -> None:
@@ -31,12 +29,12 @@ class Account:
         return self.__transaction_list
     
     def get_account_details(self) -> dict:
-        # from internal.customer import Customer
+        from internal.customer import Customer
         return {
             "id": str(self.__id),
             "username": self.__username,
             "pic_url": self.__pic_url,
-            # "role": "customer" if isinstance(self, Customer) else "mate" 
+            "role": "customer" if isinstance(self, Customer) else "mate" 
         }
     
     def add_transaction(self, transaction) -> None:

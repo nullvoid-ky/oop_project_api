@@ -1,13 +1,15 @@
 from fastapi import APIRouter, status, Depends, Body
 
 from models.controller import ReviewModel
+from models.post import PostModel
 import utils.response as res
 from models.mate import MateModel
 from internal.booking import Booking
 from internal.transaction import Transaction
 from internal.account import Account
+from internal.post import Post
 from models.booking import BookingModel
-from dependencies import verify_token, verify_customer
+from dependencies import verify_token, verify_customer, verify_mate
 
 router = APIRouter(
     prefix="/controller",
@@ -52,3 +54,28 @@ def get_mates():
     if isinstance(mate_list, list):
         return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in mate_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in add mate")
+
+@router.post("/add-post", dependencies=[Depends(verify_mate)])
+def add_post(body: PostModel):
+    from app import controller
+    post: Post = controller.add_post(body.description, body.picture)
+    if post == None:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in add post")
+    return res.success_response_status(status.HTTP_200_OK, "Add Post Success", data=post.get_post_details())
+
+@router.get("/get-booking", dependencies=[Depends(verify_customer)])
+def get_booking():
+    from app import controller
+    customer: Account = controller.search_customer_by_id(Body.user_id)
+    booking_list = controller.get_booking(customer)
+    if isinstance(booking_list, list):
+        return res.success_response_status(status.HTTP_200_OK, "Get Booking Success", data=[booking.get_booking_detail() for booking in booking_list])
+    return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in get booking")
+
+@router.get("/get-user-profile")
+def get_profile():
+    from app import controller
+    account: Account = controller.search_account_by_id(Body.user_id)
+    if account == None:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
+    return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())
