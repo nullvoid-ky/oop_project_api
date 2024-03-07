@@ -9,7 +9,6 @@ class Message:
         self.__text: str = text
         self.__timestamp: datetime = datetime.now()
         self.__is_edit: bool = False
-    
     @property
     def id(self) -> UUID:
         return self.__id
