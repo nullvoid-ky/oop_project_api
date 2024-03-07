@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Union
 import datetime
 
 from internal.account import Account
@@ -216,7 +216,7 @@ class Controller:
         pledge_payment: Payment = Payment(mate.price / 2)
         pledge_payment.pay(customer, mate)
         pledge_transaction: Transaction = Transaction(customer, mate, pledge_payment.amount)   
-        booking: Booking = Booking(customer, mate, pledge_payment)
+        booking: Booking = Booking(customer, mate, datetime.date(date.year, date.month, date.day), pledge_payment)
         self.__booking_list.append(booking)
         return booking, pledge_transaction
     
@@ -227,13 +227,18 @@ class Controller:
                 booking_list.append(booking)
         return booking_list
 
-    def delete_booking(self, booking: Booking, account: Account) -> Tuple[Booking, Transaction] | None:
+    def delete_booking(self, booking: Booking, account: Account) -> Union[Tuple[Booking, Transaction], Booking, None]:
+        transaction: Transaction = None
         if isinstance(account, Mate):
             booking.payment.pay(account, booking.customer)
             transaction: Transaction = Transaction(account, booking.customer, booking.payment.amount)
         if isinstance(booking, Booking):
             self.__booking_list.remove(booking)
-            return booking, transaction
+            booking.mate.booked_customer = None
+            booking.mate.add_availablility(datetime.date(booking.book_date.year, booking.book_date.month, booking.book_date.day), "I'm available")
+            if transaction:
+                return booking, transaction
+            return booking
         return None
 
     def add_post(self, description: str, picture: str) -> Post | None:
@@ -257,10 +262,3 @@ class Controller:
         mate_list = self.get_mates()
         sorted_mates = sorted(mate_list, key=lambda mate: (mate.get_average_review_star(), mate.get_review_amount(), mate.timestamp), reverse=True)
         return sorted_mates[:10]
-
-
-
-
-
-
-

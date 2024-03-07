@@ -18,6 +18,9 @@ class Mate(Account):
     @property
     def booked_customer(self) -> Account:
         return self.__booked_customer
+    @booked_customer.setter
+    def booked_customer(self, customer: Account | None):
+        self.__booked_customer = customer
     @property
     def price(self) -> int:
         return self.__price
@@ -31,7 +34,6 @@ class Mate(Account):
     def add_availablility(self, date: datetime, detail: str) -> Availablility:
         availablility: Availablility = Availablility(date, detail)
         self.__availablility_list.append(availablility)
-        print(availablility.date)
         return availablility
     
     def search_availablility(self, year: int, month: int, day: int) -> Availablility | None:

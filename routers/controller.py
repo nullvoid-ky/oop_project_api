@@ -1,4 +1,5 @@
 from fastapi import APIRouter, status, Depends, Body
+from typing import Union, Tuple
 
 from models.post import PostModel
 from models.profile import EditUsernameModel, EditPicUrlModel
@@ -64,7 +65,7 @@ def add_post(body: PostModel):
 def get_booking():
     from app import controller
     customer: Account = controller.search_customer_by_id(Body.user_id)
-    booking_list = controller.get_booking(customer)
+    booking_list: list = controller.get_booking(customer)
     if isinstance(booking_list, list):
         return res.success_response_status(status.HTTP_200_OK, "Get Booking Success", data=[booking.get_booking_detail() for booking in booking_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in get booking")
@@ -92,8 +93,11 @@ def delete_booking(booking_id: str):
     account: Account = controller.search_account_by_id(Body.user_id)
     if booking == None or account == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Booking or Account not found")
-    if controller.delete_booking(booking, account):
-        return res.success_response_status(status.HTTP_200_OK, "Delete Booking Success")
+    deleted_booking: Union[Tuple[Booking, Transaction], Booking, None] = controller.delete_booking(booking, account)
+    if isinstance(deleted_booking, tuple):
+        return res.success_response_status(status.HTTP_200_OK, "Delete Booking Success", data={"booking": deleted_booking[0].get_booking_detail(), "transaction": deleted_booking[1].get_transaction_details()})
+    elif isinstance(deleted_booking, Booking):
+        return res.success_response_status(status.HTTP_200_OK, "Delete Booking Success", data=deleted_booking.get_booking_detail())
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in delete booking")
 
 @router.post("/add-chat-room", dependencies=[Depends(verify_customer)])
@@ -123,7 +127,6 @@ def edit_message(body: EditPicUrlModel):
         return res.success_response_status(status.HTTP_200_OK, "Edit pic url Success",  data=account.get_account_details())
     else:
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Send pic url Error")
-
     
 @router.get("/get-leaderboard")
 def get_leaderboard():
