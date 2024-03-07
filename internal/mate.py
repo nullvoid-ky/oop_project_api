@@ -8,7 +8,7 @@ class Mate(Account):
     def __init__(self, username: str, password: str, gender: str, location: str, amount: int=0):
         super().__init__(username, password, gender, location)
         self.__availablility_list: list[Availablility] = []
-        self.__review_list = []
+        self.__review_list: list[Review] = []
         self.__booked_customer = None
         self.__amount = amount
 
@@ -78,18 +78,18 @@ class Mate(Account):
                 return review
         return None
     
-    def add_review_mate(self, customer_id, message, star) -> Review | None:
-        review = Review(customer_id, message, star)
+    def add_review_mate(self, customer_id: str, message: str, star: int) -> Review:
+        review: Review = Review(customer_id, message, star)
         self.__review_list.append(review)
         return review
     
     def del_review_mate(self, review_id) -> Review | None:
-        review = self.search_review_by_id(review_id)
-        if review == None: 
+        review: Review = self.search_review_by_id(review_id)
+        if review == None:
             return None
         self.__review_list.remove(review)
         return review
     
     def get_review_mate(self) -> list:
-        return self.review__review_list
+        return self.__review_list
     

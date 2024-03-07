@@ -1,5 +1,6 @@
 from uuid import uuid4, UUID
 import datetime
+
 class Review:
     def __init__(self, message, star) -> None:
         self.__id : UUID = uuid4()
@@ -20,7 +21,7 @@ class Review:
     def timestamp(self):
         return self.__timestamp
     
-    def get_review_detail(self) -> dict:
+    def get_review_details(self) -> dict:
         return {
             "id" : str(self.__id),
             "message" : str(self.__message),

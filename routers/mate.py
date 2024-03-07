@@ -39,29 +39,31 @@ def get_availablility(mate_id: str):
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "No availablility")
     return res.success_response_status(status.HTTP_200_OK, "Get availablility success", data=[availablility.get_availablility_details() for availablility in availablility_list])
 
-@router.post("/add_review")
+@router.post("/add-review")
 async def add_review(body: ReviewCreation):
-    from main import controller
-    result : dict = controller.add_review_mate(body.customer_id, body.message, body.star)
-    if result:
-        return res.success_response_status(status.HTTP_200_OK, "Added Review Successfully", data=result.get_review_detail())
+    from app import controller
+    mate: Account = controller.search_mate_by_id(body.mate_id)
+    review = mate.add_review_mate(body.customer_id, body.message, body.star)
+    if review:
+        return res.success_response_status(status.HTTP_200_OK, "Added Review Successfully", data=review.get_review_details())
     return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")
 
-@router.get("/reviews")
-async def see_review():
-    from main import controller
-    result : dict = controller.get_review_mate()
-    data_list = []
-    for review in result:
-        data_list.append(review.get_review_detail())
-    if len(data_list):
-        return res.success_response_status(status.HTTP_200_OK, "Read Review Successfully", data=data_list)
+@router.get("/get-review/{mate_id}")
+async def get_review(mate_id: str):
+    from app import controller
+    mate: Account = controller.search_mate_by_id(mate_id)
+    review_list = []
+    for review in mate.review_list:
+        review_list.append(review.get_review_details())
+    if len(review_list):
+        return res.success_response_status(status.HTTP_200_OK, "Get Review Successfully", data=[r.get_review_details() for r in review_list])
     return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")
 
-@router.delete("/del_review")
+@router.delete("/del-review")
 async def delete_review(body: ReviewDeletion):
-    from main import controller
-    result : dict = controller.del_review_mate(body.review_id)
-    if result:
-        return res.success_response_status(status.HTTP_200_OK, "Delete Review Successfully", data=result.get_review_detail())
+    from app import controller
+    mate: Account = controller.search_mate_by_id(body.review_id)
+    review = mate.del_review_mate(body.review_id)
+    if review:
+        return res.success_response_status(status.HTTP_200_OK, "Delete Review Successfully", data=review.get_review_details())
     return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")

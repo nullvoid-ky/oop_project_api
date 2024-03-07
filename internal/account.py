@@ -12,7 +12,6 @@ class Account:
         self.__gender: str = gender
         self.__location: str = location
         self.__transaction_list: list = []
-
         self.__timestamp = datetime.now()
         
     @property
