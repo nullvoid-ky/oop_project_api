@@ -2,7 +2,7 @@ from fastapi import APIRouter, status, Depends, Body
 
 from models.controller import ReviewModel
 from models.post import PostModel
-from models.profile import EditUsernameModel, EditPicUrlModel
+from models.profile import EditDisplayNameModel, EditPicUrlModel
 import utils.response as res
 from models.mate import MateModel
 from internal.booking import Booking
@@ -81,17 +81,17 @@ def get_profile():
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
     return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())
 
-@router.put("/edit-username")
-def edit_message(body: EditUsernameModel):
+@router.put("/edit-displayname")
+def edit_display_name(body: EditDisplayNameModel):
     from app import controller
-    account: Account = controller.edit_username(Body.user_id, body.username)
+    account: Account = controller.edit_display_name(Body.user_id, body.display_name)
     if account:
-        return res.success_response_status(status.HTTP_200_OK, "Edit username Success",  data=account.get_account_details())
+        return res.success_response_status(status.HTTP_200_OK, "Edit displayname Success",  data=account.get_account_details())
     else:
-        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit username Error")
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit displayname Error")
     
-@router.put("/edit-pic-url")
-def edit_message(body: EditPicUrlModel):
+@router.post("/edit-pic-url")
+def edit_pic_url(body: EditPicUrlModel):
     from app import controller
     account: Account = controller.edit_pic_url(Body.user_id, body.url)
     if account:

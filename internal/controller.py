@@ -277,9 +277,9 @@ class Controller:
         self.__post_list.append(Post)
         return post
     
-    def edit_username(self, customer_id: str, new_username: str):
+    def edit_display_name(self, customer_id: str, new_username: str):
         customer_acc: Account = self.search_account_by_id(customer_id)
-        customer_acc.username = new_username
+        customer_acc.display_name = new_username
         return customer_acc
     
     def edit_pic_url(self, customer_id: str, new_pic_url: str):

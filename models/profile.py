@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
-class EditUsernameModel(BaseModel):
-    username: str
+class EditDisplayNameModel(BaseModel):
+    display_name: str
 
 class EditPicUrlModel(BaseModel):
     url: str
