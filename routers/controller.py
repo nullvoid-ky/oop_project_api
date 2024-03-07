@@ -1,14 +1,16 @@
 from fastapi import APIRouter, status, Depends, Body
 
-from models.controller import ReviewModel
-from models.post import PostModel
-import utils.response as res
-from models.mate import MateModel
 from internal.booking import Booking
 from internal.transaction import Transaction
 from internal.account import Account
 from internal.post import Post
+from internal.chat_room_manager import ChatRoomManeger
+from models.controller import ReviewModel
+from models.post import PostModel
+from models.mate import MateModel
 from models.booking import BookingModel
+from models.chat_room import AddChatRoomModel
+import utils.response as res
 from dependencies import verify_token, verify_customer, verify_mate
 
 router = APIRouter(
@@ -79,3 +81,21 @@ def get_profile():
     if account == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
     return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())
+
+@router.delete("/delete-booking/{booking_id}", dependencies=[Depends(verify_customer)])
+def delete_booking(booking_id: str):
+    from app import controller
+    booking: Booking = controller.search_booking_by_id(booking_id)
+    if booking == None:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Booking not found")
+    if controller.delete_booking(booking_id):
+        return res.success_response_status(status.HTTP_200_OK, "Delete Booking Success")
+    return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in delete booking")
+
+@router.post("/add-chat-room", dependencies=[Depends(verify_customer)])
+def add_chat_room(body: AddChatRoomModel):
+    from app import controller
+    chat_room: ChatRoomManeger = controller.add_chat_room(Body.user_id, body.receiver_id)
+    if chat_room == None:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
+    return res.success_response_status(status.HTTP_200_OK, "Add Chat Room Success", data=chat_room.get_chat_room_details())
