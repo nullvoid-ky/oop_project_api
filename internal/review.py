@@ -2,9 +2,9 @@ from uuid import uuid4, UUID
 import datetime
 class Review:
     def __init__(self, message, star) -> None:
-        self.__id: UUID = uuid4()
-        self.__message = message
-        self.__star = star
+        self.__id : UUID = uuid4()
+        self.__message : str = message
+        self.__star : int = star 
         self.__timestamp = datetime.now()
         
     @property

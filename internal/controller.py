@@ -8,9 +8,9 @@ from internal.payment import Payment
 from internal.transaction import Transaction
 from internal.mate import Mate
 from internal.review import Review
+from internal.post import Post
 from models.mate import Date
 import datetime
-from internal.post import Post
 
 class Controller:
     def __init__(self) -> None:
@@ -18,6 +18,7 @@ class Controller:
         self.__booking_list: list = []
         self.__post_list: list = []
         self.__chat_list = []
+
 
     def get_chat_list(self):
         return self.__chat_list
@@ -281,7 +282,7 @@ class Controller:
         review = mate.add_review_mate(customer_id, message, star)
         return review
     
-    def del_review_mate(self, mate_id, review_id):
+    def del_review_mate(self, mate_id, review_id) -> Review | None:
         mate = self.search_mate_by_id(mate_id)
         review = mate.search_review_by_id(review_id)
         if mate == None or review == None: 
@@ -289,6 +290,31 @@ class Controller:
         mate.del_review(review)
         return review
     
-    def search_review(self, mate_id):
+    def search_review(self, mate_id) -> list:
         mate = self.search_mate_by_id(mate_id)    
         return mate.review__review_list
+    
+    def search_leaderboard(self):
+        mate_list = self.get_mates()
+        my_list = []
+        top_mate = []
+        for mate in mate_list:
+            score = mate.get_average_review_star()
+            my_list.append(score)
+        new_list = sorted(my_list)[::-1]
+        for score in new_list:
+            most_mate = None
+            most_amount = 0
+            for mate in mate_list:
+                if mate.get_average_review_star() == score:
+                    if mate.get_review_amount() > most_amount:
+                        most_mate = mate
+                        most_amount = mate.get_average_review_amount()
+            new_tuple = (score, most_mate)
+            top_mate.append(new_tuple)
+
+
+
+
+
+

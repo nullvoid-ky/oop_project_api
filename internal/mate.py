@@ -61,3 +61,14 @@ class Mate(Account):
         review = Review(customer_id, message, star)
         self.__review_list.append(review)
         return review
+    
+    def get_average_review_star(self):
+        sum : float = 0
+        for review in self.__review_list:
+            sum += review.star
+        if len(self.__review_list):
+            return sum/len(self.__review_list)
+        return None
+
+    def get_review_amount(self):
+        return len(self.__review_list)
