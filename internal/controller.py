@@ -305,10 +305,10 @@ class Controller:
         mate = self.search_mate_by_id(mate_id)    
         return mate.review__review_list
     
-    def search_leaderboard(self):
+    def get_leaderboard(self):
         mate_list = self.get_mates()
-
-        sorted_mates = sorted(mate_list, key=lambda mate: (mate.get_average_review_star(), mate.get_review_amount(), mate.get_account_created()), reverse=True)
+        sorted_mates = sorted(mate_list, key=lambda mate: (mate.get_average_review_star(), mate.get_review_amount(), mate.timestamp), reverse=True)
+        return sorted_mates[:10]
 
 
 

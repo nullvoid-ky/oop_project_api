@@ -98,3 +98,15 @@ def edit_message(body: EditPicUrlModel):
         return res.success_response_status(status.HTTP_200_OK, "Edit pic url Success",  data=account.get_account_details())
     else:
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Send pic url Error")
+
+    
+@router.get("/get-leaderboard")
+def get_leaderboard():
+    from app import controller
+    mate_list : list = controller.get_leaderboard()
+    my_list = []
+    for mate in mate_list:
+        my_list.append(mate.get_account_details)
+    if len(my_list):
+        return res.success_response_status(status.HTTP_200_OK, "Get Leaderboard Success", data=my_list)
+    return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")

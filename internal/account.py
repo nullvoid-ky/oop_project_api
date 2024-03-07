@@ -11,6 +11,7 @@ class Account:
         self.__money: int = 0
         self.__transaction_list = []
         self.__timestamp = datetime.now()
+        
     @property
     def username(self) -> str:
         return self.__username
