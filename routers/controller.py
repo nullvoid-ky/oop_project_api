@@ -2,6 +2,7 @@ from fastapi import APIRouter, status, Depends, Body
 
 from models.controller import ReviewModel
 from models.post import PostModel
+from models.profile import EditUsernameModel, EditPicUrlModel
 import utils.response as res
 from models.mate import MateModel
 from internal.booking import Booking
@@ -79,3 +80,21 @@ def get_profile():
     if account == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
     return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())
+
+@router.put("/edit-username")
+def edit_message(body: EditUsernameModel):
+    from app import controller
+    account: Account = controller.edit_username(Body.user_id, body.username)
+    if account:
+        return res.success_response_status(status.HTTP_200_OK, "Edit username Success",  data=account.get_account_details())
+    else:
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit username Error")
+    
+@router.put("/edit-pic-url")
+def edit_message(body: EditPicUrlModel):
+    from app import controller
+    account: Account = controller.edit_pic_url(Body.user_id, body.url)
+    if account:
+        return res.success_response_status(status.HTTP_200_OK, "Edit pic url Success",  data=account.get_account_details())
+    else:
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Send pic url Error")
