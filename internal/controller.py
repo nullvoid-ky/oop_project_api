@@ -2,7 +2,6 @@ import datetime
 
 from internal.account import Account
 from internal.message import Message
-from internal.chat import Chat
 from internal.booking import Booking
 from internal.mate import Mate
 from internal.customer import Customer
