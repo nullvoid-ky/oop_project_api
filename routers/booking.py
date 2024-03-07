@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, Body
 from fastapi import status
-
 from dependencies import verify_token
 from internal.booking import Booking
 import utils.response as res
