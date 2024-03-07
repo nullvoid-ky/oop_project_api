@@ -52,6 +52,8 @@ async def add_review(body: ReviewCreation):
 async def get_review(mate_id: str):
     from app import controller
     mate: Account = controller.search_mate_by_id(mate_id)
+    if mate == None:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
     review_list = []
     for review in mate.review_list:
         review_list.append(review.get_review_details())

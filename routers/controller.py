@@ -1,16 +1,13 @@
 from fastapi import APIRouter, status, Depends, Body
 
-from models.controller import ReviewModel
 from models.post import PostModel
 from models.profile import EditUsernameModel, EditPicUrlModel
-import utils.response as res
 from models.mate import MateModel
 from internal.booking import Booking
 from internal.transaction import Transaction
 from internal.account import Account
 from internal.post import Post
 from internal.chat_room_manager import ChatRoomManeger
-from models.controller import ReviewModel
 from models.post import PostModel
 from models.mate import MateModel
 from models.booking import BookingModel
