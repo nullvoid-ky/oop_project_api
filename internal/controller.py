@@ -24,11 +24,13 @@ class Controller:
         self.__chat_room_list: list[ChatRoomManeger] = []
 
     def add_instance(self):
-        account_1 = register("ganThepro", "1234", "customer")
-        print("account_1_token :", create_token(str(account_1['id']), "customer"))
-        account_2 = register("ganThepro2", "1234", "mate")
-        print("account_2_token :", create_token(str(account_2['id']), "mate"))
-        chat_room = self.add_chat_room(account_1['id'], account_2['id'])
+        account_1_details = register("ganThepro", "1234", "customer")
+        print("account_1_token :", create_token(str(account_1_details['id']), "customer"))
+        account_2_details = register("ganThepro2", "1234", "mate")
+        print("account_2_token :", create_token(str(account_2_details['id']), "mate"))
+        account_1 = self.search_account_by_id(account_1_details['id'])
+        account_2 = self.search_account_by_id(account_2_details['id'])
+        chat_room = self.add_chat_room(account_1, account_2)
         print("chat_room: ", chat_room.get_chat_room_details())
         # self.add_customer("test1", "test1")
         # self.add_mate("test2", "test2")
@@ -60,9 +62,7 @@ class Controller:
             return chat_room.message_list
         return None
         
-    def add_chat_room(self, account_1_id: str, account_2_id: str) -> ChatRoomManeger | None:
-        account_1: Account = self.search_account_by_id(account_1_id)
-        account_2: Account = self.search_account_by_id(account_2_id)
+    def add_chat_room(self, account_1: Account, account_2: Account) -> ChatRoomManeger | None:
         if not (isinstance(account_1, Account) and isinstance(account_2, Account)):
             return None
         chat_room: ChatRoomManeger = ChatRoomManeger(account_1, account_2)
@@ -93,57 +93,6 @@ class Controller:
             msg_list = chat.delete_message(message_id)
             return msg_list
         return None
-
-    def retrieve_chat_log(self, sender_id, receiver_id):
-        sender_acc = self.search_account_by_id(sender_id)
-        receiver_acc = self.search_account_by_id(receiver_id)
-        if not (isinstance(sender_acc, Account) and isinstance(receiver_acc, Account)):
-            raise "No Acc found"
-        chat = self.get_chat_by_owner_pair(sender_acc, receiver_acc)
-        message_list = chat.get_message_list()
-        all_chat_data = []
-        for msg in message_list:
-            sender_name = msg.get_sender_name()
-            chat_data = {
-                "sender_username" : sender_name,
-                "message_id" : msg.id,
-                "text" : msg.get_text(),
-                "timestamp" : msg.get_timestamp(),
-                "is_edit": msg.is_edit
-            }
-            all_chat_data.append(chat_data)
-        return all_chat_data   
-
-    def get_receiver_chat_room_detail(self, sender_acc):
-        detail = []
-        if not (isinstance(sender_acc, Account)):
-            raise TypeError("receiver_acc must be Account instances")
-        for chat in self.__chat_room_list:
-            chat_owner1 = chat.get_owner1()
-            chat_owner2 = chat.get_owner2()
-            if((sender_acc in [chat_owner1, chat_owner2])):
-                if(len(chat.get_message_list()) >= 1):
-                    latest_chat = chat.get_message_list()[-1]
-                    detail.append({
-                        'account_detail' : chat_owner1.get_account_details() if sender_acc != chat_owner1 else chat_owner2.get_account_details(),
-                        'latest_timestamp' : latest_chat.get_timestamp(),
-                        'latest_text' : latest_chat.get_text(),
-                    })
-                else:
-                    detail.append({
-                        'account_detail' : chat_owner1.get_account_details() if sender_acc != chat_owner1 else chat_owner2.get_account_details(),
-                        'latest_timestamp' : "",
-                        'latest_text' : "",
-                    })
-        
-        return detail
-
-    def retrieve_chat_room(self, sender_id):
-        sender_acc = self.search_account_by_id(sender_id)
-        if not (isinstance(sender_acc, Account)):
-            raise TypeError("No Acc found")
-        detail = self.get_receiver_chat_room_detail(sender_acc)
-        return detail
     
     def delete_chat_room(self, sender_id, receiver_id) -> list | None:
         sender_acc = self.search_account_by_id(sender_id)
@@ -212,17 +161,14 @@ class Controller:
 
     def pay(self, booking_id: str) -> Transaction:
         booking: Booking = self.search_booking_by_id(booking_id)
-        if booking == None:
-            return None
         customer: Customer = self.search_customer_by_id(str(booking.customer.id))
-        if customer == None:
-            return None
         mate: Mate = self.search_mate_by_id(str(booking.mate.id))
-        if mate == None:
+        if mate == None or customer == None or booking == None:
             return None
         payment: Payment = booking.payment
         payment.pay(customer, mate)
-        self.add_chat_room(Chat(customer, mate))
+        if self.add_chat_room(customer, mate) == None:
+            return None
         transaction: Transaction = Transaction(customer, mate, payment.amount)
         customer.add_transaction(transaction)
         mate.add_transaction(transaction)
