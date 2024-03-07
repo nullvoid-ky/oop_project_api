@@ -1,5 +1,10 @@
 from fastapi import APIRouter, status, Depends, Body
 
+from models.controller import ReviewModel
+from models.post import PostModel
+from models.profile import EditUsernameModel, EditPicUrlModel
+import utils.response as res
+from models.mate import MateModel
 from internal.booking import Booking
 from internal.transaction import Transaction
 from internal.account import Account
@@ -18,14 +23,6 @@ router = APIRouter(
     tags=["controller"],
     dependencies=[Depends(verify_token)]
 )
-
-@router.post("/add-review", dependencies=[Depends(verify_customer)])
-def add_review(body: ReviewModel):
-    from app import controller
-    review = controller.add_review_mate(Body.user_id, body.mate_id, body.message, body.star)
-    if isinstance(review, None):
-        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")
-    return res.success_response_status(status.HTTP_200_OK, "Added Review Successfully", data=review.get_review_details())
 
 @router.post("/add-booking", dependencies=[Depends(verify_customer)])
 def add_booking(body: MateModel):
@@ -109,3 +106,33 @@ def add_chat_room(body: AddChatRoomModel):
     if chat_room == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
     return res.success_response_status(status.HTTP_200_OK, "Add Chat Room Success", data=chat_room.get_chat_room_details())
+
+@router.put("/edit-username")
+def edit_message(body: EditUsernameModel):
+    from app import controller
+    account: Account = controller.edit_username(Body.user_id, body.username)
+    if account:
+        return res.success_response_status(status.HTTP_200_OK, "Edit username Success",  data=account.get_account_details())
+    else:
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit username Error")
+    
+@router.put("/edit-pic-url")
+def edit_message(body: EditPicUrlModel):
+    from app import controller
+    account: Account = controller.edit_pic_url(Body.user_id, body.url)
+    if account:
+        return res.success_response_status(status.HTTP_200_OK, "Edit pic url Success",  data=account.get_account_details())
+    else:
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Send pic url Error")
+
+    
+@router.get("/get-leaderboard")
+def get_leaderboard():
+    from app import controller
+    mate_list : list = controller.get_leaderboard()
+    my_list = []
+    for mate in mate_list:
+        my_list.append(mate.get_account_details)
+    if len(my_list):
+        return res.success_response_status(status.HTTP_200_OK, "Get Leaderboard Success", data=my_list)
+    return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")

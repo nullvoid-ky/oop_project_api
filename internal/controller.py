@@ -15,6 +15,9 @@ from internal.message import Message
 from models.mate import Date
 from utils.auth import register
 from dependencies import create_token
+from internal.post import Post
+from models.mate import Date
+import datetime
 
 class Controller:
     def __init__(self) -> None:
@@ -171,6 +174,8 @@ class Controller:
     def pay(self, booking_id: str) -> Transaction:
         booking: Booking = self.search_booking_by_id(booking_id)
         customer: Customer = self.search_customer_by_id(str(booking.customer.id))
+        if customer == None:
+            return None
         mate: Mate = self.search_mate_by_id(str(booking.mate.id))
         if mate == None or customer == None or booking == None:
             return None
@@ -203,12 +208,6 @@ class Controller:
                 customer_list.append(account)
         return customer_list
     
-    def add_review_mate(self, customer_id, mate_id, message, star) -> Review | None:
-        for mate in self.get_mates():
-            if (mate.id == mate_id):
-                review = mate.add_review_mate(customer_id, message, star)
-                return review
-        return None
     
     def add_booking(self, customer: Customer, mate: Mate, date: Date) -> Booking | None:
         booked_customer: Account = mate.book(customer, date.year, date.month, date.day)
@@ -239,3 +238,25 @@ class Controller:
         post = Post(description, picture)
         self.__post_list.append(Post)
         return post
+    
+    def edit_username(self, customer_id: str, new_username: str):
+        customer_acc: Account = self.search_account_by_id(customer_id)
+        customer_acc.username = new_username
+        return customer_acc
+    
+    def edit_pic_url(self, customer_id: str, new_pic_url: str):
+        customer_acc: Account = self.search_account_by_id(customer_id)
+        customer_acc.pic_url = new_pic_url
+        return customer_acc
+    
+    def get_leaderboard(self):
+        mate_list = self.get_mates()
+        sorted_mates = sorted(mate_list, key=lambda mate: (mate.get_average_review_star(), mate.get_review_amount(), mate.timestamp), reverse=True)
+        return sorted_mates[:10]
+
+
+
+
+
+
+

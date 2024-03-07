@@ -1,4 +1,5 @@
 from uuid import uuid4, UUID
+from datetime import datetime
 
 class Account:
     def __init__(self, username: str, password: str, gender: str, location: str, pic_url: str = None, money: int = 0) -> None:
@@ -12,18 +13,26 @@ class Account:
         self.__location: str = location
         self.__transaction_list: list = []
 
+        self.__timestamp = datetime.now()
+        
     @property
     def username(self) -> str:
         return self.__username
     @property
     def pic_url(self) -> str:
         return self.__pic_url
+    @pic_url.setter
+    def pic_url(self, url):
+        self.__pic_url = url
     @property
     def password(self) -> str:
         return self.__password
     @property
     def display_name(self) -> str:
         return self.__display_name
+    @display_name.setter
+    def display_name(self, name):
+        self.__display_name = name
     @property
     def id(self) -> UUID:
         return self.__id
@@ -39,6 +48,9 @@ class Account:
     @property
     def location(self) -> str:
         return self.__location
+    @property
+    def timestamp(self) -> datetime:
+        return self.__timestamp
     
     def get_account_details(self) -> dict:
         from internal.customer import Customer
@@ -49,6 +61,7 @@ class Account:
             "role": "customer" if isinstance(self, Customer) else "mate", 
             "gender": self.__gender,
             "location": self.__location,
+            "timestamp": self.timestamp.strftime("%d/%m/%Y %H:%M:%S")
         }
     
     def add_transaction(self, transaction) -> None:
