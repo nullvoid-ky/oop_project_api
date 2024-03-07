@@ -1,7 +1,6 @@
 from fastapi import APIRouter,status
 from ..models.review import ReviewModel
-from ..internal.response import Responses 
-import uvicorn
+from ..internal.response import Responses
 
 router = APIRouter(
     prefix="/review",

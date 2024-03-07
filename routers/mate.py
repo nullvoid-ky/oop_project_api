@@ -30,7 +30,7 @@ def add_availablility(body: AvailabilityModel):
     mate.add_availablility(Availablility(datetime.date(body.date.year, body.date.month, body.date.day), body.detail))
     return res.success_response_status(status.HTTP_201_CREATED, "Availablility added")
 
-@router.get("/get-available/{mate_id}")
+@router.get("/get-availability/{mate_id}")
 def get_availablility(mate_id: str):
     from app import controller
     mate: Account = controller.search_mate_by_id(mate_id)
