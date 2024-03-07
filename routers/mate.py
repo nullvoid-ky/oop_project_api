@@ -34,13 +34,15 @@ def add_availablility(body: AvailabilityModel):
 def get_availablility(mate_id: str):
     from app import controller
     mate: Account = controller.search_mate_by_id(mate_id)
+    if mate == None:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
     availablility_list: list = mate.availablility_list
     if len(availablility_list) == 0:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "No availablility")
     return res.success_response_status(status.HTTP_200_OK, "Get availablility success", data=[availablility.get_availablility_details() for availablility in availablility_list])
 
 @router.post("/add-review")
-async def add_review(body: ReviewCreation):
+def add_review(body: ReviewCreation):
     from app import controller
     mate: Account = controller.search_mate_by_id(body.mate_id)
     review = mate.add_review_mate(body.customer_id, body.message, body.star)
@@ -49,7 +51,7 @@ async def add_review(body: ReviewCreation):
     return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")
 
 @router.get("/get-review/{mate_id}")
-async def get_review(mate_id: str):
+def get_review(mate_id: str):
     from app import controller
     mate: Account = controller.search_mate_by_id(mate_id)
     if mate == None:
@@ -62,10 +64,18 @@ async def get_review(mate_id: str):
     return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")
 
 @router.delete("/del-review")
-async def delete_review(body: ReviewDeletion):
+def delete_review(body: ReviewDeletion):
     from app import controller
     mate: Account = controller.search_mate_by_id(body.review_id)
     review = mate.del_review_mate(body.review_id)
     if review:
         return res.success_response_status(status.HTTP_200_OK, "Delete Review Successfully", data=review.get_review_details())
     return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")
+
+@router.get("/get-avarage-review-star/{mate_id}")
+def get_average_review_star(mate_id):
+    from app import controller
+    mate: Account = controller.search_mate_by_id(mate_id)
+    if mate == None:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
+    return res.success_response_status(status.HTTP_200_OK, "Get Avarage Review Star Successfully", data=mate.get_average_review_star())

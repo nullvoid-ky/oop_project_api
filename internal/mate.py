@@ -21,6 +21,9 @@ class Mate(Account):
     @property
     def amount(self) -> int:
         return self.__amount
+    @property
+    def review_list(self) -> list[Review]:
+        return self.__review_list
     
     def add_availablility(self, date: datetime, detail: str) -> Availablility:
         availablility: Availablility = Availablility(date, detail)
@@ -59,11 +62,11 @@ class Mate(Account):
     
     
     def get_average_review_star(self):
-        sum : float = 0
+        sum: float = 0
         for review in self.__review_list:
             sum += review.star
         if len(self.__review_list):
-            return sum/len(self.__review_list)
+            return sum / len(self.__review_list)
         return None
 
     def get_review_amount(self):
