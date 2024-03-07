@@ -1,14 +1,17 @@
 from uuid import uuid4, UUID
 
 class Account:
-    def __init__(self, username: str, password: str, pic_url: str = None, money: int = None) -> None:
+    def __init__(self, username: str, password: str, gender: str, location: str, pic_url: str = None, money: int = 0) -> None:
         self.__id: UUID = uuid4()
         self.__display_name : str = username
         self.__username: str = username
         self.__password: str = password
-        self.__pic_url: str = ""
-        self.__money: int = 0
-        self.__transaction_list = []
+        self.__pic_url: str = pic_url
+        self.__money: int = money
+        self.__gender: str = gender
+        self.__location: str = location
+        self.__transaction_list: list = []
+
     @property
     def username(self) -> str:
         return self.__username
@@ -27,6 +30,15 @@ class Account:
     @property
     def transaction_list(self) -> list:
         return self.__transaction_list
+    @property
+    def money(self) -> int:
+        return self.__money
+    @property
+    def gender(self) -> str:
+        return self.__gender
+    @property
+    def location(self) -> str:
+        return self.__location
     
     def get_account_details(self) -> dict:
         from internal.customer import Customer
@@ -34,7 +46,9 @@ class Account:
             "id": str(self.__id),
             "username": self.__username,
             "pic_url": self.__pic_url,
-            "role": "customer" if isinstance(self, Customer) else "mate" 
+            "role": "customer" if isinstance(self, Customer) else "mate", 
+            "gender": self.__gender,
+            "location": self.__location,
         }
     
     def add_transaction(self, transaction) -> None:

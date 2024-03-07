@@ -13,3 +13,9 @@ class Availablility:
 
     def check_available(self, year: int, month: int, day: int) -> bool:
         return str(datetime.date(year, month, day)) == str(self.__date)
+    
+    def get_availablility_details(self) -> dict:
+        return {
+            "date": self.__date.strftime("%d/%m/%Y"),
+            "detail": self.__detail
+        }

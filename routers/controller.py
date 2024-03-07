@@ -82,6 +82,14 @@ def get_profile():
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
     return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())
 
+@router.get("/get-user-data/{user_id}")
+def get_user_data(user_id: str):
+    from app import controller
+    account: Account = controller.search_account_by_id(user_id)
+    if account == None:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
+    return res.success_response_status(status.HTTP_200_OK, "Get User Data Success", data=account.get_account_details())
+
 @router.delete("/delete-booking/{booking_id}", dependencies=[Depends(verify_customer)])
 def delete_booking(booking_id: str):
     from app import controller

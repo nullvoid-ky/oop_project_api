@@ -5,8 +5,8 @@ from internal.availability import Availablility
 from internal.review import Review
 
 class Mate(Account):
-    def __init__(self, username: str, password: str, amount: int=0):
-        super().__init__(username, password)
+    def __init__(self, username: str, password: str, gender: str, location: str, amount: int=0):
+        super().__init__(username, password, gender, location)
         self.__availablility_list: list[Availablility] = []
         self.__review_list = []
         self.__booked_customer = None
@@ -36,6 +36,7 @@ class Mate(Account):
         if isinstance(self.__booked_customer, type(None)):
             for availablility in self.__availablility_list:
                 if availablility.check_available(year, month, day):
+                    self.__availablility_list.remove(availablility)
                     self.__booked_customer: Account = customer
                     return self.__booked_customer
         return None

@@ -4,7 +4,7 @@ import datetime
 from internal.account import Account
 from internal.availability import Availablility
 from models.post import PostModel
-from models.availability import AvailabilityModel 
+from models.availability import AvailabilityModel
 import utils.response as res
 from dependencies import verify_token, verify_mate
 
@@ -29,3 +29,12 @@ def add_availablility(body: AvailabilityModel):
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Availablility already exists")
     mate.add_availablility(Availablility(datetime.date(body.date.year, body.date.month, body.date.day), body.detail))
     return res.success_response_status(status.HTTP_201_CREATED, "Availablility added")
+
+@router.get("/get-available/{mate_id}")
+def get_availablility(mate_id: str):
+    from app import controller
+    mate: Account = controller.search_mate_by_id(mate_id)
+    availablility_list: list = mate.availablility_list
+    if len(availablility_list) == 0:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "No availablility")
+    return res.success_response_status(status.HTTP_200_OK, "Get availablility success", data=[availablility.get_availablility_details() for availablility in availablility_list])

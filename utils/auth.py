@@ -4,15 +4,15 @@ from models.mate import Date
 
 ph = PasswordHasher()
     
-def register(username: str, password: str, role: str) -> dict | None:
+def register(username: str, password: str, role: str, gender: str, location: str) -> dict | None:
     from app import controller
     account: Account = controller.search_account_by_username(username)
     if account == None:
         hashed_password: str = ph.hash(password)
         if role == "customer":
-            new_account: Account = controller.add_customer(username, hashed_password)
+            new_account: Account = controller.add_customer(username, hashed_password, gender, location)
         elif role == "mate":
-            new_account: Account = controller.add_mate(username, hashed_password)
+            new_account: Account = controller.add_mate(username, hashed_password, gender, location)
         else:
             return None
         # mate = controller.search_account_by_username("Mate2")

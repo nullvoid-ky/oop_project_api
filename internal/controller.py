@@ -24,9 +24,9 @@ class Controller:
         self.__chat_room_list: list[ChatRoomManeger] = []
 
     def add_instance(self):
-        account_1_details = register("ganThepro", "1234", "customer")
+        account_1_details = register("ganThepro", "1234", "customer", "male", "bangkok")
         print("account_1_token :", create_token(str(account_1_details['id']), "customer"))
-        account_2_details = register("ganThepro2", "1234", "mate")
+        account_2_details = register("ganThepro2", "1234", "mate", "female", "bangkok")
         print("account_2_token :", create_token(str(account_2_details['id']), "mate"))
         account_1 = self.search_account_by_id(account_1_details['id'])
         account_2 = self.search_account_by_id(account_2_details['id'])
@@ -55,6 +55,15 @@ class Controller:
 
     def get_chat_list(self):
         return self.__chat_room_list
+    
+    def get_chat_list_by_id(self, user_id: str) -> list:
+        chat_list = []
+        account = self.search_account_by_id(user_id)
+        if account:
+            for chat in self.__chat_room_list:
+                if chat.account_1 == account or chat.account_2 == account:
+                    chat_list.append(chat.get_chat_room_details())
+        return chat_list
     
     def get_chat_history_by_id(self, chat_room_id: str) -> list | None:
         chat_room = self.search_chat_room_by_id(chat_room_id)
@@ -113,19 +122,19 @@ class Controller:
     def booking_list(self) -> list:
         return self.__booking_list
 
-    def add_customer(self, username: str, password: str) -> Customer:
+    def add_customer(self, username: str, password: str, gender: str, location: str) -> Customer:
         existed_account: Account = self.search_account_by_username(username)
         if existed_account != None:
             return None
-        customer: Customer = Customer(username, password)
+        customer: Customer = Customer(username, password, gender, location)
         self.__account_list.append(customer)
         return customer
 
-    def add_mate(self, username: str, password: str) -> Mate:
+    def add_mate(self, username: str, password: str, gender: str, location: str) -> Mate:
         existed_account: Account = self.search_account_by_username(username)
         if existed_account != None:
             return None
-        mate: Mate = Mate(username, password)
+        mate: Mate = Mate(username, password, gender, location)
         self.__account_list.append(mate)
         return mate
 
