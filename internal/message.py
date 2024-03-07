@@ -35,7 +35,7 @@ class Message:
             "id": str(self.__id),
             "sender": self.__sender.get_account_details(),
             "text": self.__text,
-            "timestamp": self.__timestamp.strftime("%d/%m/%Y %H:%M:%S")
+            "timestamp": self.__timestamp.strftime("%d/%m/%Y %H:%M")
         }
 
     # def get_sender_name(self) -> str:

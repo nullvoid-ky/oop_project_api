@@ -30,6 +30,17 @@ class Controller:
         print("account_2_token :", create_token(str(account_2['id']), "mate"))
         chat_room = self.add_chat_room(account_1['id'], account_2['id'])
         print("chat_room: ", chat_room.get_chat_room_details())
+
+        account_3 = register("pawit", "1234", "customer")
+        account_4 = register("yok", "1234", "mate")
+        self.add_chat_room(account_1['id'], account_4['id'])
+        self.add_chat_room(account_3['id'], account_2['id'])
+        self.add_chat_room(account_3['id'], account_4['id'])
+
+        account_5 = register("yok2", "1234", "mate")
+        account_6 = register("yok3", "1234", "mate")
+        account_7 = register("yok4", "1234", "mate")
+
         # self.add_customer("test1", "test1")
         # self.add_mate("test2", "test2")
         # self.add_customer("test3", "test3")
@@ -196,6 +207,15 @@ class Controller:
             if account.username == username:
                 return account
         return None
+
+    def search_mate_by_display_name_similar(self, display_name: str) -> list | None:
+        account_list = []
+        for account in self.get_mates():
+            if display_name in account.display_name:
+                account_list.append(account)
+        if(len(account_list)):
+            return account_list
+        return None
     
     def search_booking_by_id(self, booking_id: str) -> Booking | None:
         for booking in self.__booking_list:
@@ -213,6 +233,12 @@ class Controller:
         for account in self.get_mates():
             if str(account.id) == mate_id:
                 return account
+        return None
+    
+    def search_mate_by_condition(self, name: str, location: str, gender: str, age: int) -> Mate | None:
+        account_list = self.search_mate_by_display_name_similar(name)
+        if len(account_list):
+            return account_list
         return None
     
     def search_chat_room_by_id(self, chat_room_id: str) -> ChatRoomManeger | None:

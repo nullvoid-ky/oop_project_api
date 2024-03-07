@@ -11,3 +11,9 @@ class Date(BaseModel):
 class MateModel(BaseModel):
     mate_id: str
     date: Date
+
+class SearchMateModel(BaseModel):
+    name: str
+    location: str
+    gender: str
+    age: int

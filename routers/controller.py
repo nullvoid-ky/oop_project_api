@@ -4,7 +4,7 @@ from models.controller import ReviewModel
 from models.post import PostModel
 from models.profile import EditDisplayNameModel, EditPicUrlModel
 import utils.response as res
-from models.mate import MateModel
+from models.mate import MateModel, SearchMateModel
 from internal.booking import Booking
 from internal.transaction import Transaction
 from internal.account import Account
@@ -58,6 +58,16 @@ def pay(body: BookingModel):
 def get_mates():
     from app import controller
     mate_list = controller.get_mates()
+    if isinstance(mate_list, list):
+        return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in mate_list])
+    return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in add mate")
+
+@router.post("/search-mates")
+def search_mate_by_condition(body: SearchMateModel):
+    from app import controller
+    print(body.name, body.location, body.gender, body.age)
+    mate_list = controller.search_mate_by_condition(body.name, body.location, body.gender, body.age)
+    print(mate_list)
     if isinstance(mate_list, list):
         return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in mate_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in add mate")
