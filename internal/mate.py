@@ -56,12 +56,6 @@ class Mate(Account):
     def set_availablility(self):
         pass
     
-    def add_review_mate(self, customer_id, message, star) -> Review | None:
-        if not isinstance(customer_id , str):
-            return None
-        review = Review(customer_id, message, star)
-        self.__review_list.append(review)
-        return review
     
     def get_average_review_star(self):
         sum : float = 0
@@ -76,3 +70,25 @@ class Mate(Account):
     
     def get_account_created(self):
         return
+        
+    def search_review_by_id(self, review_id) -> Review | None:
+        for review in self.__review_list:
+            if review.validate_id(review_id):
+                return review
+        return None
+    
+    def add_review_mate(self, customer_id, message, star) -> Review | None:
+        review = Review(customer_id, message, star)
+        self.__review_list.append(review)
+        return review
+    
+    def del_review_mate(self, review_id) -> Review | None:
+        review = self.search_review_by_id(review_id)
+        if review == None: 
+            return None
+        self.__review_list.remove(review)
+        return review
+    
+    def get_review_mate(self) -> list:
+        return self.review__review_list
+    

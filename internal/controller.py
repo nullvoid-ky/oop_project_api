@@ -285,25 +285,6 @@ class Controller:
         customer_acc: Account = self.search_account_by_id(customer_id)
         customer_acc.pic_url = new_pic_url
         return customer_acc
-
-    
-
-    def add_review_mate(self, customer_id, mate_id, message, star) -> Review | None:
-        mate = self.search_mate_by_id(mate_id)
-        review = mate.add_review_mate(customer_id, message, star)
-        return review
-    
-    def del_review_mate(self, mate_id, review_id) -> Review | None:
-        mate = self.search_mate_by_id(mate_id)
-        review = mate.search_review_by_id(review_id)
-        if mate == None or review == None: 
-            return None
-        mate.del_review(review)
-        return review
-    
-    def search_review(self, mate_id) -> list:
-        mate = self.search_mate_by_id(mate_id)    
-        return mate.review__review_list
     
     def get_leaderboard(self):
         mate_list = self.get_mates()
