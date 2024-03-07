@@ -2,13 +2,13 @@ from uuid import uuid4, UUID
 from datetime import datetime
 
 class Account:
-    def __init__(self, username: str, password: str, gender: str, location: str, pic_url: str = None, money: int = 0) -> None:
+    def __init__(self, username: str, password: str, gender: str, location: str, pic_url: str = None, amount: int = 0) -> None:
         self.__id: UUID = uuid4()
         self.__display_name : str = username
         self.__username: str = username
         self.__password: str = password
         self.__pic_url: str = pic_url
-        self.__money: int = money
+        self.__amount: int = amount
         self.__gender: str = gender
         self.__location: str = location
         self.__transaction_list: list = []
@@ -39,8 +39,11 @@ class Account:
     def transaction_list(self) -> list:
         return self.__transaction_list
     @property
-    def money(self) -> int:
-        return self.__money
+    def amount(self) -> int:
+        return self.__amount
+    @amount.setter
+    def amount(self, amount):
+        self.__amount = amount
     @property
     def gender(self) -> str:
         return self.__gender
@@ -70,13 +73,13 @@ class Account:
         self.__transaction_list.append(transaction)
     
     def __add__(self, amount: int) -> int:
-        self.__money += amount
-        return self.__money
+        self.__amount += amount
+        return self.__amount
 
     def __sub__(self, amount: int) -> int:
-        if self.__money - amount < 0:
-            self.__money = 0
+        if self.__amount - amount < 0:
+            self.__amount = 0
         else:
-            self.__money -= amount
-        return self.__money
+            self.__amount -= amount
+        return self.__amount
     

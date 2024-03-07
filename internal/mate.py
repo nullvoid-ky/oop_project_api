@@ -5,12 +5,12 @@ from internal.availability import Availablility
 from internal.review import Review
 
 class Mate(Account):
-    def __init__(self, username: str, password: str, gender: str, location: str, amount: int=0):
+    def __init__(self, username: str, password: str, gender: str, location: str, price: int=0):
         super().__init__(username, password, gender, location)
         self.__availablility_list: list[Availablility] = []
         self.__review_list: list[Review] = []
         self.__booked_customer = None
-        self.__amount = amount
+        self.__price = price
 
     @property
     def availablility_list(self) -> list[Availablility]:
@@ -19,8 +19,11 @@ class Mate(Account):
     def booked_customer(self) -> Account:
         return self.__booked_customer
     @property
-    def amount(self) -> int:
-        return self.__amount
+    def price(self) -> int:
+        return self.__price
+    @price.setter
+    def price(self, price: int):
+        self.__price = price
     @property
     def review_list(self) -> list[Review]:
         return self.__review_list
@@ -28,6 +31,7 @@ class Mate(Account):
     def add_availablility(self, date: datetime, detail: str) -> Availablility:
         availablility: Availablility = Availablility(date, detail)
         self.__availablility_list.append(availablility)
+        print(availablility.date)
         return availablility
     
     def search_availablility(self, year: int, month: int, day: int) -> Availablility | None:
@@ -60,7 +64,6 @@ class Mate(Account):
     def set_availablility(self):
         pass
     
-    
     def get_average_review_star(self):
         sum: float = 0
         for review in self.__review_list:
@@ -69,7 +72,7 @@ class Mate(Account):
             return sum / len(self.__review_list)
         return None
 
-    def get_review_amount(self):
+    def get_review_price(self):
         return len(self.__review_list)
     
     def get_account_created(self):

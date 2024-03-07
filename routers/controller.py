@@ -30,10 +30,11 @@ def add_booking(body: MateModel):
     mate: Account = controller.search_mate_by_id(body.mate_id)  
     if mate == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
-    booking: Booking = controller.add_booking(customer, mate, body.date)
-    if isinstance(booking, Booking):
-        return res.success_response_status(status.HTTP_200_OK, "Booked Successfully", data=booking.get_booking_detail())
-    return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")
+    try:
+        booking, transaction = controller.add_booking(customer, mate, body.date)
+    except:
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")
+    return res.success_response_status(status.HTTP_200_OK, "Booked Successfully", data={"booking": booking.get_booking_detail(), "transaction": transaction.get_transaction_details()})
 
 @router.post("/pay", dependencies=[Depends(verify_customer)])
 def pay(body: BookingModel):
@@ -88,9 +89,10 @@ def get_user_data(user_id: str):
 def delete_booking(booking_id: str):
     from app import controller
     booking: Booking = controller.search_booking_by_id(booking_id)
-    if booking == None:
-        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Booking not found")
-    if controller.delete_booking(booking_id):
+    account: Account = controller.search_account_by_id(Body.user_id)
+    if booking == None or account == None:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Booking or Account not found")
+    if controller.delete_booking(booking, account):
         return res.success_response_status(status.HTTP_200_OK, "Delete Booking Success")
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in delete booking")
 
