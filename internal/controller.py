@@ -24,22 +24,22 @@ class Controller:
         self.__chat_room_list: list[ChatRoomManeger] = []
 
     def add_instance(self):
-        account_1 = register("ganThepro", "1234", "customer")
+        account_1 = register("ganThepro", "1234", "customer", "male")
         print("account_1_token :", create_token(str(account_1['id']), "customer"))
-        account_2 = register("ganThepro2", "1234", "mate")
+        account_2 = register("ganThepro2", "1234", "mate", "female")
         print("account_2_token :", create_token(str(account_2['id']), "mate"))
         chat_room = self.add_chat_room(account_1['id'], account_2['id'])
         print("chat_room: ", chat_room.get_chat_room_details())
 
-        account_3 = register("pawit", "1234", "customer")
-        account_4 = register("yok", "1234", "mate")
+        account_3 = register("pawit", "1234", "customer", "male")
+        account_4 = register("yok", "1234", "mate", "male")
         self.add_chat_room(account_1['id'], account_4['id'])
         self.add_chat_room(account_3['id'], account_2['id'])
         self.add_chat_room(account_3['id'], account_4['id'])
 
-        account_5 = register("yok2", "1234", "mate")
-        account_6 = register("yok3", "1234", "mate")
-        account_7 = register("yok4", "1234", "mate")
+        account_5 = register("kanyok", "1234", "mate", "male")
+        account_6 = register("mook", "1234", "mate", "female")
+        account_7 = register("porsche", "1234", "mate", "female")
 
         # self.add_customer("test1", "test1")
         # self.add_mate("test2", "test2")
@@ -186,19 +186,19 @@ class Controller:
     def booking_list(self) -> list:
         return self.__booking_list
 
-    def add_customer(self, username: str, password: str) -> Customer:
+    def add_customer(self, username: str, password: str, gender:str) -> Customer:
         existed_account: Account = self.search_account_by_username(username)
         if existed_account != None:
             return None
-        customer: Customer = Customer(username, password)
+        customer: Customer = Customer(username, password, gender)
         self.__account_list.append(customer)
         return customer
 
-    def add_mate(self, username: str, password: str) -> Mate:
+    def add_mate(self, username: str, password: str, gender:str) -> Mate:
         existed_account: Account = self.search_account_by_username(username)
         if existed_account != None:
             return None
-        mate: Mate = Mate(username, password)
+        mate: Mate = Mate(username, password , gender)
         self.__account_list.append(mate)
         return mate
 

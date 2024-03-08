@@ -5,8 +5,8 @@ from internal.availability import Availablility
 from internal.review import Review
 
 class Mate(Account):
-    def __init__(self, username: str, password: str, amount: int=0):
-        super().__init__(username, password)
+    def __init__(self, username: str, password: str, gender:str, amount: int=0):
+        super().__init__(username, password, gender)
         self.__availablility_list: list[Availablility] = []
         self.__review_list = []
         self.__booked_customer = None

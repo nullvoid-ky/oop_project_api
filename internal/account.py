@@ -2,7 +2,7 @@ from uuid import uuid4, UUID
 from datetime import datetime
 
 class Account:
-    def __init__(self, username: str, password: str, pic_url: str = None, money: int = None, gender: str) -> None:
+    def __init__(self, username: str, password: str, gender: str, pic_url: str = None, money: int = None) -> None:
         self.__id: UUID = uuid4()
         self.__display_name : str = username
         self.__username: str = username

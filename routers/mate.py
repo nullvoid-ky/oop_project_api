@@ -33,15 +33,17 @@ def add_availablility(body: AvailabilityModel):
 @router.post("/add_review")
 async def add_review(body: ReviewCreation):
     from main import controller
-    result : dict = controller.add_review_mate(body.customer_id, body.message, body.star)
+    mate = controller.search_mate_by_id(body.mate_id)
+    result : dict = mate.add_review_mate(body.customer_id, body.message, body.star)
     if result:
         return res.success_response_status(status.HTTP_200_OK, "Added Review Successfully", data=result.get_review_detail())
     return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")
 
 @router.get("/reviews")
-async def see_review():
+async def see_review(body : MateReview):
     from main import controller
-    result : dict = controller.get_review_mate()
+    mate = controller.search_mate_by_id(body.mate_id)
+    result : dict = mate.get_review_mate()
     data_list = []
     for review in result:
         data_list.append(review.get_review_detail())
@@ -52,7 +54,8 @@ async def see_review():
 @router.delete("/del_review")
 async def delete_review(body: ReviewDeletion):
     from main import controller
-    result : dict = controller.del_review_mate(body.review_id)
+    mate = controller.search_mate_by_id(body.mate_id)
+    result : dict = mate.del_review_mate(body.review_id)
     if result:
         return res.success_response_status(status.HTTP_200_OK, "Delete Review Successfully", data=result.get_review_detail())
     return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")
