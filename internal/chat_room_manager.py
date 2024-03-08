@@ -41,7 +41,7 @@ class ChatRoomManeger:
         elif self.__account_2 == account and self.__account_2_connection == websocket:
             self.__account_2_connection = None
 
-    async def add_message(self, message: str, account: Account):
+    def add_message(self, message: str, account: Account):
         self.__message_list.append(Message(account, message))
 
     async def broadcast(self, message: str):

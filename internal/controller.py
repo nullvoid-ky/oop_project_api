@@ -148,6 +148,33 @@ class Controller:
                 return account
         return None
     
+    def get_mate_by_username(self, username: str) -> list[Mate] | None:
+        mate_list = []
+        for account in self.get_mates():
+            if username == account.username:
+                mate_list.append(account)
+        if len(mate_list) == 0:
+            return None
+        return mate_list
+    
+    def get_mate_by_gender(self, gender: str) -> list[Mate] | None:
+        mate_list = []
+        for mate in self.get_mates():
+            if mate.gender == gender:
+                mate_list.append(mate)
+        if len(mate_list) == 0:
+            return None
+        return mate_list
+    
+    def get_mate_by_avalibility(self) -> list[Mate] | None:
+        mate_list = []
+        for mate in self.get_mates():
+            if len(mate.availablility_list) > 0:
+                mate_list.append(mate)
+        if len(mate_list) == 0:
+            return None
+        return mate_list
+    
     def search_booking_by_id(self, booking_id: str) -> Booking | None:
         for booking in self.__booking_list:
             if str(booking.id) == booking_id:
@@ -195,14 +222,14 @@ class Controller:
                 return account
         return None
 
-    def get_mates(self) -> list:
+    def get_mates(self) -> list[Mate]:
         mate_list = []
         for account in self.__account_list:
             if isinstance(account, Mate):
                 mate_list.append(account)
         return mate_list
 
-    def get_customers(self) -> list:
+    def get_customers(self) -> list[Customer]:
         customer_list = []
         for account in self.__account_list:
             if isinstance(account, Customer):
