@@ -2,7 +2,7 @@ from uuid import uuid4, UUID
 from datetime import datetime
 
 class Account:
-    def __init__(self, username: str, password: str, gender: str, location: str, pic_url: str = None, amount: int = 0) -> None:
+    def __init__(self, username: str, password: str, gender: str, location: str, pic_url: str = None, amount: int = 0, age: int = 18) -> None:
         self.__id: UUID = uuid4()
         self.__display_name : str = username
         self.__username: str = username
@@ -11,6 +11,7 @@ class Account:
         self.__amount: int = amount
         self.__gender: str = gender
         self.__location: str = location
+        self.__age: int = age
         self.__transaction_list: list = []
         self.__timestamp = datetime.now()
         
@@ -20,6 +21,9 @@ class Account:
     @property
     def gender(self) -> str:
         return self.__gender
+    @property
+    def age(self) -> str:
+        return self.__age
     @property
     def pic_url(self) -> str:
         return self.__pic_url

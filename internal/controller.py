@@ -237,6 +237,15 @@ class Controller:
             return None
         return mate_list
     
+    def get_mate_by_age(self, age: str) -> list[Mate] | None:
+        mate_list = []
+        for mate in self.get_mates():
+            if mate.age >= age:
+                mate_list.append(mate)
+        if len(mate_list) == 0:
+            return None
+        return mate_list
+    
     def get_mate_by_avalibility(self) -> list[Mate] | None:
         mate_list = []
         for mate in self.get_mates():
@@ -277,7 +286,7 @@ class Controller:
         account_list_by_name = self.search_mate_by_display_name_similar(name) if self.search_mate_by_display_name_similar(name) != None else []
         account_list_by_availability = self.get_mate_by_avalibility() if self.get_mate_by_avalibility() != None else []
         account_list_by_location = self.get_mate_by_location(location) if self.get_mate_by_location(location) != None else []
-
+        account_list_by_age = self.get_mate_by_age(age) if self.get_mate_by_age(age) != None else []
         account_list_by_gender_male = []
         account_list_by_gender_female = []
         account_list_by_gender = []
@@ -293,12 +302,14 @@ class Controller:
         common_accounts.intersection_update(account_list_by_location)
         common_accounts.intersection_update(account_list_by_gender)
         common_accounts.intersection_update(account_list_by_gender_female)
+        common_accounts.intersection_update(account_list_by_age)
         common_accounts = list(common_accounts)
 
         print("account_list_by_name: ", account_list_by_name)
         print("account_list_by_availability: ", account_list_by_availability)
         print("account_list_by_location: ", account_list_by_location)
         print("account_list_by_gender: ", account_list_by_gender)
+        print("account_list_by_age: ", account_list_by_age)
         print("common_accounts: ", common_accounts)
 
         if common_accounts!=None:
