@@ -24,8 +24,7 @@ async def websocket_endpoint(websocket: WebSocket, chat_room_id: str, token: str
     try:
         while True:
             data: str = await websocket.receive_text()
-            msg: Message = await manager.add_message(data, account)
-            # await manager.broadcast(f"Message text was: {data} from user {user_id}")
+            msg: Message = manager.add_message(data, account)
             await manager.broadcast(str(msg.get_message_details()))
     except WebSocketDisconnect:
         manager.disconnect(websocket, account)
