@@ -15,5 +15,5 @@ class MateModel(BaseModel):
 class SearchMateModel(BaseModel):
     name: str
     location: str
-    gender: str
+    gender_list: list
     age: int

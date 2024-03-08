@@ -246,6 +246,15 @@ class Controller:
             return None
         return mate_list
     
+    def get_mate_by_location(self, location) -> list[Mate] | None:
+        mate_list = []
+        for mate in self.get_mates():
+            if location in mate.location:
+                mate_list.append(mate)
+        if len(mate_list) == 0:
+            return None
+        return mate_list
+    
     def search_booking_by_id(self, booking_id: str) -> Booking | None:
         for booking in self.__booking_list:
             if str(booking.id) == booking_id:
@@ -264,10 +273,36 @@ class Controller:
                 return account
         return None
     
-    def search_mate_by_condition(self, name: str, location: str, gender: str, age: int) -> Mate | None:
-        account_list = self.search_mate_by_display_name_similar(name)
-        if account_list!=None:
-            return account_list
+    def search_mate_by_condition(self, name: str, location: str, gender_list: list, age: int) -> Mate | None:
+        account_list_by_name = self.search_mate_by_display_name_similar(name) if self.search_mate_by_display_name_similar(name) != None else []
+        account_list_by_availability = self.get_mate_by_avalibility() if self.get_mate_by_avalibility() != None else []
+        account_list_by_location = self.get_mate_by_location(location) if self.get_mate_by_location(location) != None else []
+
+        account_list_by_gender_male = []
+        account_list_by_gender_female = []
+        account_list_by_gender = []
+        if("male" in gender_list):
+            account_list_by_gender_male = self.get_mate_by_gender("male") if self.get_mate_by_gender("male") != None else []
+
+        if("female" in gender_list):
+            account_list_by_gender_female = self.get_mate_by_gender("female") if self.get_mate_by_gender("female") != None else []
+        account_list_by_gender = set(account_list_by_gender_male).union(account_list_by_gender_female)
+
+        common_accounts = set(account_list_by_name)  # Convert the first list to a set
+        common_accounts.intersection_update(account_list_by_availability)
+        common_accounts.intersection_update(account_list_by_location)
+        common_accounts.intersection_update(account_list_by_gender)
+        common_accounts.intersection_update(account_list_by_gender_female)
+        common_accounts = list(common_accounts)
+
+        print("account_list_by_name: ", account_list_by_name)
+        print("account_list_by_availability: ", account_list_by_availability)
+        print("account_list_by_location: ", account_list_by_location)
+        print("account_list_by_gender: ", account_list_by_gender)
+        print("common_accounts: ", common_accounts)
+
+        if common_accounts!=None:
+            return common_accounts
         return None
     
     def search_chat_room_by_id(self, chat_room_id: str) -> ChatRoomManeger | None:
