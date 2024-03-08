@@ -54,15 +54,31 @@ def get_mates():
         return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in mate_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in add mate")
 
-@router.post("/search-mates")
-def search_mate_by_condition(body: SearchMateModel):
+@router.get("/get-mate-by-username/{username}")
+def get_mate_by_username(username: str):
     from app import controller
-    print(body.name, body.location, body.gender, body.age)
-    mate_list = controller.search_mate_by_condition(body.name, body.location, body.gender, body.age)
-    print(mate_list)
+    mate_list = controller.get_mate_by_username(username)
     if isinstance(mate_list, list):
         return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in mate_list])
-    return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in add mate")
+    return res.error_response_status(status.HTTP_404_NOT_FOUND, "mate not found")
+
+@router.get("/get-mate-by-gender/{gender}")
+def get_mate_by_gender(gender: str):
+    from app import controller
+    if gender not in ["male", "female"]:
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "gender not found")
+    mate_list = controller.get_mate_by_gender(gender)
+    if isinstance(mate_list, list):
+        return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in mate_list])
+    return res.error_response_status(status.HTTP_404_NOT_FOUND, "mate not found")
+
+@router.get("/get-mate-by-avalibility")
+def get_mate_by_avalibility():
+    from app import controller
+    mate_list = controller.get_mate_by_avalibility()
+    if isinstance(mate_list, list):
+        return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in mate_list])
+    return res.error_response_status(status.HTTP_404_NOT_FOUND, "mate not found")
 
 @router.post("/add-post", dependencies=[Depends(verify_mate)])
 def add_post(body: PostModel):
