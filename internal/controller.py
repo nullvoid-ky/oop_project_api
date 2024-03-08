@@ -239,7 +239,7 @@ class Controller:
     
     def search_mate_by_condition(self, name: str, location: str, gender: str, age: int) -> Mate | None:
         account_list = self.search_mate_by_display_name_similar(name)
-        if len(account_list):
+        if account_list!=None:
             return account_list
         return None
     
