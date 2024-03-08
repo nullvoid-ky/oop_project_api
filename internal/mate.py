@@ -1,20 +1,20 @@
 import datetime
 
 from internal.account import Account
-from internal.availability import Availablility
+from internal.availability import Availability
 from internal.review import Review
 
 class Mate(Account):
     def __init__(self, username: str, password: str, gender: str, location: str, price: int=0):
         super().__init__(username, password, gender, location)
-        self.__availablility_list: list[Availablility] = []
+        self.__availability_list: list[Availability] = []
         self.__review_list: list[Review] = []
         self.__booked_customer = None
         self.__price = price
 
     @property
-    def availablility_list(self) -> list[Availablility]:
-        return self.__availablility_list
+    def availability_list(self) -> list[Availability]:
+        return self.__availability_list
     @property
     def booked_customer(self) -> Account:
         return self.__booked_customer
@@ -31,22 +31,22 @@ class Mate(Account):
     def review_list(self) -> list[Review]:
         return self.__review_list
     
-    def add_availablility(self, date: datetime, detail: str) -> Availablility:
-        availablility: Availablility = Availablility(date, detail)
-        self.__availablility_list.append(availablility)
-        return availablility
+    def add_availability(self, date: datetime, detail: str) -> Availability:
+        availability: Availability = Availability(date, detail)
+        self.__availability_list.append(availability)
+        return availability
     
-    def search_availablility(self, year: int, month: int, day: int) -> Availablility | None:
-        for availablility in self.__availablility_list:
-            if availablility.check_available(year, month, day):
-                return availablility
+    def search_availability(self, year: int, month: int, day: int) -> Availability | None:
+        for availability in self.__availability_list:
+            if availability.check_available(year, month, day):
+                return availability
         return None
     
     def book(self, customer: Account, year: int, month: int, day: int) -> Account | None:
         if isinstance(self.__booked_customer, type(None)):
-            for availablility in self.__availablility_list:
-                if availablility.check_available(year, month, day):
-                    self.__availablility_list.remove(availablility)
+            for availability in self.__availability_list:
+                if availability.check_available(year, month, day):
+                    self.__availability_list.remove(availability)
                     self.__booked_customer: Account = customer
                     return self.__booked_customer
         return None
@@ -54,7 +54,7 @@ class Mate(Account):
     def confirm_booking(self):
         pass
     
-    def update_availablility(self):
+    def update_availability(self):
         pass
     
     def add_post(self):
@@ -63,7 +63,7 @@ class Mate(Account):
     def withdraw(self):
         pass
     
-    def set_availablility(self):
+    def set_availability(self):
         pass
     
     def get_average_review_star(self):
