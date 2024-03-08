@@ -17,3 +17,4 @@ class SearchMateModel(BaseModel):
     location: str
     gender_list: list
     age: int
+    availability: bool

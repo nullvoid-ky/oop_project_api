@@ -38,6 +38,10 @@ class Controller:
         chat_room = self.add_chat_room(account_1, account_2)
         print("chat_room: ", chat_room.get_chat_room_details())
         account_2.add_availablility(datetime.date(2024, 3, 4), "I'm available")
+
+        account_4_details = register("ganThepro3", "1234", "mate", "female", "bangkok")
+        account_5_details = register("ganThepro4", "1234", "mate", "male", "bangkok")
+        account_5_details = register("yok", "1234", "mate", "male", "bangkok")
         # self.add_customer("test1", "test1")
         # self.add_mate("test2", "test2")
         # self.add_customer("test3", "test3")
@@ -282,9 +286,9 @@ class Controller:
                 return account
         return None
     
-    def search_mate_by_condition(self, name: str, location: str, gender_list: list, age: int) -> Mate | None:
+    def search_mate_by_condition(self, name: str, location: str, gender_list: list, age: int, availability: bool) -> Mate | None:
         account_list_by_name = self.search_mate_by_display_name_similar(name) if self.search_mate_by_display_name_similar(name) != None else []
-        account_list_by_availability = self.get_mate_by_avalibility() if self.get_mate_by_avalibility() != None else []
+        account_list_by_availability = self.get_mate_by_avalibility() if self.get_mate_by_avalibility() != None and availability else self.get_mates()
         account_list_by_location = self.get_mate_by_location(location) if self.get_mate_by_location(location) != None else []
         account_list_by_age = self.get_mate_by_age(age) if self.get_mate_by_age(age) != None else []
         account_list_by_gender_male = []
@@ -301,7 +305,6 @@ class Controller:
         common_accounts.intersection_update(account_list_by_availability)
         common_accounts.intersection_update(account_list_by_location)
         common_accounts.intersection_update(account_list_by_gender)
-        common_accounts.intersection_update(account_list_by_gender_female)
         common_accounts.intersection_update(account_list_by_age)
         common_accounts = list(common_accounts)
 
