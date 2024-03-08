@@ -240,7 +240,7 @@ class Controller:
     def get_mate_by_avalibility(self) -> list[Mate] | None:
         mate_list = []
         for mate in self.get_mates():
-            if len(mate.availablility_list) > 0:
+            if len(mate.availability_list) > 0:
                 mate_list.append(mate)
         if len(mate_list) == 0:
             return None

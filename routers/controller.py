@@ -3,7 +3,7 @@ from typing import Union, Tuple
 
 from models.post import PostModel
 from models.profile import EditDisplayNameModel, EditPicUrlModel
-from models.mate import MateModel
+from models.mate import MateModel, SearchMateModel
 from internal.booking import Booking
 from internal.transaction import Transaction
 from internal.account import Account
