@@ -110,7 +110,8 @@ class Mate(Account):
             "star": self.get_average_review_star(),
             "amount":self.get_review_amount(),
             "role": "mate",
-            "gender":"",
+            "gender":self.__gender,
+            "location": self.__location,
             "timestamp": self.timestamp.strftime("%d/%m/%Y %H:%M:%S")
         }
     

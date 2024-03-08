@@ -61,6 +61,7 @@ class Account:
         from internal.customer import Customer
         return {
             "id": str(self.__id),
+            "displayname": self.__display_name,
             "username": self.__username,
             "pic_url": self.__pic_url,
             "role": "customer" if isinstance(self, Customer) else "mate", 
