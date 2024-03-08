@@ -94,11 +94,15 @@ def edit_message(body: EditPicUrlModel):
     
 @router.get("/get-leaderboard")
 def get_leaderboard():
+    rank = 1
     from app import controller
     mate_list : list = controller.get_leaderboard()
     my_list = []
     for mate in mate_list:
-        my_list.append(mate.get_account_details)
+        my_list.append(mate)
+    send_data = [{'account_detail' : acc.get_mate_details()} for acc in my_list]
+    for data in send_data:
+        data["account_detail"]["rank"] = rank
     if len(my_list):
-        return res.success_response_status(status.HTTP_200_OK, "Get Leaderboard Success", data=my_list)
+        return res.success_response_status(status.HTTP_200_OK, "Get Leaderboard Success", data=send_data)
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")

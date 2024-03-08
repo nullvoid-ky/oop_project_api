@@ -92,3 +92,21 @@ class Mate(Account):
     def get_review_mate(self) -> list:
         return self.review__review_list
     
+    def get_mate_details(self) -> dict:
+        return {
+            "id": str(self.__id),
+            "username": self.__username,
+            "displayname":self.__display_name,
+            "pic_url": self.__pic_url,
+            "star": self.get_average_review_star(),
+            "amount":self.get_review_amount(),
+            "role": "mate",
+            "gender":"",
+            "timestamp": self.timestamp.strftime("%d/%m/%Y %H:%M:%S")
+        }
+    
+    def get_mate_review_details(self) -> dict:
+        return {
+            "star": self.get_average_review_star(),
+            "amount":self.get_review_amount(),
+        }
