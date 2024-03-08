@@ -3,7 +3,6 @@ from pydantic import BaseModel
 class ReviewCreation(BaseModel):
     mate_id : str
     message : str
-    mate_id : str
     star : int
 
 class ReviewDeletion(BaseModel):

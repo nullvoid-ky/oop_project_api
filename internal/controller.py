@@ -37,7 +37,7 @@ class Controller:
         account_2.price = 1000
         chat_room = self.add_chat_room(account_1, account_2)
         print("chat_room: ", chat_room.get_chat_room_details())
-        account_2.add_availablility(datetime.date(2024, 3, 4), "I'm available")
+        account_2.add_availability(datetime.date(2024, 3, 4), "I'm available")
 
         account_4_details = register("ganThepro3", "1234", "mate", "female", "bangkok")
         account_5_details = register("ganThepro4", "1234", "mate", "male", "bangkok")
@@ -69,17 +69,14 @@ class Controller:
             if((owner1 in [chat_owner1, chat_owner2]) and (owner2 in [chat_owner1, chat_owner2]) and (chat_owner1 != chat_owner2)):
                 return chat
         return None
-
-    def get_chat_list(self):
-        return self.__chat_room_list
     
-    def get_chat_list_by_id(self, user_id: str) -> list:
+    def get_chat_list(self, account: Account) -> list | None:
         chat_list = []
-        account = self.search_account_by_id(user_id)
-        if account:
-            for chat in self.__chat_room_list:
-                if chat.account_1 == account or chat.account_2 == account:
-                    chat_list.append(chat.get_chat_room_details())
+        for chat in self.__chat_room_list:
+            if chat.account_1 == account or chat.account_2 == account:
+                chat_list.append(chat.get_chat_room_details())
+        if len(chat_list) == 0:
+            return None
         return chat_list
     
     def get_chat_history_by_id(self, chat_room_id: str) -> list | None:
@@ -99,16 +96,6 @@ class Controller:
         for acc in self.__account_list:
             if(id == str(acc.id)):
                 return acc
-        return None
-
-    def talk(self, sender_id: str, receiver_id: str, text: str):
-        sender = self.search_account_by_id(sender_id)
-        receiver = self.search_account_by_id(receiver_id)
-        chat = self.get_chat_by_owner_pair(sender, receiver)
-        if(chat != None):
-            timestamp = datetime.datetime.now()
-            msg = chat.save_chat_log(Message(sender, text, timestamp))
-            return msg
         return None
     
     def delete_message(self, sender_id: str, receiver_id: str, message_id: str):
@@ -388,7 +375,7 @@ class Controller:
         if isinstance(booking, Booking):
             self.__booking_list.remove(booking)
             booking.mate.booked_customer = None
-            booking.mate.add_availablility(datetime.date(booking.book_date.year, booking.book_date.month, booking.book_date.day), "I'm available")
+            booking.mate.add_availability(datetime.date(booking.book_date.year, booking.book_date.month, booking.book_date.day), "I'm available")
             if transaction:
                 return booking, transaction
             return booking
@@ -401,15 +388,13 @@ class Controller:
         self.__post_list.append(Post)
         return post
     
-    def edit_display_name(self, customer_id: str, new_username: str):
-        customer_acc: Account = self.search_account_by_id(customer_id)
-        customer_acc.display_name = new_username
-        return customer_acc
+    def edit_display_name(self, account: Account, new_display_name: str) -> Account:
+        account.display_name = new_display_name
+        return account
     
-    def edit_pic_url(self, customer_id: str, new_pic_url: str):
-        customer_acc: Account = self.search_account_by_id(customer_id)
-        customer_acc.pic_url = new_pic_url
-        return customer_acc
+    def edit_pic_url(self, account: Account, new_pic_url: str) -> Account:
+        account.pic_url = new_pic_url
+        return account
     
     def get_leaderboard(self):
         mate_list = self.get_mates()

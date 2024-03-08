@@ -10,7 +10,7 @@
 
 # @router.post("/add_review")
 # async def add_review(body: ReviewCreation):
-#     from main import controller
+#     from app import controller
 #     result : dict = controller.add_review_mate(body.customer_id, body.mate_id, body.message, body.star)
 #     if result:
 #         return Responses.success_response_status(status.HTTP_200_OK, "Added Review Successfully", data=result.get_review_detail())
@@ -18,7 +18,7 @@
 
 # @router.get("/reviews")
 # async def see_review(body : ReviewRead):
-#     from main import controller
+#     from app import controller
 #     result : dict = controller.search_review(body.mate_id)
 #     data_list = []
 #     for review in result:
@@ -29,7 +29,7 @@
 
 # @router.delete("/del_review")
 # async def delete_review(body: ReviewDeletion):
-#     from main import controller
+#     from app import controller
 #     result : dict = controller.del_review_mate(body.mate_id, body.review_id)
 #     if result:
 #         return Responses.success_response_status(status.HTTP_200_OK, "Delete Review Successfully", data=result.get_review_detail())

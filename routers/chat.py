@@ -11,15 +11,6 @@ router = APIRouter(
     tags=["chat"],
     dependencies=[Depends(verify_token)]
 )
-
-@router.post("/talk")
-def talking(body: MessageModel):
-    from app import controller
-    msg = controller.talk(Body.user_id, body.receiver_id, body.text)
-    if msg:
-        return res.success_response_status(status.HTTP_200_OK, "Send message Success", {'id': str(msg.id), "text": msg.get_text(), "timestamp": msg.get_timestamp(), "is_edit": msg.is_edit})
-    else:
-        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Send message Error")
     
 # @router.delete("/delete-message")
 # def delete_message(body: DeleteMessageModel):
@@ -31,9 +22,9 @@ def talking(body: MessageModel):
 #         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Send message Error")
     
 @router.put("/edit-message/{chat_room_id}")
-def edit_message(chat_room_id: str, body: EditMessageModel):
+def edit_message(body: EditMessageModel):
     from app import controller
-    chat_room = controller.search_chat_room_by_id(chat_room_id)
+    chat_room = controller.search_chat_room_by_id(body.chat_room_id)
     if chat_room is None:
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Chat Room not found")
     message = chat_room.search_message_by_id(body.message_id)
@@ -42,7 +33,7 @@ def edit_message(chat_room_id: str, body: EditMessageModel):
     message.set_text(body.new_text)
     return res.success_response_status(status.HTTP_200_OK, "Edit message Success", message.get_message_details())
 
-@router.get("/chat-history/{chat_room_id}")
+@router.get("/get-chat-history/{chat_room_id}")
 def get_chat_history_by_id(chat_room_id: str):
     from app import controller
     chat_list: list = controller.get_chat_history_by_id(chat_room_id)
@@ -50,14 +41,16 @@ def get_chat_history_by_id(chat_room_id: str):
         return res.success_response_status(status.HTTP_200_OK, "Get Chat History Success", data=[c.get_message_details() for c in chat_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "No Chat History")
     
-@router.get("/chat-room")
+@router.get("/get-chat-room")
 def get_chat_rooms():
     from app import controller
-    all_chat_room = controller.get_chat_list_by_id(Body.user_id)
-    if len(all_chat_room) != 0:
-        return res.success_response_status(status.HTTP_200_OK, "Get Chat Room Success", all_chat_room)
-    else:
+    account = controller.search_account_by_id(Body.user_id)
+    if account is None:
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Account not found")
+    chat_list = controller.get_chat_list(account)
+    if chat_list is None:
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "No Chat Room")
+    return res.success_response_status(status.HTTP_200_OK, "Get Chat Room Success", chat_list)
     
 # @router.delete("/delete-chat-room")
 # def delete_chat_room(body: DeleteChatRoomModel):

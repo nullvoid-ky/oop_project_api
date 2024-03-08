@@ -3,8 +3,7 @@ from typing import Union, Tuple
 
 from models.post import PostModel
 from models.profile import EditDisplayNameModel, EditPicUrlModel
-import utils.response as res
-from models.mate import MateModel, SearchMateModel
+from models.mate import MateModel
 from internal.booking import Booking
 from internal.transaction import Transaction
 from internal.account import Account
@@ -106,21 +105,29 @@ def get_booking():
         return res.success_response_status(status.HTTP_200_OK, "Get Booking Success", data=[booking.get_booking_detail() for booking in booking_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in get booking")
 
-@router.get("/get-user-profile")
-def get_profile():
+@router.get("/get-booking-by-id/{booking_id}")
+def get_booking_by_id(booking_id: str):
+    from app import controller
+    result: Booking = controller.search_booking_by_id(booking_id)
+    if result:
+        return res.success_response_status(status.HTTP_200_OK, "Booking found", data=result.get_booking_detail())
+    return res.error_response_status(status.HTTP_404_NOT_FOUND, "Booking not found")
+
+@router.get("/get-self-profile")
+def get_self_profile():
     from app import controller
     account: Account = controller.search_account_by_id(Body.user_id)
     if account == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
     return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())
 
-@router.get("/get-user-data/{user_id}")
-def get_user_data(user_id: str):
+@router.get("/get-user-profile/{user_id}")
+def get_user_profile(user_id: str):
     from app import controller
     account: Account = controller.search_account_by_id(user_id)
     if account == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
-    return res.success_response_status(status.HTTP_200_OK, "Get User Data Success", data=account.get_account_details())
+    return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())
 
 @router.delete("/delete-booking/{booking_id}", dependencies=[Depends(verify_customer)])
 def delete_booking(booking_id: str):
@@ -146,23 +153,23 @@ def add_chat_room(body: AddChatRoomModel):
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
     return res.success_response_status(status.HTTP_200_OK, "Add Chat Room Success", data=chat_room.get_chat_room_details())
 
-@router.put("/edit-displayname")
+@router.put("/edit-display-name")
 def edit_display_name(body: EditDisplayNameModel):
     from app import controller
-    account: Account = controller.edit_display_name(Body.user_id, body.display_name)
-    if account:
-        return res.success_response_status(status.HTTP_200_OK, "Edit displayname Success",  data=account.get_account_details())
-    else:
+    account: Account = controller.search_account_by_id(Body.user_id)
+    if account == None:
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit displayname Error")
+    edited_account: Account = controller.edit_display_name(account, body.display_name)
+    return res.success_response_status(status.HTTP_200_OK, "Edit displayname Success",  data=edited_account.get_account_details())
     
-@router.post("/edit-pic-url")
+@router.put("/edit-pic-url")
 def edit_pic_url(body: EditPicUrlModel):
     from app import controller
-    account: Account = controller.edit_pic_url(Body.user_id, body.url)
-    if account:
-        return res.success_response_status(status.HTTP_200_OK, "Edit pic url Success",  data=account.get_account_details())
-    else:
+    account: Account = controller.search_account_by_id(Body.user_id)
+    if account == None:
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Send pic url Error")
+    edited_account: Account = controller.edit_pic_url(account, body.url)
+    return res.success_response_status(status.HTTP_200_OK, "Edit pic url Success",  data=edited_account.get_account_details())
     
 @router.get("/get-leaderboard")
 def get_leaderboard():
