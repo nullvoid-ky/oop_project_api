@@ -99,7 +99,7 @@ class Mate(Account):
         return review
     
     def get_review_mate(self) -> list:
-        return self.review__review_list
+        return self.__review_list
     
     def get_mate_details(self) -> dict:
         return {
