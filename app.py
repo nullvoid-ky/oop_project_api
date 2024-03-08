@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import auth, booking, chat, controller, mate
+from routers import auth, booking, chat, chat_room, controller, mate
 from internal.controller import Controller
 
 app = FastAPI(openapi_prefix="/api")
@@ -31,6 +31,10 @@ app.include_router(
 app.include_router(
     mate.router,
     tags=["mate"]
+)
+app.include_router(
+    chat_room.router,
+    tags=["chat-room"]
 )
 
 controller = Controller()

@@ -2,14 +2,20 @@ from fastapi import APIRouter, status, Depends, Body
 
 from models.controller import ReviewModel
 from models.post import PostModel
-from models.profile import EditUsernameModel, EditPicUrlModel
+from models.profile import EditDisplayNameModel, EditPicUrlModel
 import utils.response as res
-from models.mate import MateModel
+from models.mate import MateModel, SearchMateModel
 from internal.booking import Booking
 from internal.transaction import Transaction
 from internal.account import Account
 from internal.post import Post
+from internal.chat_room_manager import ChatRoomManeger
+from models.controller import ReviewModel
+from models.post import PostModel
+from models.mate import MateModel
 from models.booking import BookingModel
+from models.chat_room import AddChatRoomModel
+import utils.response as res
 from dependencies import verify_token, verify_customer, verify_mate
 
 router = APIRouter(
@@ -48,6 +54,16 @@ def get_mates():
         return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in mate_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in add mate")
 
+@router.post("/search-mates")
+def search_mate_by_condition(body: SearchMateModel):
+    from app import controller
+    print(body.name, body.location, body.gender, body.age)
+    mate_list = controller.search_mate_by_condition(body.name, body.location, body.gender, body.age)
+    print(mate_list)
+    if isinstance(mate_list, list):
+        return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in mate_list])
+    return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in add mate")
+
 @router.post("/add-post", dependencies=[Depends(verify_mate)])
 def add_post(body: PostModel):
     from app import controller
@@ -73,17 +89,35 @@ def get_profile():
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
     return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())
 
-@router.put("/edit-username")
-def edit_message(body: EditUsernameModel):
+@router.delete("/delete-booking/{booking_id}", dependencies=[Depends(verify_customer)])
+def delete_booking(booking_id: str):
     from app import controller
-    account: Account = controller.edit_username(Body.user_id, body.username)
+    booking: Booking = controller.search_booking_by_id(booking_id)
+    if booking == None:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Booking not found")
+    if controller.delete_booking(booking_id):
+        return res.success_response_status(status.HTTP_200_OK, "Delete Booking Success")
+    return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in delete booking")
+
+@router.post("/add-chat-room", dependencies=[Depends(verify_customer)])
+def add_chat_room(body: AddChatRoomModel):
+    from app import controller
+    chat_room: ChatRoomManeger = controller.add_chat_room(Body.user_id, body.receiver_id)
+    if chat_room == None:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
+    return res.success_response_status(status.HTTP_200_OK, "Add Chat Room Success", data=chat_room.get_chat_room_details())
+
+@router.put("/edit-displayname")
+def edit_display_name(body: EditDisplayNameModel):
+    from app import controller
+    account: Account = controller.edit_display_name(Body.user_id, body.display_name)
     if account:
-        return res.success_response_status(status.HTTP_200_OK, "Edit username Success",  data=account.get_account_details())
+        return res.success_response_status(status.HTTP_200_OK, "Edit displayname Success",  data=account.get_account_details())
     else:
-        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit username Error")
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit displayname Error")
     
-@router.put("/edit-pic-url")
-def edit_message(body: EditPicUrlModel):
+@router.post("/edit-pic-url")
+def edit_pic_url(body: EditPicUrlModel):
     from app import controller
     account: Account = controller.edit_pic_url(Body.user_id, body.url)
     if account:
