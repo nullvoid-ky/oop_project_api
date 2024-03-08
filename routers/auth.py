@@ -6,9 +6,7 @@ from models.register import RegisterModel
 from models.login import LoginModel
 import utils.auth as auth
 import utils.response as res
-from internal.account import Account
 from internal.customer import Customer
-from internal.mate import Mate
 
 router = APIRouter(
     prefix="/auth",
@@ -26,7 +24,7 @@ def login(body: LoginModel):
 
 @router.post("/register")
 def register(body: RegisterModel):
-    account: dict = auth.register(body.username, body.password, body.role, body.gender)
+    account: dict = auth.register(body.username, body.password, body.role, body.gender, "bangkok")
     if account:
         token: str = create_token(str(account["id"]), body.role)
         return res.success_response_status(status=status.HTTP_201_CREATED, message="Account added", data={"token": token, "id": account["id"], "username": account["username"], "pic_url": account["pic_url"]})

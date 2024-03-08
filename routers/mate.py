@@ -4,7 +4,7 @@ from models.review import *
 from internal.account import Account
 from internal.availability import Availablility
 from models.post import PostModel
-from models.availability import AvailabilityModel 
+from models.availability import AvailabilityModel
 import utils.response as res
 from dependencies import verify_token, verify_mate
 
@@ -30,13 +30,25 @@ def add_availablility(body: AvailabilityModel):
     mate.add_availablility(Availablility(datetime.date(body.date.year, body.date.month, body.date.day), body.detail))
     return res.success_response_status(status.HTTP_201_CREATED, "Availablility added")
 
-@router.post("/add_review")
-async def add_review(body: ReviewCreation):
-    from main import controller
+@router.get("/get-availability/{mate_id}")
+def get_availablility(mate_id: str):
+    from app import controller
+    mate: Account = controller.search_mate_by_id(mate_id)
+    if mate == None:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
+    availablility_list: list = mate.availablility_list
+    if len(availablility_list) == 0:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "No availablility")
+    return res.success_response_status(status.HTTP_200_OK, "Get availablility success", data=[availablility.get_availablility_details() for availablility in availablility_list])
+
+@router.post("/add-review")
+def add_review(body: ReviewCreation):
+    from app import controller
     mate = controller.search_mate_by_id(body.mate_id)
-    result : dict = mate.add_review_mate(body.customer_id, body.message, body.star)
-    if result:
-        return res.success_response_status(status.HTTP_200_OK, "Added Review Successfully", data=result.get_review_detail())
+    mate: Account = mate.search_mate_by_id(body.mate_id)
+    review = mate.add_review_mate(body.customer_id, body.message, body.star)
+    if review:
+        return res.success_response_status(status.HTTP_200_OK, "Added Review Successfully", data=review.get_review_details())
     return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")
 
 @router.get("/reviews")
@@ -59,3 +71,11 @@ async def delete_review(body: ReviewDeletion):
     if result:
         return res.success_response_status(status.HTTP_200_OK, "Delete Review Successfully", data=result.get_review_detail())
     return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")
+
+@router.get("/get-avarage-review-star/{mate_id}")
+def get_average_review_star(mate_id):
+    from app import controller
+    mate: Account = controller.search_mate_by_id(mate_id)
+    if mate == None:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
+    return res.success_response_status(status.HTTP_200_OK, "Get Avarage Review Star Successfully", data=mate.get_average_review_star())

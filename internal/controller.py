@@ -1,3 +1,4 @@
+from typing import Tuple, Union
 import datetime
 
 from internal.account import Account
@@ -8,13 +9,15 @@ from internal.customer import Customer
 from internal.payment import Payment
 from internal.transaction import Transaction
 from internal.mate import Mate
-from internal.review import Review
 from internal.chat_room_manager import ChatRoomManeger
 from internal.post import Post
 from internal.message import Message
 from models.mate import Date
 from utils.auth import register
 from dependencies import create_token
+from internal.post import Post
+from models.mate import Date
+import datetime
 
 class Controller:
     def __init__(self) -> None:
@@ -24,23 +27,17 @@ class Controller:
         self.__chat_room_list: list[ChatRoomManeger] = []
 
     def add_instance(self):
-        account_1 = register("ganThepro", "1234", "customer", "male")
-        print("account_1_token :", create_token(str(account_1['id']), "customer"))
-        account_2 = register("ganThepro2", "1234", "mate", "female")
-        print("account_2_token :", create_token(str(account_2['id']), "mate"))
-        chat_room = self.add_chat_room(account_1['id'], account_2['id'])
+        account_1_details = register("ganThepro", "1234", "customer", "male", "bangkok")
+        print("account_1_token :", create_token(str(account_1_details['id']), "customer"))
+        account_2_details = register("ganThepro2", "1234", "mate", "female", "bangkok")
+        print("account_2_token :", create_token(str(account_2_details['id']), "mate"))
+        account_1 = self.search_account_by_id(account_1_details['id'])
+        account_2 = self.search_account_by_id(account_2_details['id'])
+        account_1.amount = 1000
+        account_2.price = 1000
+        chat_room = self.add_chat_room(account_1, account_2)
         print("chat_room: ", chat_room.get_chat_room_details())
-
-        account_3 = register("pawit", "1234", "customer", "male")
-        account_4 = register("yok", "1234", "mate", "male")
-        self.add_chat_room(account_1['id'], account_4['id'])
-        self.add_chat_room(account_3['id'], account_2['id'])
-        self.add_chat_room(account_3['id'], account_4['id'])
-
-        account_5 = register("kanyok", "1234", "mate", "male")
-        account_6 = register("mook", "1234", "mate", "female")
-        account_7 = register("porsche", "1234", "mate", "female")
-
+        account_2.add_availablility(datetime.date(2024, 3, 4), "I'm available")
         # self.add_customer("test1", "test1")
         # self.add_mate("test2", "test2")
         # self.add_customer("test3", "test3")
@@ -55,8 +52,6 @@ class Controller:
         # mate_acc2 = self.add_mate("Mate2", "1234")
         # # print("mate_acc: ", mate_acc.id)
         # # print("mate_acc: ", mate_acc2.id)
-        # mate_acc.add_availablility(datetime.date(2024, 3, 4), "I'm available")
-        # mate_acc2.add_availablility(datetime.date(2024, 3, 4), "I'm available")
         # self.add_booking(my_acc, mate_acc, Date(year=2024, month=3, day=4))
 
         # self.add_chat_room(Chat(my_acc, mate_acc))
@@ -74,22 +69,29 @@ class Controller:
     def get_chat_list(self):
         return self.__chat_room_list
     
+    def get_chat_list_by_id(self, user_id: str) -> list:
+        chat_list = []
+        account = self.search_account_by_id(user_id)
+        if account:
+            for chat in self.__chat_room_list:
+                if chat.account_1 == account or chat.account_2 == account:
+                    chat_list.append(chat.get_chat_room_details())
+        return chat_list
+    
     def get_chat_history_by_id(self, chat_room_id: str) -> list | None:
         chat_room = self.search_chat_room_by_id(chat_room_id)
         if chat_room:
             return chat_room.message_list
         return None
         
-    def add_chat_room(self, account_1_id: str, account_2_id: str) -> ChatRoomManeger | None:
-        account_1: Account = self.search_account_by_id(account_1_id)
-        account_2: Account = self.search_account_by_id(account_2_id)
+    def add_chat_room(self, account_1: Account, account_2: Account) -> ChatRoomManeger | None:
         if not (isinstance(account_1, Account) and isinstance(account_2, Account)):
             return None
         chat_room: ChatRoomManeger = ChatRoomManeger(account_1, account_2)
         self.__chat_room_list.append(chat_room)
         return chat_room
 
-    def search_account_by_id(self, id: str):
+    def search_account_by_id(self, id: str) -> Account | None:
         for acc in self.__account_list:
             if(id == str(acc.id)):
                 return acc
@@ -186,19 +188,19 @@ class Controller:
     def booking_list(self) -> list:
         return self.__booking_list
 
-    def add_customer(self, username: str, password: str, gender:str) -> Customer:
+    def add_customer(self, username: str, password: str, gender: str, location: str) -> Customer:
         existed_account: Account = self.search_account_by_username(username)
         if existed_account != None:
             return None
-        customer: Customer = Customer(username, password, gender)
+        customer: Customer = Customer(username, password, gender, location)
         self.__account_list.append(customer)
         return customer
 
-    def add_mate(self, username: str, password: str, gender:str) -> Mate:
+    def add_mate(self, username: str, password: str, gender: str, location: str) -> Mate:
         existed_account: Account = self.search_account_by_username(username)
         if existed_account != None:
             return None
-        mate: Mate = Mate(username, password , gender)
+        mate: Mate = Mate(username, password, gender, location)
         self.__account_list.append(mate)
         return mate
 
@@ -249,21 +251,16 @@ class Controller:
 
     def pay(self, booking_id: str) -> Transaction:
         booking: Booking = self.search_booking_by_id(booking_id)
-        if booking == None:
-            return None
         customer: Customer = self.search_customer_by_id(str(booking.customer.id))
-        
-        # customer : Customer = self.validate_customer(booking.customer)
-        # todo : make validate function to all instances
-        
         if customer == None:
             return None
         mate: Mate = self.search_mate_by_id(str(booking.mate.id))
-        if mate == None:
+        if mate == None or customer == None or booking == None:
             return None
         payment: Payment = booking.payment
         payment.pay(customer, mate)
-        self.add_chat_room(customer, mate)
+        if self.add_chat_room(customer, mate) == None:
+            return None
         transaction: Transaction = Transaction(customer, mate, payment.amount)
         customer.add_transaction(transaction)
         mate.add_transaction(transaction)
@@ -289,14 +286,16 @@ class Controller:
                 customer_list.append(account)
         return customer_list
     
-    
-    def add_booking(self, customer: Customer, mate: Mate, date: Date) -> Booking | None:
+    def add_booking(self, customer: Customer, mate: Mate, date: Date) -> Tuple[Booking, Transaction] | None:
         booked_customer: Account = mate.book(customer, date.year, date.month, date.day)
         if booked_customer == None:
             return None
-        booking: Booking = Booking(customer, mate, Payment(mate.amount))
+        pledge_payment: Payment = Payment(mate.price / 2)
+        pledge_payment.pay(customer, mate)
+        pledge_transaction: Transaction = Transaction(customer, mate, pledge_payment.amount)   
+        booking: Booking = Booking(customer, mate, datetime.date(date.year, date.month, date.day), pledge_payment)
         self.__booking_list.append(booking)
-        return booking
+        return booking, pledge_transaction
     
     def get_booking(self, customer: Customer) -> list[Booking]:
         booking_list = []
@@ -305,13 +304,19 @@ class Controller:
                 booking_list.append(booking)
         return booking_list
 
-    def delete_booking(self, booking_id: str) -> Booking | None:
-        booking: Booking = self.search_booking_by_id(booking_id)
-        if booking:
+    def delete_booking(self, booking: Booking, account: Account) -> Union[Tuple[Booking, Transaction], Booking, None]:
+        transaction: Transaction = None
+        if isinstance(account, Mate):
+            booking.payment.pay(account, booking.customer)
+            transaction: Transaction = Transaction(account, booking.customer, booking.payment.amount)
+        if isinstance(booking, Booking):
             self.__booking_list.remove(booking)
+            booking.mate.booked_customer = None
+            booking.mate.add_availablility(datetime.date(booking.book_date.year, booking.book_date.month, booking.book_date.day), "I'm available")
+            if transaction:
+                return booking, transaction
             return booking
-        else:
-            return None
+        return None
 
     def add_post(self, description: str, picture: str) -> Post | None:
         if not isinstance(description, str) or not isinstance(picture, str):
@@ -334,10 +339,3 @@ class Controller:
         mate_list = self.get_mates()
         sorted_mates = sorted(mate_list, key=lambda mate: (mate.get_average_review_star(), mate.get_review_amount(), mate.timestamp), reverse=True)
         return sorted_mates[:10]
-
-
-
-
-
-
-
