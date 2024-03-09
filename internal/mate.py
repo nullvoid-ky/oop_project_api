@@ -108,6 +108,7 @@ class Mate(Account):
             "rentcount": self.__rented_count,
             "gender":self.gender,
             "location": self.location,
+            "price": self.price,
             "timestamp": self.timestamp.strftime("%d/%m/%Y %H:%M:%S")
         }
     
