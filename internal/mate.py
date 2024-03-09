@@ -15,12 +15,6 @@ class Mate(Account):
     def availability_list(self) -> list[Availability]:
         return self.__availability_list
     @property
-    def booked_customer(self) -> Account:
-        return self.__booked_customer
-    @booked_customer.setter
-    def booked_customer(self, customer: Account | None):
-        self.__booked_customer = customer
-    @property
     def price(self) -> int:
         return self.__price
     @price.setter
