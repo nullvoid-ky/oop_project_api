@@ -408,6 +408,10 @@ class Controller:
     def edit_pic_url(self, account: Account, new_pic_url: str) -> Account:
         account.pic_url = new_pic_url
         return account
+
+    def edit_money(self, account: Account, new_money: str) -> Account:
+        account.amount = new_money
+        return account
     
     def get_leaderboard(self) -> list[Mate]:
         mate_list = self.get_mates()
