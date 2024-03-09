@@ -9,19 +9,12 @@ class Mate(Account):
         super().__init__(username, password, gender, location)
         self.__availability_list: list[Availability] = []
         self.__review_list: list[Review] = []
-        self.__booked_customer = None
         self.__price = price
         self.__rented_count = 0
 
     @property
     def availability_list(self) -> list[Availability]:
         return self.__availability_list
-    @property
-    def booked_customer(self) -> Account:
-        return self.__booked_customer
-    @booked_customer.setter
-    def booked_customer(self, customer: Account | None):
-        self.__booked_customer = customer
     @property
     def price(self) -> int:
         return self.__price
@@ -43,13 +36,11 @@ class Mate(Account):
                 return availability
         return None
     
-    def book(self, customer: Account, year: int, month: int, day: int) -> Account | None:
-        if isinstance(self.__booked_customer, type(None)):
-            for availability in self.__availability_list:
-                if availability.check_available(year, month, day):
-                    self.__availability_list.remove(availability)
-                    self.__booked_customer: Account = customer
-                    return self.__booked_customer
+    def book(self, year: int, month: int, day: int) -> Availability | None:
+        for availability in self.__availability_list:
+            if availability.check_available(year, month, day):
+                self.__availability_list.remove(availability)
+                return availability
         return None
 
     def confirm_booking(self):
