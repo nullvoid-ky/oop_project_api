@@ -31,17 +31,26 @@ class Controller:
         print("account_1_token :", create_token(str(account_1_details['id']), "customer"))
         account_2_details = register("ganThepro2", "1234", "mate", "female", "bangkok")
         print("account_2_token :", create_token(str(account_2_details['id']), "mate"))
-        account_1 = self.search_account_by_id(account_1_details['id'])
-        account_2 = self.search_account_by_id(account_2_details['id'])
+        account_1: Customer = self.search_account_by_id(account_1_details['id'])
+        account_2: Mate = self.search_account_by_id(account_2_details['id'])
         account_1.amount = 1000
         account_2.price = 1000
         chat_room = self.add_chat_room(account_1, account_2)
         print("chat_room: ", chat_room.get_chat_room_details())
         account_2.add_availability(datetime.date(2024, 3, 4), "I'm available")
 
-        account_4_details = register("ganThepro3", "1234", "mate", "female", "bangkok")
-        account_5_details = register("ganThepro4", "1234", "mate", "male", "bangkok")
-        account_5_details = register("yok", "1234", "mate", "male", "bangkok")
+        account_4_details: Mate = register("ganThepro3", "1234", "mate", "female", "bangkok")
+        account_5_details: Mate = register("ganThepro4", "1234", "mate", "male", "bangkok")
+        account_6_details: Mate = register("yok", "1234", "mate", "male", "bangkok")
+        account_4: Mate = self.search_account_by_id(account_4_details['id'])
+        account_5: Mate = self.search_account_by_id(account_5_details['id'])
+        account_6: Mate = self.search_account_by_id(account_6_details['id'])
+
+        account_2.add_review_mate(account_1, "So Good", 5)
+        account_2.add_review_mate(account_1, "So Good", 4)
+        account_4.add_review_mate(account_1, "So Good", 4)
+        account_5.add_review_mate(account_1, "So Good", 2)
+        account_6.add_review_mate(account_1, "So Good", 5)
         # self.add_customer("test1", "test1")
         # self.add_mate("test2", "test2")
         # self.add_customer("test3", "test3")
@@ -396,7 +405,7 @@ class Controller:
         account.pic_url = new_pic_url
         return account
     
-    def get_leaderboard(self):
+    def get_leaderboard(self) -> list[Mate]:
         mate_list = self.get_mates()
         sorted_mates = sorted(mate_list, key=lambda mate: (mate.get_average_review_star(), mate.get_review_amount(), mate.timestamp), reverse=True)
         return sorted_mates[:10]

@@ -3,7 +3,7 @@ import datetime
 from internal.account import Account
 from internal.availability import Availability
 from internal.review import Review
-
+from internal.customer import Customer
 class Mate(Account):
     def __init__(self, username: str, password: str, gender: str, location: str, price: int=0):
         super().__init__(username, password, gender, location)
@@ -66,13 +66,13 @@ class Mate(Account):
     def set_availability(self):
         pass
     
-    def get_average_review_star(self):
+    def get_average_review_star(self) -> float:
         sum: float = 0
         for review in self.__review_list:
             sum += review.star
         if len(self.__review_list):
-            return sum / len(self.__review_list)
-        return None
+            return round(sum / len(self.__review_list), 1)
+        return -1.0
 
     def get_review_price(self):
         return len(self.__review_list)
@@ -86,8 +86,8 @@ class Mate(Account):
                 return review
         return None
     
-    def add_review_mate(self, customer_id: str, message: str, star: int) -> Review:
-        review: Review = Review(customer_id, message, star)
+    def add_review_mate(self, reviewer: Customer, message: str, star: int) -> Review:
+        review: Review = Review(reviewer, message, star)
         self.__review_list.append(review)
         return review
     
@@ -101,17 +101,20 @@ class Mate(Account):
     def get_review_mate(self) -> list:
         return self.__review_list
     
+    def get_review_amount(self) -> int:
+        return len(self.__review_list)
+    
     def get_mate_details(self) -> dict:
         return {
-            "id": str(self.__id),
-            "username": self.__username,
-            "displayname":self.__display_name,
-            "pic_url": self.__pic_url,
+            "id": str(self.id),
+            "username": self.username,
+            "displayname":self.display_name,
+            "pic_url": self.pic_url,
             "star": self.get_average_review_star(),
             "amount":self.get_review_amount(),
             "role": "mate",
-            "gender":self.__gender,
-            "location": self.__location,
+            "gender":self.gender,
+            "location": self.location,
             "timestamp": self.timestamp.strftime("%d/%m/%Y %H:%M:%S")
         }
     
