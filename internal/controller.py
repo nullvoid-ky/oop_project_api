@@ -418,3 +418,6 @@ class Controller:
         mate_list = self.get_mates()
         sorted_mates = sorted(mate_list, key=lambda mate: (mate.get_average_review_star(), mate.get_review_amount(), mate.timestamp), reverse=True)
         return sorted_mates[:10]
+    
+    def add_log(self, type, head, des):
+        pass
