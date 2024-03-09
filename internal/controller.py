@@ -51,6 +51,10 @@ class Controller:
         account_4.add_review_mate(account_1, "So Good", 4)
         account_5.add_review_mate(account_1, "So Good", 2)
         account_6.add_review_mate(account_1, "So Good", 5)
+
+        chat_room = self.add_chat_room(account_1, account_4)
+        chat_room = self.add_chat_room(account_2, account_4)
+
         # self.add_customer("test1", "test1")
         # self.add_mate("test2", "test2")
         # self.add_customer("test3", "test3")
