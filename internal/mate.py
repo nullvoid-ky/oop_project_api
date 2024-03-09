@@ -120,6 +120,6 @@ class Mate(Account):
     def get_mate_rent_details(self) -> dict:
         return {
             "star": self.get_average_review_star(),
-            "amount":self.get_review_amount(),
+            "reviewcount":self.get_review_amount(),
             "rentcount": self.__rented_count
         }
