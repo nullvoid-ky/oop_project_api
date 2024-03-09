@@ -136,7 +136,7 @@ class Controller:
             all_chat_data.append(chat_data)
         return all_chat_data   
 
-    def get_receiver_chat_room_detail(self, sender_acc):
+    def get_receiver_chat_room_detail(self, sender_acc: Account) -> list:
         detail = []
         if not (isinstance(sender_acc, Account)):
             raise TypeError("receiver_acc must be Account instances")
