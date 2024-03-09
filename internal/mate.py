@@ -11,6 +11,7 @@ class Mate(Account):
         self.__review_list: list[Review] = []
         self.__booked_customer = None
         self.__price = price
+        self.__rented_count = 0
 
     @property
     def availability_list(self) -> list[Availability]:
@@ -111,15 +112,17 @@ class Mate(Account):
             "displayname":self.display_name,
             "pic_url": self.pic_url,
             "star": self.get_average_review_star(),
-            "amount":self.get_review_amount(),
+            "reviewcount":self.get_review_amount(),
             "role": "mate",
+            "rentcount": self.__rented_count,
             "gender":self.gender,
             "location": self.location,
             "timestamp": self.timestamp.strftime("%d/%m/%Y %H:%M:%S")
         }
     
-    def get_mate_review_details(self) -> dict:
+    def get_mate_rent_details(self) -> dict:
         return {
             "star": self.get_average_review_star(),
-            "amount":self.get_review_amount(),
+            "reviewcount":self.get_review_amount(),
+            "rentcount": self.__rented_count
         }
