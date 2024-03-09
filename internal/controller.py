@@ -301,7 +301,7 @@ class Controller:
         return customer_list
     
     def add_booking(self, customer: Customer, mate: Mate, date: Date) -> Tuple[Booking, Transaction] | None:
-        booked_customer: Account = mate.book(customer, date.year, date.month, date.day)
+        booked_customer: Account = mate.book(date.year, date.month, date.day)
         if booked_customer == None:
             return None
         pledge_payment: Payment = Payment(mate.price / 2)
