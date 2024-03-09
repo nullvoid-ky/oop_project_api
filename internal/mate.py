@@ -94,7 +94,7 @@ class Mate(Account):
         return self.__review_list
     
     def get_review_amount(self) -> int:
-        return len(self.__review_list)
+        return int(len(self.__review_list)) 
     
     def get_mate_details(self) -> dict:
         return {
