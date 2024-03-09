@@ -38,6 +38,7 @@ class Controller:
         chat_room = self.add_chat_room(account_1, account_2)
         print("chat_room: ", chat_room.get_chat_room_details())
         account_2.add_availability(datetime.date(2024, 3, 4), "I'm available")
+        print(account_2.id)
 
         account_4_details: Mate = register("ganThepro3", "1234", "mate", "female", "bangkok")
         account_5_details: Mate = register("ganThepro4", "1234", "mate", "male", "bangkok")
