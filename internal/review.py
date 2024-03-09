@@ -30,5 +30,6 @@ class Review:
             "id" : str(self.__id),
             "message" : str(self.__message),
             "star" : str(self.__star),
-            "timestamp" : str(self.__timestamp)
+            "timestamp" : str(self.__timestamp),
+            "user": self.__reviewer.get_account_details()
         }

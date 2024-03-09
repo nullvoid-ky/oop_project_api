@@ -57,11 +57,12 @@ def add_review(body: ReviewCreation):
 @router.get("/get-reviews/{mate_id}")
 async def get_review(mate_id: str):
     from app import controller
+    from internal.review import Review
     mate = controller.search_mate_by_id(mate_id)
-    result : dict = mate.get_review_mate()
+    result : list[Review] = mate.get_review_mate()
     data_list = []
     for review in result:
-        data_list.append(review.get_review_detail())
+        data_list.append(review.get_review_details())
     if len(data_list):
         return res.success_response_status(status.HTTP_200_OK, "Read Review Successfully", data=data_list)
     return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")
