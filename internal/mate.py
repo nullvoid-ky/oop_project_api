@@ -109,7 +109,7 @@ class Mate(Account):
             "displayname":self.__display_name,
             "pic_url": self.__pic_url,
             "star": self.get_average_review_star(),
-            "amount":self.get_review_amount(),
+            "reviewcount":self.get_review_amount(),
             "role": "mate",
             "rentcount": self.__rented_count,
             "gender":self.__gender,
