@@ -206,8 +206,9 @@ def add_amount(body: EditMoneyModel):
     account: Account = controller.search_account_by_id(Body.user_id)
     if account == None:
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
-    account.amount + int(body.amount)
-    return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=account.get_account_details())
+    account.amount = account.amount + body.amount
+    transaction: Transaction = account.add_transaction(Transaction(account, account, body.amount))
+    return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=transaction.get_transaction_details())
 
 @router.post("/del-amount", dependencies=[Depends(verify_mate)])
 def del_amount(body: EditMoneyModel):
@@ -215,5 +216,6 @@ def del_amount(body: EditMoneyModel):
     account: Account = controller.search_account_by_id(Body.user_id)
     if account == None:
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
-    account.amount - int(body.amount)
-    return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=account.get_account_details())
+    account.amount = account.amount - body.amount
+    transaction: Transaction = account.add_transaction(Transaction(account, account, body.amount))
+    return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=transaction.get_transaction_details())

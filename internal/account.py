@@ -69,6 +69,9 @@ class Account(AllAccount):
     @property
     def amount(self) -> int:
         return self._amount
+    @amount.setter
+    def amount(self, amount):
+        self._amount = amount
     @property
     def location(self) -> str:
         return self._location
@@ -91,6 +94,7 @@ class Account(AllAccount):
         if not isinstance(transaction, Transaction):
             raise TypeError(f"Expected transaction, but got {type(transaction)} instead.")
         self._transaction_list.append(transaction)
+        return transaction
     
     def __add__(self, amount: int) -> int:
         self._amount += amount
