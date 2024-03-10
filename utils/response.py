@@ -2,6 +2,8 @@ from fastapi.responses import JSONResponse
 from fastapi import HTTPException, status
 
 def success_response_status(status: status, message: str, data=None):
+    from app import controller
+    controller.add_log(status, message, data)
     return JSONResponse(
         status_code=status,
         content={"message": message, "data": data},

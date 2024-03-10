@@ -24,8 +24,8 @@ class Transaction:
 
     def get_transaction_details(self) -> dict:
         return {
-            "sender": str(self.sender.id),
-            "recipient": str(self.recipient.id),
+            "sender": self.sender.get_account_details(),
+            "recipient": self.recipient.get_account_details(),
             "amount": self.amount,
             "timestamp": str(self.timestamp)
         }
