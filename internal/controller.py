@@ -394,6 +394,7 @@ class Controller:
         transaction: Transaction = Transaction(customer, mate, payment.amount)
         customer.add_transaction(transaction)
         mate.add_transaction(transaction)
+        booking.status = "Success"
         return transaction
     
     def get_account_by_name(self, name: str) -> UserAccount | None:
@@ -452,12 +453,24 @@ class Controller:
             transaction: Transaction = Transaction(account, booking.customer, booking.payment.amount)
         if isinstance(booking, Booking):
             booking.mate.booked_customer = None
-            booking.is_success = False
+            booking.status = "Failed"
             booking.mate.add_availability(datetime.date(booking.book_date.year, booking.book_date.month, booking.book_date.day), "I'm available")
             if transaction:
                 return booking, transaction
             return booking
         return None
+    
+    def get_all_transaction(self):
+        transaction = []
+        for account in self.account_list:
+            transaction = transaction + account.transaction_list
+        return transaction
+    
+    def get_all_booking(self):
+        booking_list = []
+        for booking in self.__booking_list:
+            booking_list.append(booking)
+        return booking_list
 
     def add_post(self, writer: Mate, description: str, picture: str) -> Post | None:
         if not isinstance(description, str) or not isinstance(picture, str) or not isinstance(writer, Mate):
