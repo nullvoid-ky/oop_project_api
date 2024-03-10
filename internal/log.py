@@ -43,20 +43,20 @@ class Log:
         if isinstance(self.__item, str):
             return {
                 "success": self.__success,
-                "actor": self.__actor.get_account_details() if not isinstance(self.__actor, UserAccount) else "?",
+                "actor": self.__actor.get_account_details() if isinstance(self.__actor, UserAccount) else "?",
                 "action": self.__action,
                 "item": self.__item,
-                "target": self.__target.get_account_details() if not isinstance(self.__target, UserAccount) else "?",
+                "target": self.__target.get_account_details() if isinstance(self.__target, UserAccount) else "?",
                 "msg": self.__msg,
                 "timestamp": self.__timestamp.strftime("%d/%m/%Y %H:%M")  # Fixed typo here
             }
         else:
             return {
                 "success": self.__success,
-                "actor": self.__actor.get_account_details() if not isinstance(self.__actor, UserAccount) else "?",
+                "actor": self.__actor.get_account_details() if isinstance(self.__actor, UserAccount) else "?",
                 "action": self.__action,
                 "item": str(type(self.__item)),  # Convert type to string
-                "target": self.__target.get_account_details() if not isinstance(self.__target, UserAccount) else "?",
+                "target": self.__target.get_account_details() if isinstance(self.__target, UserAccount) else "?",
                 "msg": self.__msg,
                 "timestamp": self.__timestamp.strftime("%d/%m/%Y %H:%M")
             }

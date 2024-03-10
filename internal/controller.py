@@ -70,6 +70,7 @@ class Controller:
         account_2.add_availability(datetime.date(2024, 3, 4), "I'm available")
         # print(account_2.availability_list)
         account_2.add_review_mate(account_1, "good", 4)
+        self.add_booking(account_1, account_2, Date(year=2024, month=3, day=4))
         # booking, transaction = self.add_booking(account_1, account_2, Date(year=2024, month=3, day=4))
         # print("booking: ", booking.id)    
         # self.pay(str(booking.id))
