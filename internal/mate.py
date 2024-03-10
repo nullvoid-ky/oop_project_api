@@ -35,7 +35,7 @@ class Mate(UserAccount):
         return availability
     
     def search_availability(self, year: int, month: int, day: int) -> Availability | None:
-        if(not self.is_availability_slot_valid()):
+        if not self.is_availability_slot_valid():
             return None
         for availability in self.__availability_list:
             if availability.check_available(year, month, day):

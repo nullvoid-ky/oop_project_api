@@ -391,6 +391,7 @@ class Controller:
         transaction: Transaction = Transaction(customer, mate, payment.amount)
         customer.add_transaction(transaction)
         mate.add_transaction(transaction)
+        booking.status = "Success"
         return transaction
     
     def get_account_by_name(self, name: str) -> UserAccount | None:
@@ -441,9 +442,8 @@ class Controller:
                 return None
             transaction: Transaction = Transaction(account, booking.customer, booking.payment.amount)
         if isinstance(booking, Booking):
-            booking.is_success = False
             booking.mate.booked_customer = None
-            booking.is_success = False
+            booking.status = "Failed"
             booking.mate.add_availability(datetime.date(booking.book_date.year, booking.book_date.month, booking.book_date.day), "I'm available")
             if transaction:
                 return booking, transaction
