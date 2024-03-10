@@ -12,15 +12,12 @@ class Post:
     @property
     def description(self):
         return self.__description
-
     @property
     def picture(self):
         return self.__picture
-    
     @property
     def timestamp(self):
         return self.__timestamp
-
     @property
     def id(self):
         return self.__id
@@ -32,5 +29,3 @@ class Post:
             "timestamp": self.__timestamp.strftime("%Y-%m-%d %H:%M:%S"),
             "id": str(self.__id),
         }
-
-

@@ -9,6 +9,6 @@ class DeleteMessageModel(BaseModel):
     message_id: str
 
 class EditMessageModel(BaseModel):
-    receiver_id: str
+    chat_room_id: str
     message_id: str
     new_text: str
