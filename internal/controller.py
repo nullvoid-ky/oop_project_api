@@ -440,3 +440,6 @@ class Controller:
             return None
         self.__admin = Admin()
         return self.__admin
+    
+    def get_admin(self) -> Admin:
+        return self.__admin

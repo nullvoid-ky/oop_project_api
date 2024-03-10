@@ -25,6 +25,9 @@ class AllAccount(ABC):
     def id(self) -> UUID:
         return self._id
     @property
+    def password(self) -> str:
+        return self._password
+    @property
     def timestamp(self) -> datetime:
         return self._timestamp
     @property
@@ -53,9 +56,6 @@ class Account(AllAccount):
     @property
     def age(self) -> str:
         return self._age
-    @property
-    def password(self) -> str:
-        return self._password
     @property
     def display_name(self) -> str:
         return self._display_name

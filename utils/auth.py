@@ -8,7 +8,7 @@ ph = PasswordHasher()
 def register(username: str, password: str, role: str, gender: str, location: str) -> dict | None:
     from app import controller
     account: Account = controller.search_account_by_username(username)
-    if account == None:
+    if account == None and username != "admin":
         hashed_password: str = ph.hash(password)
         if role == "customer":
             new_account: Account = controller.add_customer(username, hashed_password, gender, location)

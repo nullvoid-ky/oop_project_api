@@ -1,10 +1,12 @@
 from internal.account import AllAccount
+from argon2 import PasswordHasher 
+ph = PasswordHasher()
 
 class Admin(AllAccount):
     def __init__(self):
         username : str = "admin"
         password : str = "admin"
-        super().__init__(username, password, "")
+        super().__init__(username, ph.hash(password), "")
     
     def get_account_details(self) -> dict:
         return {
