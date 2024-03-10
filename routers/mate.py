@@ -30,7 +30,7 @@ def add_availability(body: AvailabilityModel):
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
     if mate.search_availability(body.date.year, body.date.month, body.date.day):
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Availability already exists")
-    mate.add_availability(Availability(datetime.date(body.date.year, body.date.month, body.date.day), body.detail))
+    mate.add_availability(datetime.date(body.date.year, body.date.month, body.date.day), body.detail)
     return res.success_response_status(status.HTTP_201_CREATED, "Availability added")
 
 @router.get("/get-availability/{mate_id}")
