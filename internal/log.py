@@ -1,28 +1,44 @@
 from datetime import datetime
 class Log:
-    def __init__(self, method, topic, description) -> None:
-        self.__method : str = method # GET, POST, PUT, DELETE
-        self.__topic :str = topic # Mate, Book. Error
-        self.__description : str = description # Details text 
+    def __init__(self, success, actor, action, item, target, msg) -> None:
+        self.__success = success
+        self.__actor = actor
+        self.__action = action
+        self.__item = item
+        self.__target = target
+        self.__msg = msg
         self.__timestamp =  datetime.now()
 
         @property
-        def method(self):
-            return self.__method
+        def success(self):
+            return self.__success
         @property
-        def topic(self):
-            return self.__topic
+        def actor(self):
+            return self.__actor
         @property
-        def description(self):
-            return self.__description
+        def action(self):
+            return self.__action
+        @property
+        def item(self):
+            return self.__item
+        @property
+        def target(self):
+            return self.__target
+        @property
+        def msg(self):
+            return self.__msg
         @property
         def timestamp(self):
             return self.__timestamp
         
         def get_log_details(self):
             return {
-                "method" : self.__method,
-                "topic" : self.__topic,
-                "description" : self.__description,
-                "timestamp" : self.__timestamp        
+               "success" : self.__success,
+               "actor" : self.__actor,
+               "action" : self.__action,
+               "item" : self.__item,
+               "target" : self.__target,
+               "msg" : self.__msg,
+               "timestamp" : self.__timestam.strftime("%d/%m/%Y %H:%M")
             }
+        

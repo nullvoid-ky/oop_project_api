@@ -3,6 +3,7 @@ import datetime
 
 from internal.account import UserAccount, Account
 from internal.admin import Admin
+from internal.log import Log
 from internal.booking import Booking
 from internal.mate import Mate
 from internal.customer import Customer
@@ -99,6 +100,8 @@ class Controller:
         print(f'Admin ID : {self.__admin.id}')
         print(f'Admin username : {self.__admin._username}')
         print(f'Admin password : {self.__admin._password}')
+        self.edit_display_name(tmp6, "Narak")
+        print(self.__log_list)
         # self.add_customer("test1", "test1")
         # self.add_mate("test2", "test2")
         # self.add_customer("test3", "test3")
@@ -458,9 +461,11 @@ class Controller:
 
     def add_post(self, writer: Mate, description: str, picture: str) -> Post | None:
         if not isinstance(description, str) or not isinstance(picture, str) or not isinstance(writer, Mate):
+            self.add_log(False, writer, "add_post" ,None, None, "Instance Error")
             return None
         post = Post(writer, description, picture)
         self.__post_list.append(post)
+        self.add_log(True, writer, "add_post" ,post, None, "Added Post")
         return post
     
     def get_post(self):
@@ -470,21 +475,49 @@ class Controller:
 
     def edit_display_name(self, account: Account, new_display_name: str) -> Account:
         if not isinstance(account, Account) or not isinstance(new_display_name, str):
+            self.add_log(False, account, "edit_display_name" , "", None, "Instance Error")
             return None
+        self.add_log(True, account, "edit_display_name" ,new_display_name, None, "Edited name")
         account.display_name = new_display_name
         return account
     
     def edit_pic_url(self, account: UserAccount, new_pic_url: str) -> UserAccount:
         if not isinstance(account, Account) or not isinstance(new_pic_url, str):
+            self.add_log(False, account, "edit_pic_url" ,"", None, "Instance Error")
             return None
+        self.add_log(True, account, "edit_pic_url" ,new_pic_url, None, "Edited Pic")
         account.pic_url = new_pic_url
         return account
 
     def edit_money(self, account: UserAccount, new_money: str) -> UserAccount:
         if not isinstance(account, Account) or not isinstance(new_money, str):
+            self.add_log(False, account, "edit_money" ,"", None, "instanec Error")
             return None
+        self.add_log(True, account, "edit_money" ,new_money, None, "Adjusted Money")
         account.amount = new_money
         return account
+    
+    def edit_age(self, account: Account, new_age: int) -> Account:
+        if not isinstance(account, Account) or not(isinstance(new_age,int)):
+            self.add_log(False, account, "edit_age" ,"", None, "Instance Error")
+        account.age = new_age
+        self.add_log(True, account, "edit_age" ,new_age, None, "Edited Age")
+        return account
+
+    def edit_location(self, account: Account, new_location: str) -> Account:
+        if not isinstance(account, Account) or not(isinstance(new_location,str)):
+            self.add_log(False, account, "edit_location" ,"", None, "Instance Error")
+        account.location = new_location
+        self.add_log(True, account, "edit_location" ,new_location, None, "Edited Location")
+        return account
+    
+    # def edit_gender(self, account: UserAccount, new_money: str) -> UserAccount:
+    #     if not isinstance(account, Account) or not isinstance(new_money, str):
+    #         self.add_log(False, account, "edit_money" ,"", None)
+    #         return None
+    #     self.add_log(True, account, "edit_money" ,new_money, None)
+    #     account.amount = new_money
+    #     return account
     
     def get_leaderboard(self) -> list[Mate]:
         mate_list = self.get_mates()
@@ -493,9 +526,9 @@ class Controller:
         sorted_mates = sorted(mate_list, key=lambda mate: (mate.get_average_review_star(), mate.get_review_amount(), mate.timestamp), reverse=True)
         return sorted_mates[:10]
     
-    def add_log(self, status: int, message: str, data: dict) -> None:
-        pass
-    
+    def add_log(self, success, actor, action, item, target, msg) -> None:
+        self.__log_list.append(Log(success, actor, action, item, target, msg))
+
     def create_admin(self) -> Admin | None:
         if isinstance(self.__admin, Admin):
             return None
@@ -510,10 +543,3 @@ class Controller:
     def get_admin(self) -> Admin:
         return self.__admin
     
-    def edit_age(self, account: Account, new_age: int) -> Account:
-        account.age = new_age
-        return account
-
-    def edit_location(self, account: Account, new_location: str) -> Account:
-        account.location = new_location
-        return account
