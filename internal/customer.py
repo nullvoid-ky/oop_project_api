@@ -14,5 +14,5 @@ class Customer(Account):
             "gender": self.gender,
             "location": self.location,
             "amount": self.amount,
-            "timestamp": self.timestamp.strftime("%d/%m/%Y %H:%M:%S")
+            "timestamp": self._timestamp.strftime("%d/%m/%Y %H:%M:%S")
         }

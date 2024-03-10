@@ -7,7 +7,7 @@ class Review:
         self.__reviewer = reviewer
         self.__message : str = message
         self.__star : int = star 
-        self.__timestamp = datetime.datetime.now()
+        self.__timestamp = datetime.now()
         
     @property
     def id(self):
