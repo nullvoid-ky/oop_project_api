@@ -4,6 +4,7 @@ from internal.account import Account
 from internal.availability import Availability
 from internal.review import Review
 from internal.customer import Customer
+
 class Mate(Account):
     def __init__(self, username: str, password: str, gender: str, location: str, price: int=0):
         super().__init__(username, password, gender, location)
