@@ -247,6 +247,7 @@ def add_amount(body: EditMoneyModel):
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
     account.amount = account.amount + body.amount
     transaction: Transaction = account.add_transaction(Transaction(account, account, body.amount))
+    controller.add_log(True, account, "Add Transaction", f"Transaction {body.amount}", account, "Create Transaction Successfully")
     controller.add_log(True, account, "Add Amount", "Money", account, "Added Successfully")
     return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=transaction.get_transaction_details())
 
@@ -259,6 +260,7 @@ def del_amount(body: EditMoneyModel):
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
     account.amount = account.amount - body.amount
     transaction: Transaction = account.add_transaction(Transaction(account, account, body.amount))
+    controller.add_log(True, account, "Add Transaction", f"Transaction {body.amount}", account, "Create Transaction Successfully")
     controller.add_log(True, account, "Delete Amount", "Money", account, "Delete Successfully")
     return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=transaction.get_transaction_details())
 

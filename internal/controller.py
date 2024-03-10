@@ -382,19 +382,32 @@ class Controller:
         booking: Booking = self.search_booking_by_id(booking_id)
         customer: Customer = self.search_customer_by_id(str(booking.customer.id))
         if customer == None:
+            self.add_log(False, "?", "Paid Booking", "No Item", "?", "UserAccount Not Found")
             return None
         mate: Mate = self.search_mate_by_id(str(booking.mate.id))
         if mate == None or customer == None or booking == None:
+            self.add_log(False, customer, "Paid Booking", "No Item", customer, "Booking Not Found")
             return None
         payment: Payment = booking.payment
         if payment.pay(customer, mate) == False:
+            self.add_log(False, customer, "Pay", "No Item", mate, "Paid Failed")
+            self.add_log(False, customer, "Paid Booking", "No Item", customer, "Pay Booking Failed ")
             return None
+        self.add_log(True, customer, "Pay", "Money", mate, "Paid Succesfully")
         if self.add_chat_room(customer, mate) == None:
+            self.add_log(False, customer, "Create Chat", "No Item", mate, "Crate Chat Failed")
+            self.add_log(False, mate, "Create Transaction", "No Item", customer, "Create Transaction Failed")
+            self.add_log(False, customer, "Create Transaction", "No Item", mate, "Create Transaction Failed")
+            self.add_log(False, customer, "Paid Booking", "No Item", customer, "Pay Booking Failed ")
             return None
+        self.add_log(False, customer, "Create Chat", "Chat", mate, "Create Chat Failed")
         transaction: Transaction = Transaction(customer, mate, payment.amount)
         customer.add_transaction(transaction)
         mate.add_transaction(transaction)
+        self.add_log(True, customer, "Create Transaction", f"Transaction {payment.amount}", mate, "Create Transaction Succesfully")
+        self.add_log(True, mate, "Create Transaction", f"Transaction {payment.amount}", customer, "Create Transaction Succesfully")
         booking.status = "Success"
+        self.add_log(True, customer, "Paid Booking", "Booking", customer, "Paid Booking -> Booking status 'Success' ")
         return transaction
     
     def get_account_by_name(self, name: str) -> UserAccount | None:
