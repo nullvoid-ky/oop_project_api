@@ -53,6 +53,14 @@ def get_mates():
         return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in mate_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in add mate")
 
+@router.get("/get-customers")
+def get_mates():
+    from app import controller
+    customer_list = controller.get_customers()
+    if isinstance(customer_list, list):
+        return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in customer_list])
+    return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in add mate")
+
 @router.get("/get-mate-by-username/{username}")
 def get_mate_by_username(username: str):
     from app import controller
