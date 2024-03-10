@@ -67,8 +67,11 @@ class Controller:
         chat_room = self.add_chat_room(account_1, account_2)
         print("chat_room: ", chat_room.get_chat_room_details())
         account_2.add_availability(datetime.date(2024, 3, 4), "I'm available")
+        # print(account_2.availability_list)
         account_2.add_review_mate(account_1, "good", 4)
-        self.add_booking(account_1, account_2, Date(year=2024, month=3, day=4))
+        booking, transaction = self.add_booking(account_1, account_2, Date(year=2024, month=3, day=4))
+        # self.pay(str(booking.id))
+        # print(account_2.get_success_booking(self.__booking_list))
         print(account_2.id)
 
         account_4_details: Mate = register("ganThepro3", "1234", "mate", "female")
@@ -369,6 +372,7 @@ class Controller:
 
     def pay(self, booking_id: str) -> Transaction:
         booking: Booking = self.search_booking_by_id(booking_id)
+        booking.is_success = True
         customer: Customer = self.search_customer_by_id(str(booking.customer.id))
         if customer == None:
             return None
@@ -376,7 +380,8 @@ class Controller:
         if mate == None or customer == None or booking == None:
             return None
         payment: Payment = booking.payment
-        payment.pay(customer, mate)
+        if payment.pay(customer, mate) == False:
+            return None
         if self.add_chat_room(customer, mate) == None:
             return None
         transaction: Transaction = Transaction(customer, mate, payment.amount)
@@ -409,8 +414,11 @@ class Controller:
         if booked_customer == None:
             return None
         pledge_payment: Payment = Payment(mate.price / 2)
-        pledge_payment.pay(customer, mate)
+        if pledge_payment.pay(customer, mate) == False:
+            return None
         pledge_transaction: Transaction = Transaction(customer, mate, pledge_payment.amount)   
+        customer.add_transaction(pledge_transaction)
+        mate.add_transaction(pledge_transaction)
         booking: Booking = Booking(customer, mate, datetime.date(date.year, date.month, date.day), pledge_payment)
         self.__booking_list.append(booking)
         return booking, pledge_transaction
@@ -425,10 +433,10 @@ class Controller:
     def delete_booking(self, booking: Booking, account: UserAccount) -> Union[Tuple[Booking, Transaction], Booking, None]:
         transaction: Transaction = None
         if isinstance(account, Mate):
-            booking.payment.pay(account, booking.customer)
+            if booking.payment.pay(account, booking.customer) == False:
+                return None
             transaction: Transaction = Transaction(account, booking.customer, booking.payment.amount)
         if isinstance(booking, Booking):
-            self.__booking_list.remove(booking)
             booking.mate.booked_customer = None
             booking.mate.add_availability(datetime.date(booking.book_date.year, booking.book_date.month, booking.book_date.day), "I'm available")
             if transaction:

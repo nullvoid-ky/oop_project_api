@@ -60,10 +60,14 @@ class UserAccount(Account):
         self._location: str = location
         self._age: int = age
         self._transaction_list: list = []
+        self._booking_list: list = []
 
     @property
     def gender(self) -> str:
         return self._gender
+    @property
+    def booking_list(self) -> list:
+        return self._booking_list  
     @property
     def display_name(self) -> str:
         return self._display_name

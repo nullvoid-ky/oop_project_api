@@ -25,6 +25,9 @@ class Mate(UserAccount):
     def review_list(self) -> list[Review]:
         return self.__review_list
     
+    def get_success_booking(self, booking_list: list) -> list:
+        return [booking for booking in booking_list if booking.mate == self and booking.is_success]
+    
     def add_availability(self, date: datetime, detail: str) -> Availability:
         availability: Availability = Availability(date, detail)
         self.__availability_list.append(availability)
@@ -42,21 +45,6 @@ class Mate(UserAccount):
                 self.__availability_list.remove(availability)
                 return availability
         return None
-
-    def confirm_booking(self):
-        pass
-    
-    def update_availability(self):
-        pass
-    
-    def add_post(self):
-        pass
-    
-    def withdraw(self):
-        pass
-    
-    def set_availability(self):
-        pass
     
     def get_average_review_star(self) -> float:
         sum: float = 0
@@ -65,12 +53,6 @@ class Mate(UserAccount):
         if len(self.__review_list):
             return round(sum / len(self.__review_list), 1)
         return -1.0
-
-    def get_review_price(self):
-        return len(self.__review_list)
-    
-    def get_account_created(self):
-        return
         
     def search_review_by_id(self, review_id) -> Review | None:
         for review in self.__review_list:
