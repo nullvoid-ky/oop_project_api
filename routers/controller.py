@@ -169,12 +169,16 @@ def delete_booking(booking_id: str):
     booking: Booking = controller.search_booking_by_id(booking_id)
     account: UserAccount = controller.search_account_by_id(Body.user_id)
     if booking == None or account == None:
+        controller.add_log(False, "?", "Delete Booking", "No Item", "?", "Booking Error Not Found")
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Booking or UserAccount not found")
     deleted_booking: Union[Tuple[Booking, Transaction], Booking, None] = controller.delete_booking(booking, account)
     if isinstance(deleted_booking, tuple):
+        controller.add_log(True, "?", "Delete Booking", "Booking", delete_booking[0], "Delete Booking Succes")
         return res.success_response_status(status.HTTP_200_OK, "Delete Booking Success", data={"booking": deleted_booking[0].get_booking_details(), "transaction": deleted_booking[1].get_transaction_details()})
     elif isinstance(deleted_booking, Booking):
+        controller.add_log(True, "?", "Delete Booking", "Booking", delete_booking, "Delete Booking Succes")
         return res.success_response_status(status.HTTP_200_OK, "Delete Booking Success", data=deleted_booking.get_booking_details())
+    controller.add_log(False, "?", "Delete Booking", "No Item", "?", "Booking Error Not Found")
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in delete booking")
 
 @router.post("/add-chat-room", dependencies=[Depends(verify_customer)])
@@ -184,7 +188,9 @@ def add_chat_room(body: AddChatRoomModel):
     account_2: UserAccount = controller.search_account_by_id(body.receiver_id)
     chat_room: ChatRoomManeger = controller.add_chat_room(account_1, account_2)
     if chat_room == None:
+        controller.add_log(False, account_1, "Add Chat Room (Create Chat Room)", "No Item", account_2, "Created Failed")
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "UserAccount not found")
+    controller.add_log(True, account_1, "Add Chat Room (Create Chat Room)", "Chat", account_2, "Created Successfully")
     return res.success_response_status(status.HTTP_200_OK, "Add Chat Room Success", data=chat_room.get_chat_room_details())
 
 @router.put("/edit-display-name")
@@ -237,9 +243,11 @@ def add_amount(body: EditMoneyModel):
     from app import controller
     account: Account = controller.search_account_by_id(Body.user_id)
     if account == None:
+        controller.add_log(True, account, "Add Amount", "Money", account, "Added Failed, Account Not Found")
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
     account.amount = account.amount + body.amount
     transaction: Transaction = account.add_transaction(Transaction(account, account, body.amount))
+    controller.add_log(True, account, "Add Amount", "Money", account, "Added Successfully")
     return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=transaction.get_transaction_details())
 
 @router.post("/del-amount", dependencies=[Depends(verify_mate)])
@@ -247,9 +255,11 @@ def del_amount(body: EditMoneyModel):
     from app import controller
     account: Account = controller.search_account_by_id(Body.user_id)
     if account == None:
+        controller.add_log(True, account, "Delete  Amount", "Money", account, "Delete Failed, Account Not Found")
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
     account.amount = account.amount - body.amount
     transaction: Transaction = account.add_transaction(Transaction(account, account, body.amount))
+    controller.add_log(True, account, "Delete Amount", "Money", account, "Delete Successfully")
     return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=transaction.get_transaction_details())
 
 @router.get("/get-log")

@@ -22,7 +22,6 @@ async def websocket_endpoint(websocket: WebSocket, chat_room_id: str, token: str
     manager: ChatRoomManeger = controller.search_chat_room_by_id(chat_room_id)
     await manager.connect(websocket, account)
     try:
-        controller.add_log(True, manager.account_1, "Create Chat", "Chat", manager.account_2, "Created Successfully")
         while True:
             data: str = await websocket.receive_text()
             msg: Message = await manager.add_message(data, account)
