@@ -5,3 +5,6 @@ class EditDisplayNameModel(BaseModel):
 
 class EditPicUrlModel(BaseModel):
     url: str
+
+class EditMoneyModel(BaseModel):
+    amount: str

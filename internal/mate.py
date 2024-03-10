@@ -4,7 +4,6 @@ from internal.account import Account
 from internal.availability import Availability
 from internal.review import Review
 from internal.customer import Customer
-
 class Mate(Account):
     def __init__(self, username: str, password: str, gender: str, location: str, price: int=0):
         super().__init__(username, password, gender, location)
@@ -59,13 +58,13 @@ class Mate(Account):
     def set_availability(self):
         pass
     
-    def get_average_review_star(self):
+    def get_average_review_star(self) -> float:
         sum: float = 0
         for review in self.__review_list:
             sum += review.star
-        if len(self.__review_list) > 0:
-            return sum / len(self.__review_list)
-        return None
+        if len(self.__review_list):
+            return round(sum / len(self.__review_list), 1)
+        return -1.0
 
     def get_review_price(self):
         return len(self.__review_list)
@@ -79,8 +78,8 @@ class Mate(Account):
                 return review
         return None
     
-    def add_review_mate(self, customer: Customer, message: str, star: int) -> Review:
-        review: Review = Review(message, star, customer)
+    def add_review_mate(self, reviewer: Customer, message: str, star: int) -> Review:
+        review: Review = Review(reviewer, message, star)
         self.__review_list.append(review)
         return review
     
@@ -97,25 +96,22 @@ class Mate(Account):
     def get_review_mate(self) -> list[Review]:
         return self.__review_list
     
-    def get_mate_details(self) -> dict:
+    def get_review_amount(self) -> int:
+        return int(len(self.__review_list)) 
+    
+    def get_account_details(self) -> dict:
         return {
-            "id": str(self._id),
-            "username": self._username,
-            "displayname": self._display_name,
-            "pic_url": self._pic_url,
-            "star": self.get_average_review_star(),
-            "reviewcount": self.get_review_amount(),
-            "price": self.__price,
+            "id": str(self.id),
+            "username": self.username,
+            "displayname":self.display_name,
+            "pic_url": self.pic_url,
+            "star": str(round(self.get_average_review_star(), 1)),
+            "reviewcount":self.get_review_amount(),
             "role": "mate",
             "rentcount": self.__rented_count,
-            "gender":self._gender,
-            "location": self._location,
-            "timestamp": self._timestamp.strftime("%d/%m/%Y %H:%M:%S")
-        }
-    
-    def get_mate_rent_details(self) -> dict:
-        return {
-            "star": self.get_average_review_star(),
-            "reviewcount":self.get_review_amount(),
-            "rentcount": self.__rented_count
+            "gender":self.gender,
+            "location": self.location,
+            "price": self.price,
+            "amount" : self.amount,
+            "timestamp": self.timestamp.strftime("%d/%m/%Y %H:%M:%S")
         }

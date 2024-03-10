@@ -62,6 +62,7 @@ def add_review(body: ReviewCreation):
 @router.get("/get-reviews/{mate_id}")
 async def get_review(mate_id: str):
     from app import controller
+    from internal.review import Review
     mate = controller.search_mate_by_id(mate_id)
     if mate == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
@@ -89,3 +90,12 @@ def get_average_review_star(mate_id):
     if mate == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
     return res.success_response_status(status.HTTP_200_OK, "Get Avarage Review Star Successfully", data=mate.get_average_review_star())
+
+@router.get("/get-mate-profile/{user_id}")
+def get_user_profile(user_id: str):
+    from app import controller
+    from internal.mate import Mate
+    account: Mate = controller.search_mate_by_id(user_id)
+    if account == None:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
+    return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())

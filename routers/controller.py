@@ -2,11 +2,11 @@ from fastapi import APIRouter, status, Depends, Body
 from typing import Union, Tuple
 
 from models.post import PostModel
-from models.profile import EditDisplayNameModel, EditPicUrlModel
+from models.profile import EditDisplayNameModel, EditPicUrlModel, EditMoneyModel
 from models.mate import MateModel, SearchMateModel
 from internal.booking import Booking
 from internal.transaction import Transaction
-from internal.account import Account
+from internal.account import Account, AllAccount
 from internal.post import Post
 from internal.chat_room_manager import ChatRoomManeger
 from internal.mate import Mate
@@ -125,7 +125,7 @@ def get_self_profile():
 @router.get("/get-user-profile/{user_id}")
 def get_user_profile(user_id: str):
     from app import controller
-    account: Account = controller.search_account_by_id(user_id)
+    account: AllAccount = controller.search_account_by_id(user_id)
     if account == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
     if isinstance(account, Mate):
@@ -174,17 +174,28 @@ def edit_pic_url(body: EditPicUrlModel):
     edited_account: Account = controller.edit_pic_url(account, body.url)
     return res.success_response_status(status.HTTP_200_OK, "Edit pic url Success",  data=edited_account.get_account_details())
     
+@router.put("/edit-money")
+def edit_money(body: EditMoneyModel):
+    from app import controller
+    account: Account = controller.search_account_by_id(Body.user_id)
+    if account == None:
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
+    edited_account: Account = controller.edit_money(account, body.amount)
+    return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=edited_account.get_account_details())
+
 @router.get("/get-leaderboard")
 def get_leaderboard():
     rank = 1
     from app import controller
-    mate_list : list = controller.get_leaderboard()
+    from internal.mate import Mate
+    mate_list : list[Mate] = controller.get_leaderboard()
     my_list = []
     for mate in mate_list:
         my_list.append(mate)
-    send_data = [{'account_detail' : acc.get_mate_details()} for acc in my_list]
+    send_data = [{'account_detail' : acc.get_account_details()} for acc in my_list]
     for data in send_data:
         data["account_detail"]["rank"] = rank
+        rank += 1
     if len(my_list):
         return res.success_response_status(status.HTTP_200_OK, "Get Leaderboard Success", data=send_data)
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
