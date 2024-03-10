@@ -13,7 +13,7 @@ class Booking:
         self.__payment = payment
         self.__timestamp = datetime.now()
         self.__book_date = book_date
-        self.__is_success: bool = False
+        self.__is_success: bool = True
 
     @property
     def customer(self) -> Customer:

@@ -39,7 +39,7 @@ class Controller:
         account_2.add_availability(datetime.date(2024, 3, 4), "I'm available")
         # print(account_2.availability_list)
         account_2.add_review_mate(account_1, "good", 4)
-        booking, transaction = self.add_booking(account_1, account_2, Date(year=2024, month=3, day=4))
+        # booking, transaction = self.add_booking(account_1, account_2, Date(year=2024, month=3, day=4))
         # self.pay(str(booking.id))
         # print(account_2.get_success_booking(self.__booking_list))
         print(account_2.id)
@@ -342,7 +342,6 @@ class Controller:
 
     def pay(self, booking_id: str) -> Transaction:
         booking: Booking = self.search_booking_by_id(booking_id)
-        booking.is_success = True
         customer: Customer = self.search_customer_by_id(str(booking.customer.id))
         if customer == None:
             return None
@@ -407,6 +406,7 @@ class Controller:
                 return None
             transaction: Transaction = Transaction(account, booking.customer, booking.payment.amount)
         if isinstance(booking, Booking):
+            booking.is_success = False
             booking.mate.booked_customer = None
             booking.mate.add_availability(datetime.date(booking.book_date.year, booking.book_date.month, booking.book_date.day), "I'm available")
             if transaction:
