@@ -30,6 +30,7 @@ class AllAccount(ABC):
     @property
     def age(self) -> str:
         return self._age
+    @property
     def timestamp(self) -> datetime:
         return self._timestamp
     @property
@@ -41,6 +42,9 @@ class AllAccount(ABC):
     @property
     def password(self) -> str:
         return self._password
+    @age.setter
+    def age(self, new_age):
+        self.age = new_age
 
     def validate_account_id(self, id):
         return str(self.id) == id
@@ -78,6 +82,9 @@ class Account(AllAccount):
     @property
     def location(self) -> str:
         return self._location
+    @location.setter
+    def location(self, location):
+        self.location = location
     
     def get_account_details(self) -> dict:
         from internal.customer import Customer
