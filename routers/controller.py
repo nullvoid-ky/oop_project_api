@@ -6,7 +6,7 @@ from models.profile import EditDisplayNameModel, EditPicUrlModel, EditMoneyModel
 from models.mate import MateModel, SearchMateModel
 from internal.booking import Booking
 from internal.transaction import Transaction
-from internal.account import Account, AllAccount
+from internal.account import UserAccount, Account
 from internal.post import Post
 from internal.chat_room_manager import ChatRoomManeger
 from internal.mate import Mate
@@ -27,10 +27,10 @@ router = APIRouter(
 @router.post("/add-booking", dependencies=[Depends(verify_customer)])
 def add_booking(body: MateModel):
     from app import controller
-    customer: Account = controller.search_customer_by_id(Body.user_id)
+    customer: UserAccount = controller.search_customer_by_id(Body.user_id)
     if customer == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Customer not found")
-    mate: Account = controller.search_mate_by_id(body.mate_id)  
+    mate: UserAccount = controller.search_mate_by_id(body.mate_id)  
     if mate == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
     try:
@@ -121,7 +121,7 @@ def get_post():
 @router.get("/get-booking", dependencies=[Depends(verify_customer)])
 def get_booking():
     from app import controller
-    customer: Account = controller.search_customer_by_id(Body.user_id)
+    customer: UserAccount = controller.search_customer_by_id(Body.user_id)
     booking_list: list = controller.get_booking(customer)
     if isinstance(booking_list, list):
         return res.success_response_status(status.HTTP_200_OK, "Get Booking Success", data=[booking.get_booking_details() for booking in booking_list])
@@ -138,28 +138,26 @@ def get_booking_by_id(booking_id: str):
 @router.get("/get-self-profile")
 def get_self_profile():
     from app import controller
-    account: Account = controller.search_account_by_id(Body.user_id)
+    account: UserAccount = controller.search_account_by_id(Body.user_id)
     if account == None:
-        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "UserAccount not found")
     return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())
 
 @router.get("/get-user-profile/{user_id}")
 def get_user_profile(user_id: str):
     from app import controller
-    account: AllAccount = controller.search_account_by_id(user_id)
+    account: Account = controller.search_account_by_id(user_id)
     if account == None:
-        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
-    if isinstance(account, Mate):
-        return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "UserAccount not found")
     return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())
 
 @router.delete("/delete-booking/{booking_id}", dependencies=[Depends(verify_customer)])
 def delete_booking(booking_id: str):
     from app import controller
     booking: Booking = controller.search_booking_by_id(booking_id)
-    account: Account = controller.search_account_by_id(Body.user_id)
+    account: UserAccount = controller.search_account_by_id(Body.user_id)
     if booking == None or account == None:
-        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Booking or Account not found")
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Booking or UserAccount not found")
     deleted_booking: Union[Tuple[Booking, Transaction], Booking, None] = controller.delete_booking(booking, account)
     if isinstance(deleted_booking, tuple):
         return res.success_response_status(status.HTTP_200_OK, "Delete Booking Success", data={"booking": deleted_booking[0].get_booking_details(), "transaction": deleted_booking[1].get_transaction_details()})
@@ -170,38 +168,38 @@ def delete_booking(booking_id: str):
 @router.post("/add-chat-room", dependencies=[Depends(verify_customer)])
 def add_chat_room(body: AddChatRoomModel):
     from app import controller
-    account_1: Account = controller.search_account_by_id(Body.user_id)
-    account_2: Account = controller.search_account_by_id(body.receiver_id)
+    account_1: UserAccount = controller.search_account_by_id(Body.user_id)
+    account_2: UserAccount = controller.search_account_by_id(body.receiver_id)
     chat_room: ChatRoomManeger = controller.add_chat_room(account_1, account_2)
     if chat_room == None:
-        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "UserAccount not found")
     return res.success_response_status(status.HTTP_200_OK, "Add Chat Room Success", data=chat_room.get_chat_room_details())
 
 @router.put("/edit-display-name")
 def edit_display_name(body: EditDisplayNameModel):
     from app import controller
-    account: Account = controller.search_account_by_id(Body.user_id)
+    account: UserAccount = controller.search_account_by_id(Body.user_id)
     if account == None:
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit displayname Error")
-    edited_account: Account = controller.edit_display_name(account, body.display_name)
+    edited_account: UserAccount = controller.edit_display_name(account, body.display_name)
     return res.success_response_status(status.HTTP_200_OK, "Edit displayname Success",  data=edited_account.get_account_details())
     
 @router.put("/edit-pic-url")
 def edit_pic_url(body: EditPicUrlModel):
     from app import controller
-    account: Account = controller.search_account_by_id(Body.user_id)
+    account: UserAccount = controller.search_account_by_id(Body.user_id)
     if account == None:
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Send pic url Error")
-    edited_account: Account = controller.edit_pic_url(account, body.url)
+    edited_account: UserAccount = controller.edit_pic_url(account, body.url)
     return res.success_response_status(status.HTTP_200_OK, "Edit pic url Success",  data=edited_account.get_account_details())
     
 @router.put("/edit-money")
 def edit_money(body: EditMoneyModel):
     from app import controller
-    account: Account = controller.search_account_by_id(Body.user_id)
+    account: UserAccount = controller.search_account_by_id(Body.user_id)
     if account == None:
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
-    edited_account: Account = controller.edit_money(account, body.amount)
+    edited_account: UserAccount = controller.edit_money(account, body.amount)
     return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=edited_account.get_account_details())
 
 @router.get("/get-leaderboard")
@@ -212,14 +210,15 @@ def get_leaderboard():
     mate_list : list[Mate] = controller.get_leaderboard()
     my_list = []
     for mate in mate_list:
-        my_list.append(mate)
+        if (mate.get_average_review_star() >= 0):
+            my_list.append(mate)
     send_data = [{'account_detail' : acc.get_account_details()} for acc in my_list]
     for data in send_data:
         data["account_detail"]["rank"] = rank
         rank += 1
     if len(my_list):
         return res.success_response_status(status.HTTP_200_OK, "Get Leaderboard Success", data=send_data)
-    return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
+    return res.error_response_status(status.HTTP_404_NOT_FOUND, "UserAccount not found")
 
 @router.post("/add-amount", dependencies=[Depends(verify_customer)])
 def add_amount(body: EditMoneyModel):

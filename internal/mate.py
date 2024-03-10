@@ -1,11 +1,10 @@
 import datetime
 
-from internal.account import Account
+from internal.account import UserAccount
 from internal.availability import Availability
 from internal.review import Review
 from internal.customer import Customer
-
-class Mate(Account):
+class Mate(UserAccount):
     def __init__(self, username: str, password: str, gender: str, location: str, price: int=0):
         super().__init__(username, password, gender, location)
         self.__availability_list: list[Availability] = []
@@ -49,6 +48,22 @@ class Mate(Account):
                 self.__availability_list.remove(availability)
                 return availability
         return None
+
+    def confirm_booking(self):
+        pass
+    
+    def update_availability(self):
+        pass
+    
+ 
+    def withdraw(self):
+        pass
+    
+    def set_availability(self):
+        pass
+
+    def is_availability_slot_valid(self):
+        return len(self.__availability_list) < self.__max_availability
     
     def get_average_review_star(self) -> float:
         sum: float = 0
@@ -92,9 +107,9 @@ class Mate(Account):
             "displayname":self.display_name,
             "pic_url": self.pic_url,
             "star": str(round(self.get_average_review_star(), 1)),
-            "reviewcount":self.get_review_amount(),
+            "review_count":self.get_review_amount(),
             "role": "mate",
-            "rentcount": self.__rented_count,
+            "rent_count": self.__rented_count,
             "gender":self.gender,
             "location": self.location.capitalize(),
             "price": self.price,

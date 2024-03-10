@@ -1,11 +1,11 @@
-from internal.account import Account
+from internal.account import UserAccount
 from uuid import uuid4, UUID
 from datetime import datetime
 
 class Message:
-    def __init__(self, sender: Account, text: str) -> None:
+    def __init__(self, sender: UserAccount, text: str) -> None:
         self.__id: UUID = uuid4()
-        self.__sender: Account = sender
+        self.__sender: UserAccount = sender
         self.__text: str = text
         self.__timestamp: datetime = datetime.now()
         self.__is_edit: bool = False
@@ -22,7 +22,7 @@ class Message:
     def text(self) -> str:
         return self.__text 
     @property
-    def sender(self) -> Account:
+    def sender(self) -> UserAccount:
         return self.__sender
 
     def set_text(self, text: str) -> None:
@@ -40,7 +40,7 @@ class Message:
     # def get_sender_name(self) -> str:
     #     return self.__sender.username
     
-    # def get_sender_account(self) -> Account:
+    # def get_sender_account(self) -> UserAccount:
     #     return self.__sender
     
     # def get_text(self) -> str:
