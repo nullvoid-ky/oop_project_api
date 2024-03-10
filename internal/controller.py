@@ -35,6 +35,7 @@ class Controller:
         print("account_2_token :", create_token(str(account_2_details['id']), "mate"))
         account_1: Customer = self.search_account_by_id(account_1_details['id'])
         account_2: Mate = self.search_account_by_id(account_2_details['id'])
+        account_2.pic_url = "https://i1.sndcdn.com/artworks-ubBjVp0Z50ZykDdG-lU7NWg-t500x500.jpg"
         account_1.amount = 1000
         account_2.price = 1000
         chat_room = self.add_chat_room(account_1, account_2)
