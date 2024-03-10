@@ -62,7 +62,6 @@ def add_review(body: ReviewCreation):
 @router.get("/get-reviews/{mate_id}")
 async def get_review(mate_id: str):
     from app import controller
-    from internal.review import Review
     mate = controller.search_mate_by_id(mate_id)
     if mate == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")

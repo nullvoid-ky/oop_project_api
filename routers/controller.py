@@ -219,3 +219,8 @@ def del_amount(body: EditMoneyModel):
     account.amount = account.amount - body.amount
     transaction: Transaction = account.add_transaction(Transaction(account, account, body.amount))
     return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=transaction.get_transaction_details())
+
+@router.get("/get-log")
+def get_log():
+    from app import controller
+    return res.success_response_status(status.HTTP_200_OK, "Get Log Success", data=controller.get_log())

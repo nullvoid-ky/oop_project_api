@@ -1,7 +1,7 @@
 from typing import Tuple, Union
 import datetime
 
-from internal.account import Account, AllAccount
+from internal.account import Account
 from internal.admin import Admin
 from internal.booking import Booking
 from internal.mate import Mate
@@ -22,6 +22,7 @@ class Controller:
         self.__post_list: list = []
         self.__chat_room_list: list[ChatRoomManeger] = []
         self.__admin = None
+        self.__log_list: list = []
 
     def add_instance(self):
         account_1_details = register("ganThepro", "1234", "customer", "male", "bangkok")
@@ -431,11 +432,14 @@ class Controller:
         sorted_mates = sorted(mate_list, key=lambda mate: (mate.get_average_review_star(), mate.get_review_amount(), mate.timestamp), reverse=True)
         return sorted_mates[:10]
     
-    def add_log(self, type, head, des):
-        pass
+    def add_log(self, status: int, message: str, data: dict) -> None:
+        self.__log_list.append({"status": status, "message": message, "data": data})
 
     def create_admin(self) -> Admin | None:
         if isinstance(self.__admin, Admin):
             return None
         self.__admin = Admin()
         return self.__admin
+    
+    def get_log(self) -> list:
+        return self.__log_list
