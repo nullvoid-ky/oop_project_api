@@ -40,6 +40,7 @@ def get_availability(mate_id: str):
     if mate == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
     availability_list: list = mate.availability_list
+    print(availability_list)
     if len(availability_list) == 0:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "No availability")
     return res.success_response_status(status.HTTP_200_OK, "Get availability success", data=[availability.get_availability_details() for availability in availability_list])
@@ -97,3 +98,14 @@ def get_user_profile(user_id: str):
     if account == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
     return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())
+
+@router.get("/get-success-booking/{mate_id}")
+def get_success_booking(mate_id: str):
+    from app import controller
+    mate = controller.search_mate_by_id(mate_id)
+    if mate == None:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
+    booking_list = mate.get_success_booking()
+    if len(booking_list) == 0:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "No success booking")
+    return res.success_response_status(status.HTTP_200_OK, "Get success booking success", data=[booking.get_booking_details() for booking in booking_list])
