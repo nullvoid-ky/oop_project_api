@@ -25,9 +25,37 @@ class Controller:
         self.__log_list: list = []
 
     def add_instance(self):
-        account_1_details = register("ganThepro", "1234", "customer", "male", "bangkok")
+        temp_detail_1 = register("temporaryaccount1", "qwer", "mate", "female")
+        temp_detail_2 = register("temporaryaccount2", "qwer", "mate", "male")
+        temp_detail_3 = register("temporaryaccount3", "qwer", "mate", "male")
+        temp_detail_4 = register("temporaryaccount4", "qwer", "mate", "male")
+        temp_detail_5 = register("temporaryaccount5", "qwer", "mate", "female")
+        temp_detail_6 = register("temporaryaccount6", "qwer", "mate", "female")
+        print(("temp_1"), create_token(str(temp_detail_1['id']), "mate"))
+        print(("temp_2"), create_token(str(temp_detail_2['id']), "mate"))
+        print(("temp_3"), create_token(str(temp_detail_3['id']), "mate"))
+        print(("temp_4"), create_token(str(temp_detail_4['id']), "mate"))
+        print(("temp_5"), create_token(str(temp_detail_5['id']), "mate"))
+        print(("temp_6"), create_token(str(temp_detail_6['id']), "mate"))
+        tmp1 = self.search_account_by_id(temp_detail_1['id'])
+        tmp2 = self.search_account_by_id(temp_detail_2['id'])
+        tmp3 = self.search_account_by_id(temp_detail_3['id'])
+        tmp4 = self.search_account_by_id(temp_detail_4['id'])
+        tmp5 = self.search_account_by_id(temp_detail_5['id'])
+        tmp6 = self.search_account_by_id(temp_detail_6['id'])
+        tmp_list =[tmp1, tmp2, tmp3, tmp4, tmp5, tmp6]
+        for tmp in tmp_list:
+            tmp.pic_url = "https://i1.sndcdn.com/artworks-ubBjVp0Z50ZykDdG-lU7NWg-t500x500.jpg"
+            tmp.amount = 1234
+            tmp.price = 3000
+        tmp1.display_name = "Edok"
+        tmp2.display_name = "Thong"
+        tmp3.display_name = "Eson-Teen"
+        tmp4.display_name = "GanGayOnline"
+
+        account_1_details = register("ganThepro", "1234", "customer", "male")
         print("account_1_token :", create_token(str(account_1_details['id']), "customer"))
-        account_2_details = register("ganThepro2", "1234", "mate", "female", "bangkok")
+        account_2_details = register("ganThepro2", "1234", "mate", "female")
         print("account_2_token :", create_token(str(account_2_details['id']), "mate"))
         account_1: Customer = self.search_account_by_id(account_1_details['id'])
         account_2: Mate = self.search_account_by_id(account_2_details['id'])
@@ -41,9 +69,9 @@ class Controller:
         self.add_booking(account_1, account_2, Date(year=2024, month=3, day=4))
         print(account_2.id)
 
-        account_4_details: Mate = register("ganThepro3", "1234", "mate", "female", "bangkok")
-        account_5_details: Mate = register("ganThepro4", "1234", "mate", "male", "bangkok")
-        account_6_details: Mate = register("yok", "1234", "mate", "male", "bangkok")
+        account_4_details: Mate = register("ganThepro3", "1234", "mate", "female")
+        account_5_details: Mate = register("ganThepro4", "1234", "mate", "male")
+        account_6_details: Mate = register("yok", "1234", "mate", "male")
         account_4: Mate = self.search_account_by_id(account_4_details['id'])
         account_5: Mate = self.search_account_by_id(account_5_details['id'])
         account_6: Mate = self.search_account_by_id(account_6_details['id'])

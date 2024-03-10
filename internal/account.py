@@ -49,6 +49,9 @@ class Account(ABC):
     def validate_account_id(self, id):
         return str(self.id) == id
     
+    def add_pic_url(self, pic_url):
+        self.pic_url = pic_url
+    
 class UserAccount(Account):
     def __init__(self, username: str, password: str, gender: str, location: str, pic_url: str = "", amount: int = 0, age: int = 18) -> None:
         super().__init__(username, password, pic_url)
