@@ -6,7 +6,7 @@ from models.profile import EditDisplayNameModel, EditPicUrlModel, EditMoneyModel
 from models.mate import MateModel, SearchMateModel
 from internal.booking import Booking
 from internal.transaction import Transaction
-from internal.account import Account
+from internal.account import Account, AllAccount
 from internal.post import Post
 from internal.chat_room_manager import ChatRoomManeger
 from models.post import PostModel
@@ -124,7 +124,7 @@ def get_self_profile():
 @router.get("/get-user-profile/{user_id}")
 def get_user_profile(user_id: str):
     from app import controller
-    account: Account = controller.search_account_by_id(user_id)
+    account: AllAccount = controller.search_account_by_id(user_id)
     if account == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
     return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())

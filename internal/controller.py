@@ -1,7 +1,8 @@
 from typing import Tuple, Union
 import datetime
 
-from internal.account import Account
+from internal.account import Account, AllAccount
+from internal.admin import Admin
 from internal.message import Message
 from internal.booking import Booking
 from internal.mate import Mate
@@ -25,6 +26,7 @@ class Controller:
         self.__booking_list: list = []
         self.__post_list: list = []
         self.__chat_room_list: list[ChatRoomManeger] = []
+        self.__admin = None
 
     def add_instance(self):
         account_1_details = register("ganThepro", "1234", "customer", "male", "bangkok")
@@ -56,6 +58,10 @@ class Controller:
         chat_room = self.add_chat_room(account_1, account_4)
         chat_room = self.add_chat_room(account_2, account_4)
 
+        self.create_admin()
+        print(f'Admin ID : {self.__admin.id}')
+        print(f'Admin username : {self.__admin._username}')
+        print(f'Admin password : {self.__admin._password}')
         # self.add_customer("test1", "test1")
         # self.add_mate("test2", "test2")
         # self.add_customer("test3", "test3")
@@ -108,8 +114,11 @@ class Controller:
 
     def search_account_by_id(self, id: str) -> Account | None:
         for acc in self.__account_list:
-            if(id == str(acc.id)):
+            if(acc.validate_account_id(str(id))):
                 return acc
+        if isinstance(self.__admin, Admin):
+            if(self.__admin.validate_account_id(str(id))):
+                return self.__admin
         return None
     
     def delete_message(self, sender_id: str, receiver_id: str, message_id: str):
@@ -209,10 +218,13 @@ class Controller:
         self.__account_list.append(mate)
         return mate
 
-    def search_account_by_username(self, username: str) -> Account | None:
+    def search_account_by_username(self, username: str) -> Mate | Customer | Admin | None:
         for account in self.__account_list:
             if account.username == username:
                 return account
+        if isinstance(self.__admin, Admin):
+            if username == "admin":
+                return self.__admin
         return None
 
     def search_mate_by_display_name_similar(self, display_name: str) -> list | None:
@@ -421,3 +433,9 @@ class Controller:
     
     def add_log(self, type, head, des):
         pass
+
+    def create_admin(self) -> Admin | None:
+        if isinstance(self.__admin, Admin):
+            return None
+        self.__admin = Admin()
+        return self.__admin
