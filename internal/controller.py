@@ -90,6 +90,10 @@ class Controller:
         chat_room = self.add_chat_room(account_1, account_4)
         chat_room = self.add_chat_room(account_2, account_4)
 
+        self.add_post(account_2, "Hello kra", "")
+        self.add_post(account_4, "luv you na", "")
+        self.add_post(account_5, "Hello krub", "")
+
         self.create_admin()
         print(f'Admin ID : {self.__admin.id}')
         print(f'Admin username : {self.__admin._username}')
@@ -444,14 +448,19 @@ class Controller:
             return booking
         return None
 
-    def add_post(self, description: str, picture: str) -> Post | None:
-        if not isinstance(description, str) or not isinstance(picture, str):
+    def add_post(self, writer: Mate, description: str, picture: str) -> Post | None:
+        if not isinstance(description, str) or not isinstance(picture, str) or not isinstance(writer, Mate):
             return None
-        post = Post(description, picture)
-        self.__post_list.append(Post)
+        post = Post(writer, description, picture)
+        self.__post_list.append(post)
         return post
     
-    def edit_display_name(self, account: UserAccount, new_display_name: str) -> UserAccount:
+    def get_post(self):
+        if len(self.__post_list) == 0:
+            return None
+        return self.__post_list
+
+    def edit_display_name(self, account: Account, new_display_name: str) -> Account:
         account.display_name = new_display_name
         return account
     

@@ -11,6 +11,7 @@ class Mate(UserAccount):
         self.__review_list: list[Review] = []
         self.__price = price
         self.__rented_count = 0
+        self.__max_availability = 6
 
     @property
     def availability_list(self) -> list[Availability]:
@@ -34,6 +35,8 @@ class Mate(UserAccount):
         return availability
     
     def search_availability(self, year: int, month: int, day: int) -> Availability | None:
+        if(not self.is_availability_slot_valid()):
+            return None
         for availability in self.__availability_list:
             if availability.check_available(year, month, day):
                 return availability
@@ -45,6 +48,22 @@ class Mate(UserAccount):
                 self.__availability_list.remove(availability)
                 return availability
         return None
+
+    def confirm_booking(self):
+        pass
+    
+    def update_availability(self):
+        pass
+    
+ 
+    def withdraw(self):
+        pass
+    
+    def set_availability(self):
+        pass
+
+    def is_availability_slot_valid(self):
+        return len(self.__availability_list) < self.__max_availability
     
     def get_average_review_star(self) -> float:
         sum: float = 0
