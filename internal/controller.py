@@ -268,13 +268,6 @@ class Controller:
             if booking.customer == customer:
                 booking_list.append(booking)
         return booking_list
-
-    def add_post(self, description: str, picture: str) -> Post | None:
-        if not isinstance(description, str) or not isinstance(picture, str):
-            return None
-        post = Post(description, picture)
-        self.__post_list.append(Post)
-        return post
     
     def edit_username(self, customer_id: str, new_username: str):
         customer_acc: Account = self.search_account_by_id(customer_id)
@@ -284,9 +277,7 @@ class Controller:
     def edit_pic_url(self, customer_id: str, new_pic_url: str):
         customer_acc: Account = self.search_account_by_id(customer_id)
         customer_acc.pic_url = new_pic_url
-        return customer_acc
-
-    
+        return customer_acc  
 
     def add_review_mate(self, customer_id, mate_id, message, star) -> Review | None:
         mate = self.search_mate_by_id(mate_id)
@@ -310,7 +301,19 @@ class Controller:
         sorted_mates = sorted(mate_list, key=lambda mate: (mate.get_average_review_star(), mate.get_review_amount(), mate.timestamp), reverse=True)
         return sorted_mates[:10]
 
+    def add_post(self, mate, description: str, pic_url: str) -> Post | None:
+        if not isinstance(mate, Mate):
+            return None
+        if not isinstance(description, str) or not isinstance(pic_url, str):
+            return None
+        post = Post(mate, description, pic_url)
+        self.__post_list.append(Post)
+        return post
 
+    def read_post(self):
+        if len(self.__post_list) == 0:
+            return None
+        return self.__post_list            
 
 
 

@@ -1,11 +1,13 @@
-import datetime
-import uuid
+from datetime import datetime
+from internal.mate import Mate
+from uuid import uuid4, UUID
 class Post:
-    def __init__(self, description, picture) :
+    def __init__(self, mate, description, picture) :
+        self.__mate : Mate = mate
         self.__description = description
         self.__picture = picture
         self.__timestamp = datetime.datetime.now()
-        self.__id = uuid.uuid4()
+        self.__id : UUID= uuid4()
 
     @property
     def description(self):
