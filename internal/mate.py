@@ -110,7 +110,7 @@ class Mate(Account):
             "role": "mate",
             "rentcount": self.__rented_count,
             "gender":self.gender,
-            "location": self.location,
+            "location": self.location.capitalize(),
             "price": self.price,
             "amount" : self.amount,
             "timestamp": self._timestamp.strftime("%d/%m/%Y %H:%M:%S"),
