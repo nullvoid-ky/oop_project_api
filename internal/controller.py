@@ -313,7 +313,17 @@ class Controller:
     def read_post(self):
         if len(self.__post_list) == 0:
             return None
-        return self.__post_list            
+        return self.__post_list     
+
+    def edit_age(self, account: Account, new_age: int) -> Account:
+        account.age = new_age
+        return account
+    
+    def edit_location(self, account: Account, new_location: str) -> Account:
+        account.location = new_location
+        return account 
+
+
 
 
 

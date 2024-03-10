@@ -39,6 +39,24 @@ class Account:
     @property
     def timestamp(self) -> datetime:
         return self.__timestamp
+
+    @property
+    def age(self):
+        return self.__age
+
+    @age.setter
+    def age(self, new_age):
+        self.__age = new_age
+
+
+    @property
+    def location(self):
+        return self.__location
+
+    @location.setter
+    def location(self, location):
+        self.__age = location
+    
     
     def get_account_details(self) -> dict:
         from internal.customer import Customer
@@ -66,4 +84,5 @@ class Account:
         else:
             self.__money -= amount
         return self.__money
+    
     

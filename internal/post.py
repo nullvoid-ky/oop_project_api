@@ -28,7 +28,7 @@ class Post:
     def get_post_details(self) -> dict:
         return {
             "description": self.__description,
-            "picture": self.__picture,
+            "pic_url": self.__pic_url,
             "timestamp": self.__timestamp.strftime("%Y-%m-%d %H:%M:%S"),
             "id": str(self.__id),
         }

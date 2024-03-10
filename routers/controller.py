@@ -11,6 +11,7 @@ from internal.account import Account
 from internal.post import Post
 from models.booking import BookingModel
 from dependencies import verify_token, verify_customer, verify_mate
+from models.account import AccountModel
 
 router = APIRouter(
     prefix="/controller",
@@ -107,5 +108,34 @@ def get_leaderboard():
     for mate in mate_list:
         my_list.append(mate.get_account_details)
     if len(my_list):
-        return res.success_response_status(status.HTTP_200_OK, "Get Leaderboard Success", data=my_list)
+        return res.success_response_status(status.HTTP_200_OK, "Get Leaderboard Success", data = my_list)
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
+
+@router.get("/read-post")
+def read_post(body: PostModel):
+    from app import controller
+    post_list : Post = controller.read_post(body.description, body.pic_url)
+    data_list = []
+    for post in post_list:
+        data_list.append(post.get_post_details())
+    if post == None:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in read post")
+    return res.success_response_status(status.HTTP_200_OK, "Get Post Success", data = post)
+
+@router.put("/edit-age")
+def edit_age(body: AccountModel):
+    from app import controller
+    account: Account = controller.search_account_by_id(body.user_id)
+    if account == None:
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit Age Error")
+    edited_account: Account = controller.edit_age(account, body.age)
+    return res.success_response_status(status.HTTP_200_OK, "Edit Age Success",  data=edited_account.get_account_details())
+    
+@router.put("/edit-location")
+def edit_location(body: AccountModel):
+    from app import controller
+    account: Account = controller.search_account_by_id(Body.user_id)
+    if account == None:
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit Location Error")
+    edited_account: Account = controller.edit_location(account, body.location)
+    return res.success_response_status(status.HTTP_200_OK, "Edit Location Success",  data=edited_account.get_account_details())
