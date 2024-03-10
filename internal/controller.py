@@ -441,5 +441,7 @@ class Controller:
         self.__admin = Admin()
         return self.__admin
     
-    def get_log(self) -> list:
+    def get_log(self) -> list | None:
+        if self.__log_list == []:
+            return None
         return self.__log_list

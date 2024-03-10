@@ -223,4 +223,7 @@ def del_amount(body: EditMoneyModel):
 @router.get("/get-log")
 def get_log():
     from app import controller
-    return res.success_response_status(status.HTTP_200_OK, "Get Log Success", data=controller.get_log())
+    log_list = controller.get_log()
+    if isinstance(log_list, list):
+        return res.success_response_status(status.HTTP_200_OK, "Get Log Success", data=controller.get_log())
+    return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in get log")
