@@ -2,9 +2,9 @@ import datetime
 import uuid
 
 class Post:
-    def __init__(self, description, picture) :
-        self.__description = description
-        self.__picture = picture
+    def __init__(self, description: str, picture: str) :
+        self.__description: str = description
+        self.__picture: str = picture
         self.__timestamp = datetime.datetime.now()
         self.__id = uuid.uuid4()
 
