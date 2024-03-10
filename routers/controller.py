@@ -14,9 +14,10 @@ from models.post import PostModel
 from models.mate import MateModel
 from models.booking import BookingModel
 from models.chat_room import AddChatRoomModel
+from models.availability import AddAvailabilityModel
 import utils.response as res
 from dependencies import verify_token, verify_customer, verify_mate
-
+from datetime import datetime, date
 router = APIRouter(
     prefix="/controller",
     tags=["controller"],
@@ -86,6 +87,15 @@ def get_mate_by_avalibility():
     mate_list = controller.get_mate_by_avalibility()
     if isinstance(mate_list, list):
         return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in mate_list])
+    return res.error_response_status(status.HTTP_404_NOT_FOUND, "mate not found")
+
+@router.post("/add-avalibility")
+def add_avalibility(body: AddAvailabilityModel):
+    from app import controller
+    mate = controller.search_account_by_id(Body.user_id)
+    if isinstance(mate, Mate):
+        availability = mate.add_availability(date(body.year, body.month, body.day), body.detail)
+        return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data={"availability": availability.get_availability_details()})
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "mate not found")
 
 @router.post("/search-mate-by-condition")
