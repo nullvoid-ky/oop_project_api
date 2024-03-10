@@ -1,10 +1,11 @@
 import datetime
 import uuid
-
+from internal.mate import Mate
 class Post:
-    def __init__(self, description, picture) :
-        self.__description = description
-        self.__picture = picture
+    def __init__(self, writer, description: str, picture: str) :
+        self.__writer: Mate = writer
+        self.__description: str = description
+        self.__picture: str = picture
         self.__timestamp = datetime.datetime.now()
         self.__id = uuid.uuid4()
 
@@ -23,8 +24,9 @@ class Post:
         
     def get_post_details(self) -> dict:
         return {
-            "description": self.__description,
-            "picture": self.__picture,
-            "timestamp": self.__timestamp.strftime("%Y-%m-%d %H:%M:%S"),
-            "id": str(self.__id),
+            "account_detail": self.__writer.get_account_details(),
+            "description": self.description,
+            "picture": self.picture,
+            "timestamp": self.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            "id": str(self.id),
         }

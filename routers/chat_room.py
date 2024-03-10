@@ -4,7 +4,7 @@ from fastapi import APIRouter, WebSocket, Depends, WebSocketDisconnect
 
 from dependencies import verify_token_websocket
 from internal.chat_room_manager import ChatRoomManeger
-from internal.account import Account
+from internal.account import UserAccount
 import utils.response as res
 
 router = APIRouter(
@@ -18,7 +18,7 @@ async def websocket_endpoint(websocket: WebSocket, chat_room_id: str, token: str
     from app import controller
     from internal.message import Message
     user_id = verify_token_websocket(token)
-    account: Account = controller.search_account_by_id(user_id)
+    account: UserAccount = controller.search_account_by_id(user_id)
     manager: ChatRoomManeger = controller.search_chat_room_by_id(chat_room_id)
     await manager.connect(websocket, account)
     try:

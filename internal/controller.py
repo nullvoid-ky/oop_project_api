@@ -1,7 +1,7 @@
 from typing import Tuple, Union
 import datetime
 
-from internal.account import Account
+from internal.account import UserAccount, Account
 from internal.admin import Admin
 from internal.booking import Booking
 from internal.mate import Mate
@@ -25,9 +25,39 @@ class Controller:
         self.__log_list: list = []
 
     def add_instance(self):
-        account_1_details = register("ganThepro", "1234", "customer", "male", "bangkok")
+        temp_detail_1 = register("temporaryaccount1", "qwer", "mate", "female")
+        temp_detail_2 = register("temporaryaccount2", "qwer", "mate", "male")
+        temp_detail_3 = register("temporaryaccount3", "qwer", "mate", "male")
+        temp_detail_4 = register("temporaryaccount4", "qwer", "mate", "male")
+        temp_detail_5 = register("temporaryaccount5", "qwer", "mate", "female")
+        temp_detail_6 = register("temporaryaccount6", "qwer", "mate", "female")
+        print(("temp_1"), create_token(str(temp_detail_1['id']), "mate"))
+        print(("temp_2"), create_token(str(temp_detail_2['id']), "mate"))
+        print(("temp_3"), create_token(str(temp_detail_3['id']), "mate"))
+        print(("temp_4"), create_token(str(temp_detail_4['id']), "mate"))
+        print(("temp_5"), create_token(str(temp_detail_5['id']), "mate"))
+        print(("temp_6"), create_token(str(temp_detail_6['id']), "mate"))
+        tmp1 = self.search_account_by_id(temp_detail_1['id'])
+        tmp2 = self.search_account_by_id(temp_detail_2['id'])
+        tmp3 = self.search_account_by_id(temp_detail_3['id'])
+        tmp4 = self.search_account_by_id(temp_detail_4['id'])
+        tmp5 = self.search_account_by_id(temp_detail_5['id'])
+        tmp6 = self.search_account_by_id(temp_detail_6['id'])
+        tmp_list =[tmp1, tmp2, tmp3, tmp4, tmp5, tmp6]
+        for tmp in tmp_list:
+            tmp.pic_url = "https://i1.sndcdn.com/artworks-ubBjVp0Z50ZykDdG-lU7NWg-t500x500.jpg"
+            tmp.amount = 1234
+            tmp.price = 3000
+        tmp1.display_name = "Edok"
+        tmp2.display_name = "Thong"
+        tmp3.display_name = "Eson-Teen"
+        tmp4.display_name = "GanGayOnline"
+        for i in range(5):
+            tmp5.add_availability(datetime.date(2024, 3, 4+i), f"I'm available laew {i}")
+
+        account_1_details = register("ganThepro", "1234", "customer", "male")
         print("account_1_token :", create_token(str(account_1_details['id']), "customer"))
-        account_2_details = register("ganThepro2", "1234", "mate", "female", "bangkok")
+        account_2_details = register("ganThepro2", "1234", "mate", "female")
         print("account_2_token :", create_token(str(account_2_details['id']), "mate"))
         account_1: Customer = self.search_account_by_id(account_1_details['id'])
         account_2: Mate = self.search_account_by_id(account_2_details['id'])
@@ -45,9 +75,9 @@ class Controller:
         # print(account_2.get_success_booking(self.__booking_list))
         print(account_2.id)
 
-        account_4_details: Mate = register("ganThepro3", "1234", "mate", "female", "bangkok")
-        account_5_details: Mate = register("ganThepro4", "1234", "mate", "male", "bangkok")
-        account_6_details: Mate = register("yok", "1234", "mate", "male", "bangkok")
+        account_4_details: Mate = register("ganThepro3", "1234", "mate", "female")
+        account_5_details: Mate = register("ganThepro4", "1234", "mate", "male")
+        account_6_details: Mate = register("yok", "1234", "mate", "male")
         account_4: Mate = self.search_account_by_id(account_4_details['id'])
         account_5: Mate = self.search_account_by_id(account_5_details['id'])
         account_6: Mate = self.search_account_by_id(account_6_details['id'])
@@ -60,6 +90,10 @@ class Controller:
 
         chat_room = self.add_chat_room(account_1, account_4)
         chat_room = self.add_chat_room(account_2, account_4)
+
+        self.add_post(account_2, "Hello kra", "")
+        self.add_post(account_4, "luv you na", "")
+        self.add_post(account_5, "Hello krub", "")
 
         self.create_admin()
         print(f'Admin ID : {self.__admin.id}')
@@ -84,8 +118,8 @@ class Controller:
         # self.add_chat_room(Chat(my_acc, mate_acc))
         # self.add_chat_room(Chat(my_acc, mate_acc2))
     def get_chat_by_owner_pair(self, owner1, owner2):
-        if not (isinstance(owner1, Account) and isinstance(owner2, Account)):
-            raise TypeError("owner1, owner2 must be Account instances")
+        if not (isinstance(owner1, UserAccount) and isinstance(owner2, UserAccount)):
+            raise TypeError("owner1, owner2 must be UserAccount instances")
         for chat in self.__chat_room_list:
             chat_owner1 = chat.get_owner1()
             chat_owner2 = chat.get_owner2()
@@ -93,7 +127,7 @@ class Controller:
                 return chat
         return None
     
-    def get_chat_list(self, account: Account) -> list | None:
+    def get_chat_list(self, account: UserAccount) -> list | None:
         chat_list = []
         for chat in self.__chat_room_list:
             if chat.account_1 == account or chat.account_2 == account:
@@ -108,14 +142,14 @@ class Controller:
             return chat_room.message_list
         return None
         
-    def add_chat_room(self, account_1: Account, account_2: Account) -> ChatRoomManeger | None:
-        if not (isinstance(account_1, Account) and isinstance(account_2, Account)):
+    def add_chat_room(self, account_1: UserAccount, account_2: UserAccount) -> ChatRoomManeger | None:
+        if not (isinstance(account_1, UserAccount) and isinstance(account_2, UserAccount)):
             return None
         chat_room: ChatRoomManeger = ChatRoomManeger(account_1, account_2)
         self.__chat_room_list.append(chat_room)
         return chat_room
 
-    def search_account_by_id(self, id: str) -> Account | None:
+    def search_account_by_id(self, id: str) -> UserAccount | None:
         for acc in self.__account_list:
             if(acc.validate_account_id(str(id))):
                 return acc
@@ -136,7 +170,7 @@ class Controller:
     def retrieve_chat_log(self, sender_id, receiver_id):
         sender_acc = self.search_account_by_id(sender_id)
         receiver_acc = self.search_account_by_id(receiver_id)
-        if not (isinstance(sender_acc, Account) and isinstance(receiver_acc, Account)):
+        if not (isinstance(sender_acc, UserAccount) and isinstance(receiver_acc, UserAccount)):
             raise "No Acc found"
         chat = self.get_chat_by_owner_pair(sender_acc, receiver_acc)
         message_list = chat.get_message_list()
@@ -153,10 +187,10 @@ class Controller:
             all_chat_data.append(chat_data)
         return all_chat_data   
 
-    def get_receiver_chat_room_detail(self, sender_acc: Account) -> list:
+    def get_receiver_chat_room_detail(self, sender_acc: UserAccount) -> list:
         detail = []
-        if not (isinstance(sender_acc, Account)):
-            raise TypeError("receiver_acc must be Account instances")
+        if not (isinstance(sender_acc, UserAccount)):
+            raise TypeError("receiver_acc must be UserAccount instances")
         for chat in self.__chat_room_list:
             chat_owner1 = chat.account_1
             chat_owner2 = chat.account_2
@@ -181,7 +215,7 @@ class Controller:
 
     def retrieve_chat_room(self, sender_id):
         sender_acc = self.search_account_by_id(sender_id)
-        if not (isinstance(sender_acc, Account)):
+        if not (isinstance(sender_acc, UserAccount)):
             raise TypeError("No Acc found")
         detail = self.get_receiver_chat_room_detail(sender_acc)
         return detail
@@ -189,7 +223,7 @@ class Controller:
     def delete_chat_room(self, sender_id, receiver_id) -> list | None:
         sender_acc = self.search_account_by_id(sender_id)
         receiver_acc = self.search_account_by_id(receiver_id)
-        if not (isinstance(sender_acc, Account) and isinstance(receiver_acc, Account)):
+        if not (isinstance(sender_acc, UserAccount) and isinstance(receiver_acc, UserAccount)):
             raise "No Acc found"
         chat = self.get_chat_by_owner_pair(sender_acc, receiver_acc)
         if chat:
@@ -206,7 +240,7 @@ class Controller:
         return self.__booking_list
 
     def add_customer(self, username: str, password: str, gender: str, location: str) -> Customer:
-        existed_account: Account = self.search_account_by_username(username)
+        existed_account: UserAccount = self.search_account_by_username(username)
         if existed_account != None:
             return None
         customer: Customer = Customer(username, password, gender, location)
@@ -214,7 +248,7 @@ class Controller:
         return customer
 
     def add_mate(self, username: str, password: str, gender: str, location: str) -> Mate:
-        existed_account: Account = self.search_account_by_username(username)
+        existed_account: UserAccount = self.search_account_by_username(username)
         if existed_account != None:
             return None
         mate: Mate = Mate(username, password, gender, location)
@@ -233,7 +267,7 @@ class Controller:
     def search_mate_by_display_name_similar(self, display_name: str) -> list | None:
         account_list = []
         for account in self.get_mates():
-            if display_name in account.display_name:
+            if display_name.lower() in account.display_name.lower():
                 account_list.append(account)
         if(len(account_list)):
             return account_list
@@ -278,7 +312,7 @@ class Controller:
     def get_mate_by_location(self, location) -> list[Mate] | None:
         mate_list = []
         for mate in self.get_mates():
-            if location in mate.location:
+            if location.lower() in mate.location.lower():
                 mate_list.append(mate)
         if len(mate_list) == 0:
             return None
@@ -290,7 +324,7 @@ class Controller:
                 return booking
         return None
     
-    def search_customer_by_id(self, customer_id: str) -> Account | None:
+    def search_customer_by_id(self, customer_id: str) -> UserAccount | None:
         for account in self.get_customers():
             if str(account.id) == customer_id:
                 return account
@@ -359,7 +393,7 @@ class Controller:
         mate.add_transaction(transaction)
         return transaction
     
-    def get_account_by_name(self, name: str) -> Account | None:
+    def get_account_by_name(self, name: str) -> UserAccount | None:
         for account in self.__account_list:
             if name in account.name:
                 return account
@@ -400,7 +434,7 @@ class Controller:
                 booking_list.append(booking)
         return booking_list
 
-    def delete_booking(self, booking: Booking, account: Account) -> Union[Tuple[Booking, Transaction], Booking, None]:
+    def delete_booking(self, booking: Booking, account: UserAccount) -> Union[Tuple[Booking, Transaction], Booking, None]:
         transaction: Transaction = None
         if isinstance(account, Mate):
             if booking.payment.pay(account, booking.customer) == False:
@@ -415,22 +449,27 @@ class Controller:
             return booking
         return None
 
-    def add_post(self, description: str, picture: str) -> Post | None:
-        if not isinstance(description, str) or not isinstance(picture, str):
+    def add_post(self, writer: Mate, description: str, picture: str) -> Post | None:
+        if not isinstance(description, str) or not isinstance(picture, str) or not isinstance(writer, Mate):
             return None
-        post = Post(description, picture)
-        self.__post_list.append(Post)
+        post = Post(writer, description, picture)
+        self.__post_list.append(post)
         return post
     
+    def get_post(self):
+        if len(self.__post_list) == 0:
+            return None
+        return self.__post_list
+
     def edit_display_name(self, account: Account, new_display_name: str) -> Account:
         account.display_name = new_display_name
         return account
     
-    def edit_pic_url(self, account: Account, new_pic_url: str) -> Account:
+    def edit_pic_url(self, account: UserAccount, new_pic_url: str) -> UserAccount:
         account.pic_url = new_pic_url
         return account
 
-    def edit_money(self, account: Account, new_money: str) -> Account:
+    def edit_money(self, account: UserAccount, new_money: str) -> UserAccount:
         account.amount = new_money
         return account
     
@@ -454,3 +493,14 @@ class Controller:
         if self.__log_list == []:
             return None
         return self.__log_list
+    
+    def get_admin(self) -> Admin:
+        return self.__admin
+    
+    def edit_age(self, account: Account, new_age: int) -> Account:
+        account.age = new_age
+        return account
+
+    def edit_location(self, account: Account, new_location: str) -> Account:
+        account.location = new_location
+        return account
