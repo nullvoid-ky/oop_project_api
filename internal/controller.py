@@ -52,6 +52,8 @@ class Controller:
         tmp2.display_name = "Thong"
         tmp3.display_name = "Eson-Teen"
         tmp4.display_name = "GanGayOnline"
+        for i in range(5):
+            tmp5.add_availability(datetime.date(2024, 3, 4+i), f"I'm available laew {i}")
 
         account_1_details = register("ganThepro", "1234", "customer", "male")
         print("account_1_token :", create_token(str(account_1_details['id']), "customer"))

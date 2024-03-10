@@ -197,7 +197,8 @@ def get_leaderboard():
     mate_list : list[Mate] = controller.get_leaderboard()
     my_list = []
     for mate in mate_list:
-        my_list.append(mate)
+        if (mate.get_average_review_star() >= 0):
+            my_list.append(mate)
     send_data = [{'account_detail' : acc.get_account_details()} for acc in my_list]
     for data in send_data:
         data["account_detail"]["rank"] = rank
