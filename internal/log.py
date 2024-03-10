@@ -1,7 +1,8 @@
 from datetime import datetime
+from internal.account import UserAccount
 class Log:
     def __init__(self, success, actor, action, item, target, msg) -> None:
-        self.__success = success
+        self.__success : True | False = success
         self.__actor = actor
         self.__action = action
         self.__item = item
@@ -32,13 +33,25 @@ class Log:
             return self.__timestamp
         
         def get_log_details(self):
-            return {
-               "success" : self.__success,
-               "actor" : self.__actor,
-               "action" : self.__action,
-               "item" : self.__item,
-               "target" : self.__target,
-               "msg" : self.__msg,
-               "timestamp" : self.__timestam.strftime("%d/%m/%Y %H:%M")
-            }
-        
+            if isinstance(item, str):
+                return {
+                    "success" : self.__success,
+                    "actor" : self.__actor.get_account_details() if not isinstance(self.__actor , UserAccount) else "?",
+                    "action" : self.__action,
+                    "item" : self.__item,
+                    "target" : self.__target.get_account_details() if not isinstance(self.__target , UserAccount)else "?",
+                    "msg" : self.__msg,
+                    "timestamp" : self.__timestam.strftime("%d/%m/%Y %H:%M")
+                }
+            else:
+                return {
+                    "success" : self.__success, 
+                    "actor" : self.__actor.get_account_details() if not isinstance(self.__actor , UserAccount) else "?",
+                    "action" : self.__action,
+                    "item" : str(type(self.__item)),
+                    "target" : self.__target.get_account_details() if not isinstance(self.__target , UserAccount)else "?",
+                    "msg" : self.__msg,
+                    "timestamp" : self.__timestam.strftime("%d/%m/%Y %H:%M")
+                }
+
+            

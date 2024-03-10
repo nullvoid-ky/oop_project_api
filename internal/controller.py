@@ -474,11 +474,11 @@ class Controller:
 
     def add_post(self, writer: Mate, description: str, picture: str) -> Post | None:
         if not isinstance(description, str) or not isinstance(picture, str) or not isinstance(writer, Mate):
-            self.add_log(False, writer, "add_post" ,None, None, "Instance Error")
+            self.add_log(False, writer, "add_post" ,"No Item", writer, "Instance Error")
             return None
         post = Post(writer, description, picture)
         self.__post_list.append(post)
-        self.add_log(True, writer, "add_post" ,post, None, "Added Post")
+        self.add_log(True, writer, "add_post" ,post, writer, "Added Post")
         return post
     
     def get_post(self):
@@ -488,7 +488,7 @@ class Controller:
 
     def edit_display_name(self, account: Account, new_display_name: str) -> Account:
         if not isinstance(account, Account) or not isinstance(new_display_name, str):
-            self.add_log(False, account, "edit_display_name" , "", None, "Instance Error")
+            self.add_log(False, account, "edit_display_name" , "No Item", account, "Instance Error")
             return None
         self.add_log(True, account, "edit_display_name" ,new_display_name, None, "Edited name")
         account.display_name = new_display_name
@@ -496,32 +496,32 @@ class Controller:
     
     def edit_pic_url(self, account: UserAccount, new_pic_url: str) -> UserAccount:
         if not isinstance(account, Account) or not isinstance(new_pic_url, str):
-            self.add_log(False, account, "edit_pic_url" ,"", None, "Instance Error")
+            self.add_log(False, account, "edit_pic_url" ,"No Item", account, "Instance Error")
             return None
-        self.add_log(True, account, "edit_pic_url" ,new_pic_url, None, "Edited Pic")
+        self.add_log(True, account, "edit_pic_url" ,new_pic_url, account, "Edited Pic")
         account.pic_url = new_pic_url
         return account
 
     def edit_money(self, account: UserAccount, new_money: str) -> UserAccount:
         if not isinstance(account, Account) or not isinstance(new_money, str):
-            self.add_log(False, account, "edit_money" ,"", None, "instanec Error")
+            self.add_log(False, account, "edit_money" ,"No Item", account, "instanec Error")
             return None
-        self.add_log(True, account, "edit_money" ,new_money, None, "Adjusted Money")
+        self.add_log(True, account, "edit_money" ,new_money, account, "Adjusted Money")
         account.amount = new_money
         return account
     
     def edit_age(self, account: Account, new_age: int) -> Account:
         if not isinstance(account, Account) or not(isinstance(new_age,int)):
-            self.add_log(False, account, "edit_age" ,"", None, "Instance Error")
+            self.add_log(False, account, "edit_age" ,"No Item", account, "Instance Error")
         account.age = new_age
-        self.add_log(True, account, "edit_age" ,new_age, None, "Edited Age")
+        self.add_log(True, account, "edit_age" ,new_age, account, "Edited Age")
         return account
 
     def edit_location(self, account: Account, new_location: str) -> Account:
         if not isinstance(account, Account) or not(isinstance(new_location,str)):
-            self.add_log(False, account, "edit_location" ,"", None, "Instance Error")
+            self.add_log(False, account, "edit_location" ,"No Item", account, "Instance Error")
         account.location = new_location
-        self.add_log(True, account, "edit_location" ,new_location, None, "Edited Location")
+        self.add_log(True, account, "edit_location" ,new_location, account, "Edited Location")
         return account
     
     # def edit_gender(self, account: UserAccount, new_money: str) -> UserAccount:
@@ -556,3 +556,6 @@ class Controller:
     def get_admin(self) -> Admin:
         return self.__admin
     
+    @property
+    def log_list(self):
+        return self.__log_list
