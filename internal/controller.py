@@ -453,3 +453,8 @@ class Controller:
         if self.__log_list == []:
             return None
         return self.__log_list
+    
+    # def get_post(self) -> list[Post] | None:
+    #     if self.__post_list == []:
+    #         return None
+    #     return self.__post_list
