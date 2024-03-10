@@ -113,5 +113,6 @@ class Mate(Account):
             "location": self.location,
             "price": self.price,
             "amount" : self.amount,
-            "timestamp": self._timestamp.strftime("%d/%m/%Y %H:%M:%S")
+            "timestamp": self._timestamp.strftime("%d/%m/%Y %H:%M:%S"),
+            "age": self._age
         }

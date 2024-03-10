@@ -129,7 +129,7 @@ def get_user_profile(user_id: str):
     if account == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
     if isinstance(account, Mate):
-        return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_mate_details())
+        return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())
     return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())
 
 @router.delete("/delete-booking/{booking_id}", dependencies=[Depends(verify_customer)])

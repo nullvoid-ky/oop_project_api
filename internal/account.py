@@ -86,7 +86,8 @@ class Account(AllAccount):
             "role": "customer" if isinstance(self, Customer) else "mate", 
             "gender": self._gender,
             "location": self._location,
-            "timestamp": self._timestamp.strftime("%d/%m/%Y %H:%M:%S")
+            "timestamp": self._timestamp.strftime("%d/%m/%Y %H:%M:%S"),
+            "age": self._age,
         }
     
     def add_transaction(self, transaction) -> None:
