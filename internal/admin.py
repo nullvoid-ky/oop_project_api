@@ -1,4 +1,4 @@
-from internal.account import AllAccount
+from internal.account import Account
 from argon2 import PasswordHasher 
 ph = PasswordHasher()
 

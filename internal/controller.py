@@ -229,7 +229,7 @@ class Controller:
     def search_mate_by_display_name_similar(self, display_name: str) -> list | None:
         account_list = []
         for account in self.get_mates():
-            if display_name in account.display_name:
+            if display_name.lower() in account.display_name.lower():
                 account_list.append(account)
         if(len(account_list)):
             return account_list
@@ -274,7 +274,7 @@ class Controller:
     def get_mate_by_location(self, location) -> list[Mate] | None:
         mate_list = []
         for mate in self.get_mates():
-            if location in mate.location:
+            if location.lower() in mate.location.lower():
                 mate_list.append(mate)
         if len(mate_list) == 0:
             return None
