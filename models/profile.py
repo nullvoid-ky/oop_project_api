@@ -7,4 +7,10 @@ class EditPicUrlModel(BaseModel):
     url: str
 
 class EditMoneyModel(BaseModel):
-    amount: str
+    amount: int
+
+class EditAgeModel(BaseModel):
+    age: int
+
+class EditLocationModel(BaseModel):
+    location: str

@@ -90,7 +90,10 @@ class Mate(UserAccount):
         self.__review_list.remove(review)
         return review
     
-    def get_review_mate(self) -> list:
+    def get_review_amount(self) -> int:
+        return len(self.__review_list)
+    
+    def get_review_mate(self) -> list[Review]:
         return self.__review_list
     
     def get_review_amount(self) -> int:
@@ -107,8 +110,9 @@ class Mate(UserAccount):
             "role": "mate",
             "rentcount": self.__rented_count,
             "gender":self.gender,
-            "location": self.location,
+            "location": self.location.capitalize(),
             "price": self.price,
             "amount" : self.amount,
-            "timestamp": self.timestamp.strftime("%d/%m/%Y %H:%M:%S")
+            "timestamp": self._timestamp.strftime("%d/%m/%Y %H:%M:%S"),
+            "age": self._age
         }

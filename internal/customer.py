@@ -12,7 +12,8 @@ class Customer(UserAccount):
             "pic_url": self.pic_url,
             "role": "customer",
             "gender": self.gender,
-            "location": self.location,
+            "location": self.location.capitalize(),
             "amount": self.amount,
-            "timestamp": self.timestamp.strftime("%d/%m/%Y %H:%M:%S")
+            "timestamp": self._timestamp.strftime("%d/%m/%Y %H:%M:%S"),
+            "age": self._age,
         }

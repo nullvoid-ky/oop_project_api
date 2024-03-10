@@ -2,13 +2,14 @@ from fastapi import APIRouter, status, Depends, Body
 from typing import Union, Tuple
 
 from models.post import PostModel
-from models.profile import EditDisplayNameModel, EditPicUrlModel, EditMoneyModel
+from models.profile import EditDisplayNameModel, EditPicUrlModel, EditMoneyModel, EditAgeModel, EditLocationModel
 from models.mate import MateModel, SearchMateModel
 from internal.booking import Booking
 from internal.transaction import Transaction
 from internal.account import UserAccount, Account
 from internal.post import Post
 from internal.chat_room_manager import ChatRoomManeger
+from internal.mate import Mate
 from models.post import PostModel
 from models.mate import MateModel
 from models.booking import BookingModel
@@ -51,6 +52,14 @@ def get_mates():
     mate_list = controller.get_mates()
     if isinstance(mate_list, list):
         return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in mate_list])
+    return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in add mate")
+
+@router.get("/get-customers")
+def get_mates():
+    from app import controller
+    customer_list = controller.get_customers()
+    if isinstance(customer_list, list):
+        return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in customer_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in add mate")
 
 @router.get("/get-mate-by-username/{username}")
@@ -196,3 +205,49 @@ def get_leaderboard():
     if len(my_list):
         return res.success_response_status(status.HTTP_200_OK, "Get Leaderboard Success", data=send_data)
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "UserAccount not found")
+
+@router.post("/add-amount", dependencies=[Depends(verify_customer)])
+def add_amount(body: EditMoneyModel):
+    from app import controller
+    account: Account = controller.search_account_by_id(Body.user_id)
+    if account == None:
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
+    account.amount = account.amount + body.amount
+    transaction: Transaction = account.add_transaction(Transaction(account, account, body.amount))
+    return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=transaction.get_transaction_details())
+
+@router.post("/del-amount", dependencies=[Depends(verify_mate)])
+def del_amount(body: EditMoneyModel):
+    from app import controller
+    account: Account = controller.search_account_by_id(Body.user_id)
+    if account == None:
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
+    account.amount = account.amount - body.amount
+    transaction: Transaction = account.add_transaction(Transaction(account, account, body.amount))
+    return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=transaction.get_transaction_details())
+
+@router.get("/get-log")
+def get_log():
+    from app import controller
+    log_list = controller.get_log()
+    if isinstance(log_list, list):
+        return res.success_response_status(status.HTTP_200_OK, "Get Log Success", data=controller.get_log())
+    return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in get log")
+
+@router.put("/edit-age")
+def edit_age(body: EditAgeModel):
+    from app import controller
+    account: Account = controller.search_account_by_id(Body.user_id)
+    if account == None:
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit Age Error")
+    edited_account: Account = controller.edit_age(account, body.age)
+    return res.success_response_status(status.HTTP_200_OK, "Edit Age Success",  data=edited_account.get_account_details())
+
+@router.put("/edit-location")
+def edit_location(body: EditLocationModel):
+    from app import controller
+    account: Account = controller.search_account_by_id(Body.user_id)
+    if account == None:
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit Location Error")
+    edited_account: Account = controller.edit_location(account, body.location)
+    return res.success_response_status(status.HTTP_200_OK, "Edit Location Success",  data=edited_account.get_account_details()) 

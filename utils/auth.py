@@ -7,8 +7,8 @@ ph = PasswordHasher()
     
 def register(username: str, password: str, role: str, gender: str, location: str) -> dict | None:
     from app import controller
-    account: UserAccount = controller.search_account_by_username(username)
-    if account == None:
+    account: Account = controller.search_account_by_username(username)
+    if account == None and username != "admin":
         hashed_password: str = ph.hash(password)
         if role == "customer":
             new_account: UserAccount = controller.add_customer(username, hashed_password, gender, location)
@@ -26,12 +26,12 @@ def login(username: str, password: str) -> dict | None:
     account: Account = controller.search_account_by_username(username)
     if account == None:
         return None
-    return account.get_account_details()
-    # try:
-    #     # if isinstance(account, Admin):
-    #         # ph.verify("admin", password)
-    #         # return account.get_account_details()
-    #     ph.verify(account.password, password)
-    #     return account.get_account_details()
-    # except:
-    #     return None
+    # return account.get_account_details()
+    try:
+        # if isinstance(account, Admin):
+        #     ph.verify("admin", password)
+        #     return account.get_account_details()
+        ph.verify(account.password, password)
+        return account.get_account_details()
+    except:
+        return None
