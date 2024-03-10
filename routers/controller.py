@@ -36,7 +36,7 @@ def add_booking(body: MateModel):
         booking, transaction = controller.add_booking(customer, mate, body.date)
     except:
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")
-    return res.success_response_status(status.HTTP_200_OK, "Booked Successfully", data={"booking": booking.get_booking_detail(), "transaction": transaction.get_transaction_details()})
+    return res.success_response_status(status.HTTP_200_OK, "Booked Successfully", data={"booking": booking.get_booking_details(), "transaction": transaction.get_transaction_details()})
 
 @router.post("/pay", dependencies=[Depends(verify_customer)])
 def pay(body: BookingModel):
@@ -103,7 +103,7 @@ def get_booking():
     customer: Account = controller.search_customer_by_id(Body.user_id)
     booking_list: list = controller.get_booking(customer)
     if isinstance(booking_list, list):
-        return res.success_response_status(status.HTTP_200_OK, "Get Booking Success", data=[booking.get_booking_detail() for booking in booking_list])
+        return res.success_response_status(status.HTTP_200_OK, "Get Booking Success", data=[booking.get_booking_details() for booking in booking_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in get booking")
 
 @router.get("/get-booking-by-id/{booking_id}")
@@ -111,7 +111,7 @@ def get_booking_by_id(booking_id: str):
     from app import controller
     result: Booking = controller.search_booking_by_id(booking_id)
     if result:
-        return res.success_response_status(status.HTTP_200_OK, "Booking found", data=result.get_booking_detail())
+        return res.success_response_status(status.HTTP_200_OK, "Booking found", data=result.get_booking_details())
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Booking not found")
 
 @router.get("/get-self-profile")
@@ -141,9 +141,9 @@ def delete_booking(booking_id: str):
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Booking or Account not found")
     deleted_booking: Union[Tuple[Booking, Transaction], Booking, None] = controller.delete_booking(booking, account)
     if isinstance(deleted_booking, tuple):
-        return res.success_response_status(status.HTTP_200_OK, "Delete Booking Success", data={"booking": deleted_booking[0].get_booking_detail(), "transaction": deleted_booking[1].get_transaction_details()})
+        return res.success_response_status(status.HTTP_200_OK, "Delete Booking Success", data={"booking": deleted_booking[0].get_booking_details(), "transaction": deleted_booking[1].get_transaction_details()})
     elif isinstance(deleted_booking, Booking):
-        return res.success_response_status(status.HTTP_200_OK, "Delete Booking Success", data=deleted_booking.get_booking_detail())
+        return res.success_response_status(status.HTTP_200_OK, "Delete Booking Success", data=deleted_booking.get_booking_details())
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in delete booking")
 
 @router.post("/add-chat-room", dependencies=[Depends(verify_customer)])

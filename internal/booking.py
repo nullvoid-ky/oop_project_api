@@ -13,6 +13,7 @@ class Booking:
         self.__payment = payment
         self.__timestamp = datetime.now()
         self.__book_date = book_date
+        self.__is_success: bool = False
 
     @property
     def customer(self) -> Customer:
@@ -29,13 +30,20 @@ class Booking:
     @property
     def book_date(self) -> datetime:
         return self.__book_date
+    @property
+    def is_success(self) -> bool:
+        return self.__is_success
+    @is_success.setter
+    def is_success(self, is_success: bool):
+        self.__is_success = is_success
     
-    def get_booking_detail(self) -> dict:
+    def get_booking_details(self) -> dict:
         return {
             "id": str(self.__id),
             "customer": self.__customer.get_account_details(),
             "mate": self.__mate.get_account_details(),
             "payment": self.__payment.amount,
             "timestamp": self.__timestamp.strftime("%Y-%m-%d %H:%M:%S"),
-            "book_date": self.__book_date.strftime("%Y-%m-%d %H:%M:%S")
+            "book_date": self.__book_date.strftime("%Y-%m-%d %H:%M:%S"),
+            "is_success": self.__is_success
         }
