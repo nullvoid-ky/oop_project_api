@@ -92,8 +92,8 @@ def get_mate_by_avalibility():
 @router.post("/add-avalibility")
 def add_avalibility(body: AddAvailabilityModel):
     from app import controller
-    mate = controller.search_account_by_id(Body.user_id)
-    if isinstance(mate, Mate):
+    mate = controller.search_mate_by_id(Body.user_id)
+    if mate and mate.is_availability_valid(date(body.year, body.month, body.day)):
         availability = mate.add_availability(date(body.year, body.month, body.day), body.detail)
         return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data={"availability": availability.get_availability_details()})
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "mate not found")

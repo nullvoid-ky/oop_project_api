@@ -11,6 +11,7 @@ class Mate(Account):
         self.__review_list: list[Review] = []
         self.__price = price
         self.__rented_count = 0
+        self.__max_availability = 6
 
     @property
     def availability_list(self) -> list[Availability]:
@@ -57,6 +58,12 @@ class Mate(Account):
     
     def set_availability(self):
         pass
+
+    def is_availability_valid(self, date):
+        for availability in self.__availability_list:
+            if(date == availability.date):
+                return False
+        return len(self.__availability_list) < self.__max_availability
     
     def get_average_review_star(self) -> float:
         sum: float = 0
