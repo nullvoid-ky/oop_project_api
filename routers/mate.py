@@ -20,8 +20,8 @@ def add_post(body: PostModel):
     mate = controller.search_mate_by_id(Body.user_id)
     if mate == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
-    mate.add_post(body.description, body.picture, body.timestamp)
-    return res.success_response_status(status.HTTP_201_CREATED, "Post created")
+    data = mate.add_post(body.description, body.picture, body.timestamp)
+    return res.success_response_status(status.HTTP_201_CREATED, "Post created", data.get_post_details())
 
 @router.post("/add-availability", dependencies=[Depends(verify_mate)])
 def add_availability(body: AvailabilityModel):
@@ -31,8 +31,8 @@ def add_availability(body: AvailabilityModel):
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
     if mate.search_availability(body.date.year, body.date.month, body.date.day):
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Availability already exists")
-    mate.add_availability(datetime.date(body.date.year, body.date.month, body.date.day), body.detail)
-    return res.success_response_status(status.HTTP_201_CREATED, "Availability added")
+    data = mate.add_availability(datetime.date(body.date.year, body.date.month, body.date.day), body.detail)
+    return res.success_response_status(status.HTTP_201_CREATED, "Availability added", data.get_availability_details())
 
 @router.get("/get-availability/{mate_id}")
 def get_availability(mate_id: str):

@@ -428,6 +428,8 @@ class Controller:
         return booking, pledge_transaction
     
     def get_booking(self, customer: Customer) -> list[Booking]:
+        if not isinstance(customer, Customer):
+            return []
         booking_list = []
         for booking in self.__booking_list:
             if booking.customer == customer:
@@ -436,6 +438,11 @@ class Controller:
 
     def delete_booking(self, booking: Booking, account: UserAccount) -> Union[Tuple[Booking, Transaction], Booking, None]:
         transaction: Transaction = None
+        if not isinstance(booking, Booking):
+            return None
+        if not isinstance(account, Account):
+            return None
+
         if isinstance(account, Mate):
             if booking.payment.pay(account, booking.customer) == False:
                 return None
@@ -462,14 +469,20 @@ class Controller:
         return self.__post_list
 
     def edit_display_name(self, account: Account, new_display_name: str) -> Account:
+        if not isinstance(account, Account) or not isinstance(new_display_name, str):
+            return None
         account.display_name = new_display_name
         return account
     
     def edit_pic_url(self, account: UserAccount, new_pic_url: str) -> UserAccount:
+        if not isinstance(account, Account) or not isinstance(new_pic_url, str):
+            return None
         account.pic_url = new_pic_url
         return account
 
     def edit_money(self, account: UserAccount, new_money: str) -> UserAccount:
+        if not isinstance(account, Account) or not isinstance(new_money, str):
+            return None
         account.amount = new_money
         return account
     
@@ -481,8 +494,8 @@ class Controller:
         return sorted_mates[:10]
     
     def add_log(self, status: int, message: str, data: dict) -> None:
-        self.__log_list.append({"status": status, "message": message, "data": data})
-
+        pass
+    
     def create_admin(self) -> Admin | None:
         if isinstance(self.__admin, Admin):
             return None
