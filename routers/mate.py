@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status, Body
 import datetime
 from models.review import *
-from internal.account import Account
+from internal.account import UserAccount
 from internal.availability import Availability
 from models.post import PostModel
 from models.availability import AvailabilityModel
@@ -90,5 +90,5 @@ def get_user_profile(user_id: str):
     from internal.mate import Mate
     account: Mate = controller.search_mate_by_id(user_id)
     if account == None:
-        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "UserAccount not found")
     return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())

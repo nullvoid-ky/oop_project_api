@@ -1,7 +1,7 @@
 from typing import Tuple, Union
 import datetime
 
-from internal.account import Account, AllAccount
+from internal.account import UserAccount, Account
 from internal.admin import Admin
 from internal.message import Message
 from internal.booking import Booking
@@ -82,8 +82,8 @@ class Controller:
         # self.add_chat_room(Chat(my_acc, mate_acc))
         # self.add_chat_room(Chat(my_acc, mate_acc2))
     def get_chat_by_owner_pair(self, owner1, owner2):
-        if not (isinstance(owner1, Account) and isinstance(owner2, Account)):
-            raise TypeError("owner1, owner2 must be Account instances")
+        if not (isinstance(owner1, UserAccount) and isinstance(owner2, UserAccount)):
+            raise TypeError("owner1, owner2 must be UserAccount instances")
         for chat in self.__chat_room_list:
             chat_owner1 = chat.get_owner1()
             chat_owner2 = chat.get_owner2()
@@ -91,7 +91,7 @@ class Controller:
                 return chat
         return None
     
-    def get_chat_list(self, account: Account) -> list | None:
+    def get_chat_list(self, account: UserAccount) -> list | None:
         chat_list = []
         for chat in self.__chat_room_list:
             if chat.account_1 == account or chat.account_2 == account:
@@ -106,14 +106,14 @@ class Controller:
             return chat_room.message_list
         return None
         
-    def add_chat_room(self, account_1: Account, account_2: Account) -> ChatRoomManeger | None:
-        if not (isinstance(account_1, Account) and isinstance(account_2, Account)):
+    def add_chat_room(self, account_1: UserAccount, account_2: UserAccount) -> ChatRoomManeger | None:
+        if not (isinstance(account_1, UserAccount) and isinstance(account_2, UserAccount)):
             return None
         chat_room: ChatRoomManeger = ChatRoomManeger(account_1, account_2)
         self.__chat_room_list.append(chat_room)
         return chat_room
 
-    def search_account_by_id(self, id: str) -> Account | None:
+    def search_account_by_id(self, id: str) -> UserAccount | None:
         for acc in self.__account_list:
             if(acc.validate_account_id(str(id))):
                 return acc
@@ -134,7 +134,7 @@ class Controller:
     def retrieve_chat_log(self, sender_id, receiver_id):
         sender_acc = self.search_account_by_id(sender_id)
         receiver_acc = self.search_account_by_id(receiver_id)
-        if not (isinstance(sender_acc, Account) and isinstance(receiver_acc, Account)):
+        if not (isinstance(sender_acc, UserAccount) and isinstance(receiver_acc, UserAccount)):
             raise "No Acc found"
         chat = self.get_chat_by_owner_pair(sender_acc, receiver_acc)
         message_list = chat.get_message_list()
@@ -151,10 +151,10 @@ class Controller:
             all_chat_data.append(chat_data)
         return all_chat_data   
 
-    def get_receiver_chat_room_detail(self, sender_acc: Account) -> list:
+    def get_receiver_chat_room_detail(self, sender_acc: UserAccount) -> list:
         detail = []
-        if not (isinstance(sender_acc, Account)):
-            raise TypeError("receiver_acc must be Account instances")
+        if not (isinstance(sender_acc, UserAccount)):
+            raise TypeError("receiver_acc must be UserAccount instances")
         for chat in self.__chat_room_list:
             chat_owner1 = chat.account_1
             chat_owner2 = chat.account_2
@@ -179,7 +179,7 @@ class Controller:
 
     def retrieve_chat_room(self, sender_id):
         sender_acc = self.search_account_by_id(sender_id)
-        if not (isinstance(sender_acc, Account)):
+        if not (isinstance(sender_acc, UserAccount)):
             raise TypeError("No Acc found")
         detail = self.get_receiver_chat_room_detail(sender_acc)
         return detail
@@ -187,7 +187,7 @@ class Controller:
     def delete_chat_room(self, sender_id, receiver_id) -> list | None:
         sender_acc = self.search_account_by_id(sender_id)
         receiver_acc = self.search_account_by_id(receiver_id)
-        if not (isinstance(sender_acc, Account) and isinstance(receiver_acc, Account)):
+        if not (isinstance(sender_acc, UserAccount) and isinstance(receiver_acc, UserAccount)):
             raise "No Acc found"
         chat = self.get_chat_by_owner_pair(sender_acc, receiver_acc)
         if chat:
@@ -204,7 +204,7 @@ class Controller:
         return self.__booking_list
 
     def add_customer(self, username: str, password: str, gender: str, location: str) -> Customer:
-        existed_account: Account = self.search_account_by_username(username)
+        existed_account: UserAccount = self.search_account_by_username(username)
         if existed_account != None:
             return None
         customer: Customer = Customer(username, password, gender, location)
@@ -212,7 +212,7 @@ class Controller:
         return customer
 
     def add_mate(self, username: str, password: str, gender: str, location: str) -> Mate:
-        existed_account: Account = self.search_account_by_username(username)
+        existed_account: UserAccount = self.search_account_by_username(username)
         if existed_account != None:
             return None
         mate: Mate = Mate(username, password, gender, location)
@@ -288,7 +288,7 @@ class Controller:
                 return booking
         return None
     
-    def search_customer_by_id(self, customer_id: str) -> Account | None:
+    def search_customer_by_id(self, customer_id: str) -> UserAccount | None:
         for account in self.get_customers():
             if str(account.id) == customer_id:
                 return account
@@ -356,7 +356,7 @@ class Controller:
         mate.add_transaction(transaction)
         return transaction
     
-    def get_account_by_name(self, name: str) -> Account | None:
+    def get_account_by_name(self, name: str) -> UserAccount | None:
         for account in self.__account_list:
             if name in account.name:
                 return account
@@ -377,7 +377,7 @@ class Controller:
         return customer_list
     
     def add_booking(self, customer: Customer, mate: Mate, date: Date) -> Tuple[Booking, Transaction] | None:
-        booked_customer: Account = mate.book(date.year, date.month, date.day)
+        booked_customer: UserAccount = mate.book(date.year, date.month, date.day)
         if booked_customer == None:
             return None
         pledge_payment: Payment = Payment(mate.price / 2)
@@ -394,7 +394,7 @@ class Controller:
                 booking_list.append(booking)
         return booking_list
 
-    def delete_booking(self, booking: Booking, account: Account) -> Union[Tuple[Booking, Transaction], Booking, None]:
+    def delete_booking(self, booking: Booking, account: UserAccount) -> Union[Tuple[Booking, Transaction], Booking, None]:
         transaction: Transaction = None
         if isinstance(account, Mate):
             booking.payment.pay(account, booking.customer)
@@ -415,15 +415,15 @@ class Controller:
         self.__post_list.append(Post)
         return post
     
-    def edit_display_name(self, account: Account, new_display_name: str) -> Account:
+    def edit_display_name(self, account: UserAccount, new_display_name: str) -> UserAccount:
         account.display_name = new_display_name
         return account
     
-    def edit_pic_url(self, account: Account, new_pic_url: str) -> Account:
+    def edit_pic_url(self, account: UserAccount, new_pic_url: str) -> UserAccount:
         account.pic_url = new_pic_url
         return account
 
-    def edit_money(self, account: Account, new_money: str) -> Account:
+    def edit_money(self, account: UserAccount, new_money: str) -> UserAccount:
         account.amount = new_money
         return account
     

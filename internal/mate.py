@@ -1,10 +1,10 @@
 import datetime
 
-from internal.account import Account
+from internal.account import UserAccount
 from internal.availability import Availability
 from internal.review import Review
 from internal.customer import Customer
-class Mate(Account):
+class Mate(UserAccount):
     def __init__(self, username: str, password: str, gender: str, location: str, price: int=0):
         super().__init__(username, password, gender, location)
         self.__availability_list: list[Availability] = []

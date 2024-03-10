@@ -1,6 +1,6 @@
-from internal.account import AllAccount
+from internal.account import Account
 
-class Admin(AllAccount):
+class Admin(Account):
     def __init__(self):
         username : str = "admin"
         password : str = "admin"

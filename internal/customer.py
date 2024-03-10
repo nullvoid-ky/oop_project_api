@@ -1,6 +1,6 @@
-from internal.account import Account
+from internal.account import UserAccount
 
-class Customer(Account):
+class Customer(UserAccount):
     def __init__(self, username: str, password: str, gender: str, location: str) -> None:
         super().__init__(username, password, gender, location)
     

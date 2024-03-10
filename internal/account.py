@@ -2,7 +2,7 @@ from uuid import uuid4, UUID
 from datetime import datetime
 from abc import ABC, abstractmethod
 
-class AllAccount(ABC):
+class Account(ABC):
     def __init__(self, username, password, pic_url) -> None:
         self._id: UUID = uuid4()
         self._display_name : str = username
@@ -38,7 +38,7 @@ class AllAccount(ABC):
     def validate_account_id(self, id):
         return str(self.id) == id
     
-class Account(AllAccount):
+class UserAccount(Account):
     def __init__(self, username: str, password: str, gender: str, location: str, pic_url: str = "", amount: int = 0, age: int = 18) -> None:
         super().__init__(username, password, pic_url)
         self._amount: int = amount
