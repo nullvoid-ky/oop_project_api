@@ -448,3 +448,11 @@ class Controller:
     
     def get_admin(self) -> Admin:
         return self.__admin
+    
+    def edit_age(self, account: Account, new_age: int) -> Account:
+        account.age = new_age
+        return account
+
+    def edit_location(self, account: Account, new_location: str) -> Account:
+        account.location = new_location
+        return account

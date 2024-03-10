@@ -8,3 +8,9 @@ class EditPicUrlModel(BaseModel):
 
 class EditMoneyModel(BaseModel):
     amount: int
+
+class EditAgeModel(BaseModel):
+    age: int
+
+class EditLocationModel(BaseModel):
+    location: str
