@@ -246,6 +246,15 @@ def get_log():
         return res.success_response_status(status.HTTP_200_OK, "Get Log Success", data=controller.get_log())
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in get log")
 
+@router.get("/get-transaction")
+def get_transaction():
+    from app import controller
+    account: Account = controller.search_account_by_id(Body.user_id)
+    transaction_list = account.transaction_list
+    if isinstance(transaction_list, list):
+        return res.success_response_status(status.HTTP_200_OK, "Get Transaction Success", data=[transaction.get_transaction_details() for transaction in transaction_list])
+    return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in get transaction")
+
 @router.put("/edit-age")
 def edit_age(body: EditAgeModel):
     from app import controller

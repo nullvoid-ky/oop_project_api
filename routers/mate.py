@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, status, Body
 import datetime
 from models.review import *
-from internal.account import Account
 from internal.availability import Availability
 from models.post import PostModel
 from models.availability import AvailabilityModel

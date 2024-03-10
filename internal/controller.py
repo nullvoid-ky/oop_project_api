@@ -38,7 +38,8 @@ class Controller:
         print("chat_room: ", chat_room.get_chat_room_details())
         account_2.add_availability(datetime.date(2024, 3, 4), "I'm available")
         account_2.add_review_mate(account_1, "good", 4)
-        self.add_booking(account_1, account_2, Date(year=2024, month=3, day=4))
+        booking, transaction = self.add_booking(account_1, account_2, Date(year=2024, month=3, day=4))
+        booking
         print(account_2.id)
 
         account_4_details: Mate = register("ganThepro3", "1234", "mate", "female", "bangkok")
@@ -381,6 +382,8 @@ class Controller:
         pledge_payment: Payment = Payment(mate.price / 2)
         pledge_payment.pay(customer, mate)
         pledge_transaction: Transaction = Transaction(customer, mate, pledge_payment.amount)   
+        customer.add_transaction(pledge_transaction)
+        mate.add_transaction(pledge_transaction)
         booking: Booking = Booking(customer, mate, datetime.date(date.year, date.month, date.day), pledge_payment)
         self.__booking_list.append(booking)
         return booking, pledge_transaction
