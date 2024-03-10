@@ -46,7 +46,7 @@ def get_chat_rooms():
     from app import controller
     account = controller.search_account_by_id(Body.user_id)
     if account is None:
-        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Account not found")
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "UserAccount not found")
     # chat_list = controller.get_chat_list(account)
     chat_list = controller.get_receiver_chat_room_detail(account)
     if chat_list is None:

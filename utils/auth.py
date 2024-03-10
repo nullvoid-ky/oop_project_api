@@ -1,19 +1,27 @@
-from internal.account import Account, AllAccount  
+from internal.account import UserAccount, Account  
 from internal.admin import Admin
 from argon2 import PasswordHasher 
 from models.mate import Date
 
 ph = PasswordHasher()
     
-def register(username: str, password: str, role: str, gender: str, location: str) -> dict | None:
+def register(username: str, password: str, role: str, gender: str, location : str= "Bangkok") -> dict | None:
     from app import controller
     account: Account = controller.search_account_by_username(username)
-    if account == None:
+    if account == None and username != "admin":
         hashed_password: str = ph.hash(password)
         if role == "customer":
-            new_account: Account = controller.add_customer(username, hashed_password, gender, location)
+            new_account: UserAccount = controller.add_customer(username, hashed_password, gender, location)
+            if gender == "male":
+                new_account.add_pic_url("../img/customer_male.svg")
+            else:
+                new_account.add_pic_url("../img/customer_female.svg")
         elif role == "mate":
-            new_account: Account = controller.add_mate(username, hashed_password, gender, location)
+            new_account: UserAccount = controller.add_mate(username, hashed_password, gender, location)
+            if gender == "male":
+                new_account.add_pic_url("../img/mate_male.svg")
+            else:
+                new_account.add_pic_url("../img/mate_female.svg")
         else:
             return None
         # mate = controller.search_account_by_username("Mate2")
@@ -23,7 +31,7 @@ def register(username: str, password: str, role: str, gender: str, location: str
 
 def login(username: str, password: str) -> dict | None:
     from app import controller
-    account: AllAccount = controller.search_account_by_username(username)
+    account: Account = controller.search_account_by_username(username)
     if account == None:
         return None
     # return account.get_account_details()

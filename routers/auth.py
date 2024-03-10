@@ -27,6 +27,6 @@ def register(body: RegisterModel):
     account: dict = auth.register(body.username, body.password, body.role, body.gender, "bangkok")
     if account:
         token: str = create_token(str(account["id"]), body.role)
-        return res.success_response_status(status=status.HTTP_201_CREATED, message="Account added", data={"token": token, "id": account["id"], "username": account["username"], "pic_url": account["pic_url"]})
+        return res.success_response_status(status=status.HTTP_201_CREATED, message="UserAccount added", data={"token": token, "id": account["id"], "username": account["username"], "pic_url": account["pic_url"]})
     else:
-        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Account already exists")
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "UserAccount already exists")

@@ -44,3 +44,10 @@ def verify_mate(payload: dict = Depends(verify_token)):
     if payload["role"] != "mate":
         raise HTTPException(status_code=403, detail="Only mates are allowed")
     return payload
+
+def verify_admin(payload: dict = Depends(verify_token)):
+    if "role" not in payload:
+        raise HTTPException(status_code=400, detail="Role not found in token")
+    if payload["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Only admins are allowed")
+    return payload

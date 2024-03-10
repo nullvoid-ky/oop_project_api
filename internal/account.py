@@ -2,7 +2,7 @@ from uuid import uuid4, UUID
 from datetime import datetime
 from abc import ABC, abstractmethod
 
-class AllAccount(ABC):
+class Account(ABC):
     def __init__(self, username, password, pic_url) -> None:
         self._id: UUID = uuid4()
         self._display_name : str = username
@@ -25,8 +25,12 @@ class AllAccount(ABC):
     def id(self) -> UUID:
         return self._id
     @property
+    def password(self) -> str:
+        return self._password
+    @property
     def age(self) -> str:
         return self._age
+    @property
     def timestamp(self) -> datetime:
         return self._timestamp
     @property
@@ -38,11 +42,17 @@ class AllAccount(ABC):
     @property
     def password(self) -> str:
         return self._password
+    @age.setter
+    def age(self, new_age):
+        self._age = new_age
 
     def validate_account_id(self, id):
         return str(self.id) == id
     
-class Account(AllAccount):
+    def add_pic_url(self, pic_url):
+        self.pic_url = pic_url
+    
+class UserAccount(Account):
     def __init__(self, username: str, password: str, gender: str, location: str, pic_url: str = "", amount: int = 0, age: int = 18) -> None:
         super().__init__(username, password, pic_url)
         self._amount: int = amount
@@ -79,6 +89,9 @@ class Account(AllAccount):
     @property
     def location(self) -> str:
         return self._location
+    @location.setter
+    def location(self, location):
+        self._location = location
     
     def get_account_details(self) -> dict:
         from internal.customer import Customer

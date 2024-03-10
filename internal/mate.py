@@ -1,17 +1,17 @@
 import datetime
 
-from internal.account import Account
+from internal.account import UserAccount
 from internal.availability import Availability
 from internal.review import Review
 from internal.customer import Customer
-
-class Mate(Account):
+class Mate(UserAccount):
     def __init__(self, username: str, password: str, gender: str, location: str, price: int=0):
         super().__init__(username, password, gender, location)
         self.__availability_list: list[Availability] = []
         self.__review_list: list[Review] = []
         self.__price = price
         self.__rented_count = 0
+        self.__max_availability = 6
 
     @property
     def availability_list(self) -> list[Availability]:
@@ -35,6 +35,8 @@ class Mate(Account):
         return availability
     
     def search_availability(self, year: int, month: int, day: int) -> Availability | None:
+        if(not self.is_availability_slot_valid()):
+            return None
         for availability in self.__availability_list:
             if availability.check_available(year, month, day):
                 return availability
@@ -46,6 +48,22 @@ class Mate(Account):
                 self.__availability_list.remove(availability)
                 return availability
         return None
+
+    def confirm_booking(self):
+        pass
+    
+    def update_availability(self):
+        pass
+    
+ 
+    def withdraw(self):
+        pass
+    
+    def set_availability(self):
+        pass
+
+    def is_availability_slot_valid(self):
+        return len(self.__availability_list) < self.__max_availability
     
     def get_average_review_star(self) -> float:
         sum: float = 0
@@ -89,11 +107,11 @@ class Mate(Account):
             "displayname":self.display_name,
             "pic_url": self.pic_url,
             "star": str(round(self.get_average_review_star(), 1)),
-            "reviewcount":self.get_review_amount(),
+            "review_count":self.get_review_amount(),
             "role": "mate",
-            "rentcount": self.__rented_count,
+            "rent_count": self.__rented_count,
             "gender":self.gender,
-            "location": self.location,
+            "location": self.location.capitalize(),
             "price": self.price,
             "amount" : self.amount,
             "timestamp": self._timestamp.strftime("%d/%m/%Y %H:%M:%S"),

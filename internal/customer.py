@@ -1,6 +1,6 @@
-from internal.account import Account
+from internal.account import UserAccount
 
-class Customer(Account):
+class Customer(UserAccount):
     def __init__(self, username: str, password: str, gender: str, location: str) -> None:
         super().__init__(username, password, gender, location)
     
@@ -12,7 +12,8 @@ class Customer(Account):
             "pic_url": self.pic_url,
             "role": "customer",
             "gender": self.gender,
-            "location": self.location,
+            "location": self.location.capitalize(),
             "amount": self.amount,
-            "timestamp": self._timestamp.strftime("%d/%m/%Y %H:%M:%S")
+            "timestamp": self._timestamp.strftime("%d/%m/%Y %H:%M:%S"),
+            "age": self._age,
         }
