@@ -18,7 +18,6 @@ class AllAccount(ABC):
     @property
     def username(self) -> str:
         return self._username
-        return self._username
     @property
     def display_name(self) -> str:
         return self._display_name
@@ -33,11 +32,12 @@ class AllAccount(ABC):
     @property
     def pic_url(self) -> str:
         return self._pic_url
-        return self._pic_url
     @pic_url.setter
     def pic_url(self, url):
         self._pic_url = url
-
+    @property
+    def password(self) -> str:
+        return self._password
 
     def validate_account_id(self, id):
         return str(self.id) == id
@@ -55,16 +55,7 @@ class Account(AllAccount):
     def gender(self) -> str:
         return self._gender
     @property
-    def age(self) -> str:
-        return self._age
-        self._pic_url = url
-    @property
-    def password(self) -> str:
-        return self._password
-        return self._password
-    @property
     def display_name(self) -> str:
-        return self._display_name
         return self._display_name
     @display_name.setter
     def display_name(self, name):
@@ -72,30 +63,18 @@ class Account(AllAccount):
     @property
     def id(self) -> UUID:
         return self._id
-        self._display_name = name
     @property
     def transaction_list(self) -> list:
-        return self._transaction_list
         return self._transaction_list
     @property
     def amount(self) -> int:
         return self._amount
-        return self._amount
     @amount.setter
-    def amount(self, new_amount):
-        self._amount = new_amount
     def amount(self, amount):
         self._amount = amount
     @property
-    def gender(self) -> str:
-        return self._gender
-        return self._gender
-    @property
     def location(self) -> str:
         return self._location
-    @property
-    def timestamp(self) -> datetime:
-        return self._timestamp
     
     def get_account_details(self) -> dict:
         from internal.customer import Customer
@@ -110,10 +89,6 @@ class Account(AllAccount):
             "timestamp": self._timestamp.strftime("%d/%m/%Y %H:%M:%S")
         }
     
-        return self._location
-    
-    
-    # MAKE TRANSACTION IMCOMPLETEE
     def add_transaction(self, transaction) -> None:
         from internal.transaction import Transaction
         if not isinstance(transaction, Transaction):
