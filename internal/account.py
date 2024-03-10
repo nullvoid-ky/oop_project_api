@@ -1,7 +1,8 @@
 from uuid import uuid4, UUID
 from datetime import datetime
+from abc import ABC, abstractmethod
 
-class Account:
+class Account(ABC):
     def __init__(self, username: str, password: str, gender: str, location: str, pic_url: str = "", amount: int = 0, age: int = 18) -> None:
         self.__id: UUID = uuid4()
         self.__display_name : str = username
@@ -15,6 +16,7 @@ class Account:
         self.__transaction_list: list = []
         self.__timestamp = datetime.now()
         
+
     @property
     def username(self) -> str:
         return self.__username
@@ -60,21 +62,13 @@ class Account:
     @property
     def timestamp(self) -> datetime:
         return self.__timestamp
-    
+
+
+    @abstractmethod
     def get_account_details(self) -> dict:
-        from internal.customer import Customer
-        return {
-            "id": str(self.__id),
-            "displayname": self.__display_name,
-            "username": self.__username,
-            "pic_url": self.__pic_url,
-            "role": "customer" if isinstance(self, Customer) else "mate", 
-            "gender": self.__gender,
-            "location": self.__location,
-            "timestamp": self.timestamp.strftime("%d/%m/%Y %H:%M:%S"),
-            "amount": self.amount
-        }
+        pass
     
+    # MAKE TRANSACTION IMCOMPLETEE
     def add_transaction(self, transaction) -> None:
         from internal.transaction import Transaction
         if not isinstance(transaction, Transaction):

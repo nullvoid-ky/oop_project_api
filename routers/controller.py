@@ -85,7 +85,7 @@ def get_mate_by_condition(body: SearchMateModel):
     print(body.name, body.location, body.gender_list, body.age, body.availability)
     mate_list = controller.search_mate_by_condition(body.name, body.location, body.gender_list, body.age, body.availability)
     if isinstance(mate_list, list):
-        return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_mate_details()} for acc in mate_list])
+        return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in mate_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "mate not found")
 
 @router.post("/add-post", dependencies=[Depends(verify_mate)])
@@ -189,7 +189,7 @@ def get_leaderboard():
     my_list = []
     for mate in mate_list:
         my_list.append(mate)
-    send_data = [{'account_detail' : acc.get_mate_details()} for acc in my_list]
+    send_data = [{'account_detail' : acc.get_account_details()} for acc in my_list]
     for data in send_data:
         data["account_detail"]["rank"] = rank
         rank += 1

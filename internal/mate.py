@@ -96,7 +96,7 @@ class Mate(Account):
     def get_review_amount(self) -> int:
         return int(len(self.__review_list)) 
     
-    def get_mate_details(self) -> dict:
+    def get_account_details(self) -> dict:
         return {
             "id": str(self.id),
             "username": self.username,
@@ -109,12 +109,6 @@ class Mate(Account):
             "gender":self.gender,
             "location": self.location,
             "price": self.price,
+            "amount" : self.amount,
             "timestamp": self.timestamp.strftime("%d/%m/%Y %H:%M:%S")
-        }
-    
-    def get_mate_rent_details(self) -> dict:
-        return {
-            "star": self.get_average_review_star(),
-            "reviewcount":self.get_review_amount(),
-            "rentcount": self.__rented_count
         }
