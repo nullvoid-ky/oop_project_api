@@ -106,6 +106,17 @@ def add_post(body: PostModel):
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in add post")
     return res.success_response_status(status.HTTP_200_OK, "Add Post Success", data=post.get_post_details())
 
+@router.get("/get-post")
+def get_post():
+    from app import controller
+    post_list: list[Post] = controller.get_post()
+    data_list = []
+    for post in post_list:
+        data_list.append(post.get_post_details())
+    if post == None:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in read post")
+    return res.success_response_status(status.HTTP_200_OK, "Get Post Success", data = data_list)
+
 @router.get("/get-booking", dependencies=[Depends(verify_customer)])
 def get_booking():
     from app import controller
