@@ -199,3 +199,21 @@ def get_leaderboard():
     if len(my_list):
         return res.success_response_status(status.HTTP_200_OK, "Get Leaderboard Success", data=send_data)
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
+
+@router.post("/add-amount", dependencies=[Depends(verify_customer)])
+def add_amount(body: EditMoneyModel):
+    from app import controller
+    account: Account = controller.search_account_by_id(Body.user_id)
+    if account == None:
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
+    account.amount + int(body.amount)
+    return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=account.get_account_details())
+
+@router.post("/del-amount", dependencies=[Depends(verify_mate)])
+def del_amount(body: EditMoneyModel):
+    from app import controller
+    account: Account = controller.search_account_by_id(Body.user_id)
+    if account == None:
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
+    account.amount - int(body.amount)
+    return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=account.get_account_details())

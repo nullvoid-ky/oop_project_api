@@ -69,9 +69,6 @@ class Account(AllAccount):
     @property
     def amount(self) -> int:
         return self._amount
-    @amount.setter
-    def amount(self, amount):
-        self._amount = amount
     @property
     def location(self) -> str:
         return self._location
