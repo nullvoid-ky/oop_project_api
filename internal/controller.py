@@ -490,7 +490,7 @@ class Controller:
         if not isinstance(account, Account) or not isinstance(new_display_name, str):
             self.add_log(False, account, "edit_display_name" , "No Item", account, "Instance Error")
             return None
-        self.add_log(True, account, "edit_display_name" ,new_display_name, None, "Edited name")
+        self.add_log(True, account, "edit_display_name" ,new_display_name, account, "Edited name")
         account.display_name = new_display_name
         return account
     

@@ -23,16 +23,20 @@ def register(username: str, password: str, role: str, gender: str, location : st
             else:
                 new_account.add_pic_url("../img/mate_female.svg")
         else:
+            controller.add_log(False, "?", "register", "No Item", "?", "Role Error")
             return None
         # mate = controller.search_account_by_username("Mate2")
         # booking = controller.add_booking(new_account, mate, Date(year=2024, month=3, day=4))
+        controller.add_log(True, new_account, "register", "Account", new_account, "Register Account Successfully")
         return new_account.get_account_details()
+    controller.add_log(False, account, "register", "No Item", "?", "Existed Account")
     return None
 
 def login(username: str, password: str) -> dict | None:
     from app import controller
     account: Account = controller.search_account_by_username(username)
     if account == None:
+        controller.add_log(False, account, "login", "No Item", account, "Account Not Found")
         return None
     # return account.get_account_details()
     try:
@@ -40,6 +44,8 @@ def login(username: str, password: str) -> dict | None:
         #     ph.verify("admin", password)
         #     return account.get_account_details()
         ph.verify(account.password, password)
+        controller.add_log(True, account, "login", "Login Account", account, "Login Account Successfully")
         return account.get_account_details()
     except:
+        controller.add_log(False, account, "login", "No Item", account, "Login Account Error")
         return None
