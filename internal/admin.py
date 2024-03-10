@@ -1,13 +1,10 @@
-from internal.account import Account
+from internal.account import AllAccount
 
-class Admin(Account):
+class Admin(AllAccount):
     def __init__(self):
-        username :str = "admin"
+        username : str = "admin"
         password : str = "admin"
-        gender : str = "admin"
-        location : str = "admin"
-        super().__init__(username, password, gender, location)
-
+        super().__init__(username, password)
     
     def get_account_details(self) -> dict:
         return {
