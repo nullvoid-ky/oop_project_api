@@ -11,9 +11,6 @@ class Admin(AllAccount):
             "id": str(self.id),
             "username": self.username,
             "displayname":self.display_name,
-            "pic_url": self.pic_url,
             "role": "admin",
-            "gender":self.gender,
-            "location": self.location,
             "timestamp": self.timestamp.strftime("%d/%m/%Y %H:%M:%S")
         }
