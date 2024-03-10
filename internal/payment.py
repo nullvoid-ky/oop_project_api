@@ -5,7 +5,9 @@ class Payment:
         self.__amount = amount
         self.__is_mate_come = is_mate_come
 
-    def pay(self, sender: Account, receiver: Account) -> None:
+    def pay(self, sender: Account, receiver: Account) -> None | bool:
+        if sender.amount < self.__amount:
+            return False
         sender - self.__amount
         receiver + self.__amount
     @property

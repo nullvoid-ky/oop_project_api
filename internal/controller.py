@@ -347,7 +347,8 @@ class Controller:
         if mate == None or customer == None or booking == None:
             return None
         payment: Payment = booking.payment
-        payment.pay(customer, mate)
+        if payment.pay(customer, mate) == False:
+            return None
         if self.add_chat_room(customer, mate) == None:
             return None
         transaction: Transaction = Transaction(customer, mate, payment.amount)
@@ -380,7 +381,8 @@ class Controller:
         if booked_customer == None:
             return None
         pledge_payment: Payment = Payment(mate.price / 2)
-        pledge_payment.pay(customer, mate)
+        if pledge_payment.pay(customer, mate) == False:
+            return None
         pledge_transaction: Transaction = Transaction(customer, mate, pledge_payment.amount)   
         customer.add_transaction(pledge_transaction)
         mate.add_transaction(pledge_transaction)
@@ -398,7 +400,8 @@ class Controller:
     def delete_booking(self, booking: Booking, account: Account) -> Union[Tuple[Booking, Transaction], Booking, None]:
         transaction: Transaction = None
         if isinstance(account, Mate):
-            booking.payment.pay(account, booking.customer)
+            if booking.payment.pay(account, booking.customer) == False:
+                return None
             transaction: Transaction = Transaction(account, booking.customer, booking.payment.amount)
         if isinstance(booking, Booking):
             self.__booking_list.remove(booking)
