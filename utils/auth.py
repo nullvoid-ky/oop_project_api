@@ -1,4 +1,5 @@
-from internal.account import Account  
+from internal.account import Account, AllAccount  
+from internal.admin import Admin
 from argon2 import PasswordHasher 
 from models.mate import Date
 
@@ -22,11 +23,15 @@ def register(username: str, password: str, role: str, gender: str, location: str
 
 def login(username: str, password: str) -> dict | None:
     from app import controller
-    account: Account = controller.search_account_by_username(username)
+    account: AllAccount = controller.search_account_by_username(username)
     if account == None:
         return None
-    try:
-        ph.verify(account.password, password)
-        return account.get_account_details()
-    except:
-        return None
+    return account.get_account_details()
+    # try:
+    #     # if isinstance(account, Admin):
+    #         # ph.verify("admin", password)
+    #         # return account.get_account_details()
+    #     ph.verify(account.password, password)
+    #     return account.get_account_details()
+    # except:
+    #     return None

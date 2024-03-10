@@ -91,4 +91,4 @@ def get_user_profile(user_id: str):
     account: Mate = controller.search_mate_by_id(user_id)
     if account == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
-    return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_mate_details())
+    return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())
