@@ -2,17 +2,12 @@ from typing import Tuple, Union
 import datetime
 
 from internal.account import Account
-from internal.message import Message
 from internal.booking import Booking
 from internal.mate import Mate
 from internal.customer import Customer
 from internal.payment import Payment
 from internal.transaction import Transaction
-from internal.mate import Mate
 from internal.chat_room_manager import ChatRoomManeger
-from internal.post import Post
-from internal.message import Message
-from models.mate import Date
 from utils.auth import register
 from dependencies import create_token
 from internal.post import Post
@@ -32,12 +27,13 @@ class Controller:
         account_2_details = register("ganThepro2", "1234", "mate", "female", "bangkok")
         print("account_2_token :", create_token(str(account_2_details['id']), "mate"))
         account_1 = self.search_account_by_id(account_1_details['id'])
-        account_2 = self.search_account_by_id(account_2_details['id'])
+        account_2: Mate = self.search_account_by_id(account_2_details['id'])
         account_1.amount = 1000
         account_2.price = 1000
         chat_room = self.add_chat_room(account_1, account_2)
         print("chat_room: ", chat_room.get_chat_room_details())
         account_2.add_availability(datetime.date(2024, 3, 4), "I'm available")
+        account_2.add_review_mate(account_1, "good", 4)
 
         account_4_details = register("ganThepro3", "1234", "mate", "female", "bangkok")
         account_5_details = register("ganThepro4", "1234", "mate", "male", "bangkok")
@@ -398,5 +394,7 @@ class Controller:
     
     def get_leaderboard(self):
         mate_list = self.get_mates()
+        for mate in mate_list:
+            print(mate.get_average_review_star(), mate.get_review_amount(), mate.timestamp)
         sorted_mates = sorted(mate_list, key=lambda mate: (mate.get_average_review_star(), mate.get_review_amount(), mate.timestamp), reverse=True)
         return sorted_mates[:10]

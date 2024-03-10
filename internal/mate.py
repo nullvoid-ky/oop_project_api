@@ -3,6 +3,7 @@ import datetime
 from internal.account import Account
 from internal.availability import Availability
 from internal.review import Review
+from internal.customer import Customer
 
 class Mate(Account):
     def __init__(self, username: str, password: str, gender: str, location: str, price: int=0):
@@ -62,7 +63,7 @@ class Mate(Account):
         sum: float = 0
         for review in self.__review_list:
             sum += review.star
-        if len(self.__review_list):
+        if len(self.__review_list) > 0:
             return sum / len(self.__review_list)
         return None
 
@@ -78,8 +79,8 @@ class Mate(Account):
                 return review
         return None
     
-    def add_review_mate(self, customer_id: str, message: str, star: int) -> Review:
-        review: Review = Review(customer_id, message, star)
+    def add_review_mate(self, customer: Customer, message: str, star: int) -> Review:
+        review: Review = Review(message, star, customer)
         self.__review_list.append(review)
         return review
     
@@ -90,22 +91,26 @@ class Mate(Account):
         self.__review_list.remove(review)
         return review
     
-    def get_review_mate(self) -> list:
+    def get_review_amount(self) -> int:
+        return len(self.__review_list)
+    
+    def get_review_mate(self) -> list[Review]:
         return self.__review_list
     
     def get_mate_details(self) -> dict:
         return {
-            "id": str(self.__id),
-            "username": self.__username,
-            "displayname":self.__display_name,
-            "pic_url": self.__pic_url,
+            "id": str(self._id),
+            "username": self._username,
+            "displayname": self._display_name,
+            "pic_url": self._pic_url,
             "star": self.get_average_review_star(),
-            "reviewcount":self.get_review_amount(),
+            "reviewcount": self.get_review_amount(),
+            "price": self.__price,
             "role": "mate",
             "rentcount": self.__rented_count,
-            "gender":self.__gender,
-            "location": self.__location,
-            "timestamp": self.timestamp.strftime("%d/%m/%Y %H:%M:%S")
+            "gender":self._gender,
+            "location": self._location,
+            "timestamp": self._timestamp.strftime("%d/%m/%Y %H:%M:%S")
         }
     
     def get_mate_rent_details(self) -> dict:

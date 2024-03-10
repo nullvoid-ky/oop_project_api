@@ -9,6 +9,7 @@ from internal.transaction import Transaction
 from internal.account import Account
 from internal.post import Post
 from internal.chat_room_manager import ChatRoomManeger
+from internal.mate import Mate
 from models.post import PostModel
 from models.mate import MateModel
 from models.booking import BookingModel
@@ -127,6 +128,8 @@ def get_user_profile(user_id: str):
     account: Account = controller.search_account_by_id(user_id)
     if account == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Account not found")
+    if isinstance(account, Mate):
+        return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_mate_details())
     return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())
 
 @router.delete("/delete-booking/{booking_id}", dependencies=[Depends(verify_customer)])

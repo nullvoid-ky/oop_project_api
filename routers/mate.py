@@ -49,7 +49,12 @@ def get_availability(mate_id: str):
 def add_review(body: ReviewCreation):
     from app import controller
     mate = controller.search_mate_by_id(body.mate_id)
-    review = mate.add_review_mate(body.customer_id, body.message, body.star)
+    if mate == None:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
+    customer = controller.search_customer_by_id(Body.user_id)
+    if customer == None:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Customer not found")
+    review = mate.add_review_mate(customer, body.message, int(body.star))
     if review:
         return res.success_response_status(status.HTTP_200_OK, "Added Review Successfully", data=review.get_review_details())
     return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")
@@ -58,10 +63,12 @@ def add_review(body: ReviewCreation):
 async def get_review(mate_id: str):
     from app import controller
     mate = controller.search_mate_by_id(mate_id)
-    result : dict = mate.get_review_mate()
+    if mate == None:
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
+    result = mate.get_review_mate()
     data_list = []
     for review in result:
-        data_list.append(review.get_review_detail())
+        data_list.append(review.get_review_details())
     if len(data_list):
         return res.success_response_status(status.HTTP_200_OK, "Read Review Successfully", data=data_list)
     return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")
