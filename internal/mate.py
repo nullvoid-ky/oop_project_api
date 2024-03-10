@@ -90,7 +90,10 @@ class Mate(Account):
         self.__review_list.remove(review)
         return review
     
-    def get_review_mate(self) -> list:
+    def get_review_amount(self) -> int:
+        return len(self.__review_list)
+    
+    def get_review_mate(self) -> list[Review]:
         return self.__review_list
     
     def get_review_amount(self) -> int:
@@ -110,5 +113,6 @@ class Mate(Account):
             "location": self.location,
             "price": self.price,
             "amount" : self.amount,
-            "timestamp": self.timestamp.strftime("%d/%m/%Y %H:%M:%S")
+            "timestamp": self._timestamp.strftime("%d/%m/%Y %H:%M:%S"),
+            "age": self._age
         }

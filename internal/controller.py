@@ -1,19 +1,14 @@
 from typing import Tuple, Union
 import datetime
 
-from internal.account import Account, AllAccount
+from internal.account import Account
 from internal.admin import Admin
-from internal.message import Message
 from internal.booking import Booking
 from internal.mate import Mate
 from internal.customer import Customer
 from internal.payment import Payment
 from internal.transaction import Transaction
-from internal.mate import Mate
 from internal.chat_room_manager import ChatRoomManeger
-from internal.post import Post
-from internal.message import Message
-from models.mate import Date
 from utils.auth import register
 from dependencies import create_token
 from internal.post import Post
@@ -27,6 +22,7 @@ class Controller:
         self.__post_list: list = []
         self.__chat_room_list: list[ChatRoomManeger] = []
         self.__admin = None
+        self.__log_list: list = []
 
     def add_instance(self):
         account_1_details = register("ganThepro", "1234", "customer", "male", "bangkok")
@@ -41,6 +37,8 @@ class Controller:
         chat_room = self.add_chat_room(account_1, account_2)
         print("chat_room: ", chat_room.get_chat_room_details())
         account_2.add_availability(datetime.date(2024, 3, 4), "I'm available")
+        account_2.add_review_mate(account_1, "good", 4)
+        self.add_booking(account_1, account_2, Date(year=2024, month=3, day=4))
         print(account_2.id)
 
         account_4_details: Mate = register("ganThepro3", "1234", "mate", "female", "bangkok")
@@ -429,17 +427,24 @@ class Controller:
     
     def get_leaderboard(self) -> list[Mate]:
         mate_list = self.get_mates()
+        for mate in mate_list:
+            print(mate.get_average_review_star(), mate.get_review_amount(), mate.timestamp)
         sorted_mates = sorted(mate_list, key=lambda mate: (mate.get_average_review_star(), mate.get_review_amount(), mate.timestamp), reverse=True)
         return sorted_mates[:10]
     
-    def add_log(self, type, head, des):
-        pass
+    def add_log(self, status: int, message: str, data: dict) -> None:
+        self.__log_list.append({"status": status, "message": message, "data": data})
 
     def create_admin(self) -> Admin | None:
         if isinstance(self.__admin, Admin):
             return None
         self.__admin = Admin()
         return self.__admin
+    
+    def get_log(self) -> list | None:
+        if self.__log_list == []:
+            return None
+        return self.__log_list
     
     def get_admin(self) -> Admin:
         return self.__admin

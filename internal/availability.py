@@ -16,6 +16,6 @@ class Availability:
     
     def get_availability_details(self) -> dict:
         return {
-            "date": self.__date.strftime("%d/%m/%Y"),
+            "date": self.__date.strftime("%d-%m-%Y"),
             "detail": self.__detail
         }

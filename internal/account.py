@@ -28,6 +28,8 @@ class AllAccount(ABC):
     def password(self) -> str:
         return self._password
     @property
+    def age(self) -> str:
+        return self._age
     def timestamp(self) -> datetime:
         return self._timestamp
     @property
@@ -36,7 +38,9 @@ class AllAccount(ABC):
     @pic_url.setter
     def pic_url(self, url):
         self._pic_url = url
-
+    @property
+    def password(self) -> str:
+        return self._password
 
     def validate_account_id(self, id):
         return str(self.id) == id
@@ -54,14 +58,14 @@ class Account(AllAccount):
     def gender(self) -> str:
         return self._gender
     @property
-    def age(self) -> str:
-        return self._age
-    @property
     def display_name(self) -> str:
         return self._display_name
     @display_name.setter
     def display_name(self, name):
         self._display_name = name
+    @property
+    def id(self) -> UUID:
+        return self._id
     @property
     def transaction_list(self) -> list:
         return self._transaction_list
@@ -69,22 +73,32 @@ class Account(AllAccount):
     def amount(self) -> int:
         return self._amount
     @amount.setter
-    def amount(self, new_amount):
-        self._amount = new_amount
-    @property
-    def gender(self) -> str:
-        return self._gender
+    def amount(self, amount):
+        self._amount = amount
     @property
     def location(self) -> str:
         return self._location
     
+    def get_account_details(self) -> dict:
+        from internal.customer import Customer
+        return {
+            "id": str(self._id),
+            "displayname": self._display_name,
+            "username": self._username,
+            "pic_url": self._pic_url,
+            "role": "customer" if isinstance(self, Customer) else "mate", 
+            "gender": self._gender,
+            "location": self._location,
+            "timestamp": self._timestamp.strftime("%d/%m/%Y %H:%M:%S"),
+            "age": self._age,
+        }
     
-    # MAKE TRANSACTION IMCOMPLETEE
     def add_transaction(self, transaction) -> None:
         from internal.transaction import Transaction
         if not isinstance(transaction, Transaction):
             raise TypeError(f"Expected transaction, but got {type(transaction)} instead.")
         self._transaction_list.append(transaction)
+        return transaction
     
     def __add__(self, amount: int) -> int:
         self._amount += amount
