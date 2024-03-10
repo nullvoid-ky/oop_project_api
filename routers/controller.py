@@ -29,14 +29,18 @@ def add_booking(body: MateModel):
     from app import controller
     customer: UserAccount = controller.search_customer_by_id(Body.user_id)
     if customer == None:
+        controller.add_log(False, "?", "Add Booking", "No Item", "?", "Customer not found")
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Customer not found")
     mate: UserAccount = controller.search_mate_by_id(body.mate_id)  
     if mate == None:
+        controller.add_log(False, customer, "Add Booking", "No Item", "?", "Mate not found")
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
     try:
         booking, transaction = controller.add_booking(customer, mate, body.date)
     except:
+        controller.add_log(False, customer, "Add Booking", "No Item", mate, "Booking Incompleted (Try Deposit Money)")
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")
+    controller.add_log(True, customer, "Add Booking", "Booking", mate, "Booking Completed")
     return res.success_response_status(status.HTTP_200_OK, "Booked Successfully", data={"booking": booking.get_booking_details(), "transaction": transaction.get_transaction_details()})
 
 @router.post("/pay", dependencies=[Depends(verify_customer)])
