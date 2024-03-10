@@ -291,10 +291,11 @@ def edit_location(body: EditLocationModel):
     edited_account: Account = controller.edit_location(account, body.location)
     return res.success_response_status(status.HTTP_200_OK, "Edit Location Success",  data=edited_account.get_account_details()) 
 
-@router.get("/logs")
+@router.get("/get-logs")
 def get_log():
     from app import controller
     log_list = controller.log_list
+    print(log_list)
     if len(log_list) == 0:
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Get Log Error")
     return res.success_response_status(status.HTTP_200_OK, "Get Log Success", data=[log.get_log_details() for log in log_list])
