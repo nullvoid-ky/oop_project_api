@@ -448,6 +448,18 @@ class Controller:
                 return booking, transaction
             return booking
         return None
+    
+    def get_all_transaction(self):
+        transaction = []
+        for account in self.account_list:
+            transaction = transaction + account.transaction_list
+        return transaction
+    
+    def get_all_booking(self):
+        booking_list = []
+        for booking in self.__booking_list:
+            booking_list.append(booking)
+        return booking_list
 
     def add_post(self, writer: Mate, description: str, picture: str) -> Post | None:
         if not isinstance(description, str) or not isinstance(picture, str) or not isinstance(writer, Mate):

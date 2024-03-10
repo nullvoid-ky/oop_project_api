@@ -16,7 +16,7 @@ from models.booking import BookingModel
 from models.chat_room import AddChatRoomModel
 from models.availability import AvailabilityModel
 import utils.response as res
-from dependencies import verify_token, verify_customer, verify_mate
+from dependencies import verify_token, verify_customer, verify_mate, verify_admin
 from datetime import datetime, date
 router = APIRouter(
     prefix="/controller",
@@ -117,6 +117,14 @@ def get_post():
     if post == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in read post")
     return res.success_response_status(status.HTTP_200_OK, "Get Post Success", data = data_list)
+
+@router.get("/get-booking-by-admin", dependencies=[Depends(verify_admin)])
+def get_booking():
+    from app import controller
+    booking_list: list = controller.get_all_booking()
+    if isinstance(booking_list, list):
+        return res.success_response_status(status.HTTP_200_OK, "Get Booking Success", data=[booking.get_booking_details() for booking in booking_list])
+    return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in get booking")
 
 @router.get("/get-booking", dependencies=[Depends(verify_customer)])
 def get_booking():
@@ -253,6 +261,14 @@ def get_transaction():
     from app import controller
     account: Account = controller.search_account_by_id(Body.user_id)
     transaction_list = account.transaction_list
+    if isinstance(transaction_list, list):
+        return res.success_response_status(status.HTTP_200_OK, "Get Transaction Success", data=[transaction.get_transaction_details() for transaction in transaction_list])
+    return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in get transaction")
+
+@router.get("/get-transaction-by-admin", dependencies=[Depends(verify_admin)])
+def get_transaction_by_admin():
+    from app import controller
+    transaction_list = controller.get_all_transaction()
     if isinstance(transaction_list, list):
         return res.success_response_status(status.HTTP_200_OK, "Get Transaction Success", data=[transaction.get_transaction_details() for transaction in transaction_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in get transaction")
