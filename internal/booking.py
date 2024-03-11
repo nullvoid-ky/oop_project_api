@@ -6,7 +6,7 @@ from internal.mate import Mate
 from internal.payment import Payment
 
 class Booking:
-    def __init__(self, customer: Customer, mate: Mate, book_date: datetime, payment: Payment = Payment(0, False)) -> None:
+    def __init__(self, customer: Customer, mate: Mate, book_date: datetime, payment: Payment = Payment(0)) -> None:
         self.__id = uuid4()
         self.__customer = customer
         self.__mate = mate

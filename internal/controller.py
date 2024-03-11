@@ -397,7 +397,6 @@ class Controller:
         payment: Payment = booking.payment
         if payment.pay(customer, mate) == False:
             self.add_log(False, customer, "Pay", "No Item", mate, "Paid Failed")
-            self.add_log(False, customer, "Paid Booking", "No Item", customer, "Pay Booking Failed ")
             return None
         self.add_log(True, customer, "Pay", "Money", mate, "Paid Succesfully")
         if self.add_chat_room(customer, mate) == None:
