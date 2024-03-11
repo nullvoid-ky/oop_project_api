@@ -18,6 +18,9 @@ from models.availability import AvailabilityModel
 import utils.response as res
 from dependencies import verify_token, verify_customer, verify_mate, verify_admin
 from datetime import datetime, date
+from fastapi import Query
+import json
+
 router = APIRouter(
     prefix="/controller",
     tags=["controller"],
@@ -93,8 +96,6 @@ def get_mate_by_avalibility():
         return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in mate_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "mate not found")
 
-from fastapi import Query
-import json
 @router.get("/search-mate-by-condition")
 def get_mate_by_condition(
     name: str = Query(...),
