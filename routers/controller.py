@@ -159,7 +159,7 @@ def get_booking_by_id(booking_id: str):
         return res.success_response_status(status.HTTP_200_OK, "Booking found", data=result.get_booking_details())
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Booking not found")
 
-@router.get("/get-self-profile")
+@router.get("/get-self-profile", dependencies=[Depends(verify_token)])
 def get_self_profile():
     from app import controller
     account: UserAccount = controller.search_account_by_id(Body.user_id)
