@@ -65,12 +65,12 @@ class Controller:
         account_2.pic_url = "https://i1.sndcdn.com/artworks-ubBjVp0Z50ZykDdG-lU7NWg-t500x500.jpg"
         account_1.amount = 0    
         account_2.price = 1000
-        chat_room = self.add_chat_room(account_1, account_2)
-        print("chat_room: ", chat_room.get_chat_room_details())
+        # chat_room = self.add_chat_room(account_1, account_2)
+        # print("chat_room: ", chat_room.get_chat_room_details())
         account_2.add_availability(datetime.date(2024, 3, 4), "I'm available")
         # print(account_2.availability_list)
         account_2.add_review_mate(account_1, "good", 4)
-        self.add_booking(account_1, account_2, Date(year=2024, month=3, day=4))
+        # self.add_booking(account_1, account_2, Date(year=2024, month=3, day=4))
         # booking, transaction = self.add_booking(account_1, account_2, Date(year=2024, month=3, day=4))
         # print("booking: ", booking.id)    
         # self.pay(str(booking.id))
@@ -386,20 +386,22 @@ class Controller:
     def pay(self, booking_id: str) -> Transaction:
         booking: Booking = self.search_booking_by_id(booking_id)
         customer: Customer = self.search_customer_by_id(str(booking.customer.id))
-        if customer == None:
-            return None
         mate: Mate = self.search_mate_by_id(str(booking.mate.id))
         if mate == None or customer == None or booking == None:
+            print("mate or customer not found")
             return None
         payment: Payment = booking.payment
         if payment.pay(customer, mate) == False:
+            print("payment failed")
             return None
         if self.add_chat_room(customer, mate) == None:
+            print("chat room failed")
             return None
         transaction: Transaction = Transaction(customer, mate, payment.amount)
         customer.add_transaction(transaction)
         mate.add_transaction(transaction)
         booking.status = "Success"
+        print("booking: ", booking)
         return transaction
     
     def get_account_by_name(self, name: str) -> UserAccount | None:

@@ -175,7 +175,7 @@ def get_user_profile(user_id: str):
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "UserAccount not found")
     return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())
 
-@router.delete("/delete-booking/{booking_id}", dependencies=[Depends(verify_customer), Depends(verify_token)])
+@router.delete("/delete-booking/{booking_id}", dependencies=[Depends(verify_token)])
 def delete_booking(booking_id: str):
     from app import controller
     booking: Booking = controller.search_booking_by_id(booking_id)
