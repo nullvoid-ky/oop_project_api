@@ -436,12 +436,12 @@ class Controller:
         self.__booking_list.append(booking)
         return booking, pledge_transaction
     
-    def get_booking(self, customer: Customer) -> list[Booking]:
-        if not isinstance(customer, Customer):
+    def get_booking(self, account: Account) -> list[Booking]:
+        if not isinstance(account, Account):
             return []
         booking_list = []
         for booking in self.__booking_list:
-            if booking.customer == customer:
+            if booking.customer == account or booking.mate == account:
                 booking_list.append(booking)
         return booking_list
 

@@ -145,8 +145,8 @@ def get_booking():
 @router.get("/get-booking", dependencies=[Depends(verify_token)])
 def get_booking():
     from app import controller
-    customer: UserAccount = controller.search_customer_by_id(Body.user_id)
-    booking_list: list = controller.get_booking(customer)
+    account: Account = controller.search_account_by_id(Body.user_id)
+    booking_list: list = controller.get_booking(account)
     if isinstance(booking_list, list):
         return res.success_response_status(status.HTTP_200_OK, "Get Booking Success", data=[booking.get_booking_details() for booking in booking_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in get booking")
