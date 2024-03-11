@@ -223,14 +223,6 @@ def edit_pic_url(body: EditPicUrlModel):
     edited_account: UserAccount = controller.edit_pic_url(account, body.url)
     return res.success_response_status(status.HTTP_200_OK, "Edit pic url Success",  data=edited_account.get_account_details())
     
-@router.put("/edit-money", dependencies=[Depends(verify_token)])
-def edit_money(body: EditMoneyModel):
-    from app import controller
-    account: UserAccount = controller.search_account_by_id(Body.user_id)
-    if account == None:
-        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
-    edited_account: UserAccount = controller.edit_money(account, body.amount)
-    return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=edited_account.get_account_details())
 
 @router.put("/edit-price", dependencies=[Depends(verify_token), Depends(verify_mate)])
 def edit_price(body: EditPriceModel):

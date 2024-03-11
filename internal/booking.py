@@ -31,9 +31,6 @@ class Booking:
     def book_date(self) -> datetime:
         return self.__book_date
     @property
-    def is_success(self) -> bool:
-        return self.__is_success
-    @property
     def status(self) -> str:
         return self.__status
     @status.setter

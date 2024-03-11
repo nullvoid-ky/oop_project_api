@@ -52,12 +52,6 @@ class ChatRoomManeger:
         if self.__account_2_connection:
             await self.__account_2_connection.send_text(message)
 
-    def search_message_by_id(self, message_id: str) -> Message | None:
-        for message in self.__message_list:
-            if message.id == message_id:
-                return message
-        return None
-
     def get_chat_room_details(self) -> dict:
         return {
             "id": str(self.__id),

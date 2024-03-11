@@ -36,16 +36,4 @@ class Message:
             "text": self.__text,
             "timestamp": self.__timestamp.strftime("%d/%m/%Y %H:%M")
         }
-
-    # def get_sender_name(self) -> str:
-    #     return self.__sender.username
-    
-    # def get_sender_account(self) -> UserAccount:
-    #     return self.__sender
-    
-    # def get_text(self) -> str:
-    #     return self.__text
-    
-    # def get_timestamp(self) -> str:
-    #     return self.__timestamp.strftime("%d/%m/%Y %H:%M:%S")
     

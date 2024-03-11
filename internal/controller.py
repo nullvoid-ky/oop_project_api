@@ -166,35 +166,6 @@ class Controller:
             if(self.__admin.validate_account_id(str(id))):
                 return self.__admin
         return None
-    
-    def delete_message(self, sender_id: str, receiver_id: str, message_id: str):
-        sender = self.search_account_by_id(sender_id)
-        receiver = self.search_account_by_id(receiver_id)
-        chat = self.get_chat_by_owner_pair(sender, receiver)
-        if(chat != None):
-            msg_list = chat.delete_message(message_id)
-            return msg_list
-        return None
-
-    def retrieve_chat_log(self, sender_id, receiver_id):
-        sender_acc = self.search_account_by_id(sender_id)
-        receiver_acc = self.search_account_by_id(receiver_id)
-        if not (isinstance(sender_acc, UserAccount) and isinstance(receiver_acc, UserAccount)):
-            raise "No Acc found"
-        chat = self.get_chat_by_owner_pair(sender_acc, receiver_acc)
-        message_list = chat.get_message_list()
-        all_chat_data = []
-        for msg in message_list:
-            sender_name = msg.get_sender_name()
-            chat_data = {
-                "sender_username" : sender_name,
-                "message_id" : msg.id,
-                "text" : msg.get_text(),
-                "timestamp" : msg.get_timestamp(),
-                "is_edit": msg.is_edit
-            }
-            all_chat_data.append(chat_data)
-        return all_chat_data   
 
     def get_receiver_chat_room_detail(self, sender_acc: UserAccount) -> list:
         detail = []
@@ -228,18 +199,6 @@ class Controller:
             raise TypeError("No Acc found")
         detail = self.get_receiver_chat_room_detail(sender_acc)
         return detail
-    
-    def delete_chat_room(self, sender_id, receiver_id) -> list | None:
-        sender_acc = self.search_account_by_id(sender_id)
-        receiver_acc = self.search_account_by_id(receiver_id)
-        if not (isinstance(sender_acc, UserAccount) and isinstance(receiver_acc, UserAccount)):
-            raise "No Acc found"
-        chat = self.get_chat_by_owner_pair(sender_acc, receiver_acc)
-        if chat:
-            self.__chat_room_list = [c for c in self.__chat_room_list if c != chat]
-            return self.get_receiver_chat_room_detail(sender_acc)
-        else:
-            return None
 
     @property
     def account_list(self) -> list:
@@ -520,14 +479,6 @@ class Controller:
         self.add_log(True, account, "edit_pic_url" ,new_pic_url, account, "Edited Pic")
         account.pic_url = new_pic_url
         return account
-
-    def edit_money(self, account: UserAccount, new_money: str) -> UserAccount:
-        if not isinstance(account, Account) or not isinstance(new_money, str):
-            self.add_log(False, account, "edit_money" ,"No Item", account, "instanec Error")
-            return None
-        self.add_log(True, account, "edit_money" ,new_money, account, "Adjusted Money")
-        account.amount = new_money
-        return account
     
     def edit_price(self, account: UserAccount, new_price: int) -> UserAccount:
         if not isinstance(account, Account) or not isinstance(new_price, int):
@@ -550,14 +501,6 @@ class Controller:
         account.location = new_location
         self.add_log(True, account, "edit_location" ,new_location, account, "Edited Location")
         return account
-    
-    # def edit_gender(self, account: UserAccount, new_money: str) -> UserAccount:
-    #     if not isinstance(account, Account) or not isinstance(new_money, str):
-    #         self.add_log(False, account, "edit_money" ,"", None)
-    #         return None
-    #     self.add_log(True, account, "edit_money" ,new_money, None)
-    #     account.amount = new_money
-    #     return account
     
     def get_leaderboard(self) -> list[Mate]:
         mate_list = self.get_mates()
