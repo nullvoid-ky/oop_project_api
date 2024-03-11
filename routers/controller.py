@@ -3,7 +3,7 @@ from typing import Union, Tuple
 
 from models.post import PostModel
 from models.profile import EditDisplayNameModel, EditPicUrlModel, EditMoneyModel, EditAgeModel, EditLocationModel, EditPriceModel
-from models.mate import MateModel, SearchMateModel
+from models.mate import MateModel
 from internal.booking import Booking
 from internal.transaction import Transaction
 from internal.account import UserAccount, Account
@@ -14,17 +14,14 @@ from models.post import PostModel
 from models.mate import MateModel
 from models.booking import BookingModel
 from models.chat_room import AddChatRoomModel
-from models.availability import AvailabilityModel
 import utils.response as res
 from dependencies import verify_token, verify_customer, verify_mate, verify_admin
-from datetime import datetime, date
 from fastapi import Query
 import json
 
 router = APIRouter(
     prefix="/controller",
     tags=["controller"],
-    # dependencies=[Depends(verify_token)]
 )
 
 @router.post("/add-booking", dependencies=[Depends(verify_customer), Depends(verify_token)])
@@ -105,10 +102,7 @@ def get_mate_by_condition(
     availability: bool = Query(...)
 ):
     from app import controller
-    print(gender_list)
-    print(type(gender_list))
     gender_list = json.loads(gender_list[0])
-    print(name, location, gender_list, age, availability)
     mate_list = controller.search_mate_by_condition(name, location, gender_list, age, availability)
     if isinstance(mate_list, list):
         return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in mate_list])
@@ -118,6 +112,8 @@ def get_mate_by_condition(
 def add_post(body: PostModel):
     from app import controller
     mate: Mate = controller.search_mate_by_id(Body.user_id)
+    if mate == None:   
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
     post: Post = controller.add_post(mate, body.description, body.picture)
     if post == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in add post")
@@ -290,7 +286,7 @@ def get_log():
     from app import controller
     log_list = controller.get_log()
     if isinstance(log_list, list):
-        return res.success_response_status(status.HTTP_200_OK, "Get Log Success", data=controller.get_log())
+        return res.success_response_status(status.HTTP_200_OK, "Get Log Success", data=log_list)
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in get log")
 
 @router.get("/get-transaction", dependencies=[Depends(verify_token)])
@@ -327,12 +323,3 @@ def edit_location(body: EditLocationModel):
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit Location Error")
     edited_account: Account = controller.edit_location(account, body.location)
     return res.success_response_status(status.HTTP_200_OK, "Edit Location Success",  data=edited_account.get_account_details()) 
-
-@router.get("/get-logs")
-def get_log():
-    from app import controller
-    log_list = controller.log_list
-    print(log_list)
-    if len(log_list) == 0:
-        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Get Log Error")
-    return res.success_response_status(status.HTTP_200_OK, "Get Log Success", data=[log.get_log_details() for log in log_list])

@@ -1,11 +1,8 @@
-from typing import Annotated
-
-from fastapi import APIRouter, WebSocket, Depends, WebSocketDisconnect
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from dependencies import verify_token_websocket
 from internal.chat_room_manager import ChatRoomManeger
 from internal.account import UserAccount
-import utils.response as res
 
 router = APIRouter(
     prefix="/chat-room",
@@ -13,7 +10,6 @@ router = APIRouter(
 )
 
 @router.websocket("/{chat_room_id}/{token}")
-# async def websocket_endpoint(websocket: WebSocket, chat_room_id: str, user_id: Annotated[str, Depends(verify_token_websocket)]):
 async def websocket_endpoint(websocket: WebSocket, chat_room_id: str, token: str):
     from app import controller
     from internal.message import Message
