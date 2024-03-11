@@ -150,6 +150,10 @@ class Controller:
         if not (isinstance(account_1, UserAccount) and isinstance(account_2, UserAccount)):
             return None
         chat_room: ChatRoomManeger = ChatRoomManeger(account_1, account_2)
+        for chat in self.__chat_room_list:
+            if str(chat.account_1.id) == str(chat_room.account_1.id) and str(chat.account_2.id) == str(chat_room.account_2.id):
+                print("add chat: " ,chat.get_chat_room_details(), chat_room.get_chat_room_details())
+                return None
         self.__chat_room_list.append(chat_room)
         return chat_room
 

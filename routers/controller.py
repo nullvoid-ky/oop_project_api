@@ -142,7 +142,7 @@ def get_booking():
         return res.success_response_status(status.HTTP_200_OK, "Get Booking Success", data=[booking.get_booking_details() for booking in booking_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in get booking")
 
-@router.get("/get-booking", dependencies=[Depends(verify_customer), Depends(verify_token)])
+@router.get("/get-booking", dependencies=[Depends(verify_token)])
 def get_booking():
     from app import controller
     customer: UserAccount = controller.search_customer_by_id(Body.user_id)
@@ -195,9 +195,6 @@ def add_chat_room(body: AddChatRoomModel):
     account_1: UserAccount = controller.search_account_by_id(Body.user_id)
     account_2: UserAccount = controller.search_account_by_id(body.receiver_id)
     chat_room: ChatRoomManeger = controller.add_chat_room(account_1, account_2)
-    for chat in controller.get_chat_list(account_1):
-        if chat.get_chat_room_details() == chat_room.get_chat_room_details():
-            return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Chat Room already exist")
     if chat_room == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "UserAccount not found")
     return res.success_response_status(status.HTTP_200_OK, "Add Chat Room Success", data=chat_room.get_chat_room_details())
