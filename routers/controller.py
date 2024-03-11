@@ -93,14 +93,26 @@ def get_mate_by_avalibility():
         return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in mate_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "mate not found")
 
-@router.post("/search-mate-by-condition")
-def get_mate_by_condition(body: SearchMateModel):
+from fastapi import Query
+import json
+@router.get("/search-mate-by-condition")
+def get_mate_by_condition(
+    name: str = Query(...),
+    location: str = Query(...),
+    gender_list: list[str] = Query(...),
+    age: int = Query(...),
+    availability: bool = Query(...)
+):
     from app import controller
-    print(body.name, body.location, body.gender_list, body.age, body.availability)
-    mate_list = controller.search_mate_by_condition(body.name, body.location, body.gender_list, body.age, body.availability)
+    print(gender_list)
+    print(type(gender_list))
+    gender_list = json.loads(gender_list[0])
+    print(name, location, gender_list, age, availability)
+    mate_list = controller.search_mate_by_condition(name, location, gender_list, age, availability)
     if isinstance(mate_list, list):
         return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in mate_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "mate not found")
+
 
 @router.post("/add-post", dependencies=[Depends(verify_mate)])
 def add_post(body: PostModel):
