@@ -20,8 +20,8 @@ def add_post(body: PostModel):
     mate = controller.search_mate_by_id(Body.user_id)
     if mate == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
-    mate.add_post(body.description, body.picture, body.timestamp)
-    return res.success_response_status(status.HTTP_201_CREATED, "Post created")
+    data = mate.add_post(body.description, body.picture, body.timestamp)
+    return res.success_response_status(status.HTTP_201_CREATED, "Post created", data.get_post_details())
 
 @router.post("/add-availability", dependencies=[Depends(verify_mate)])
 def add_availability(body: AvailabilityModel):
@@ -30,9 +30,11 @@ def add_availability(body: AvailabilityModel):
     if mate == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
     if mate.search_availability(body.date.year, body.date.month, body.date.day):
+        controller.add_log(False, mate, "add_availability", "No Item", mate, "Already Existed Availability")
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Availability already exists")
-    mate.add_availability(datetime.date(body.date.year, body.date.month, body.date.day), body.detail)
-    return res.success_response_status(status.HTTP_201_CREATED, "Availability added")
+    data = mate.add_availability(datetime.date(body.date.year, body.date.month, body.date.day), body.detail)
+    controller.add_log(True, mate, "add_availability", data, mate, "Added Availability")
+    return res.success_response_status(status.HTTP_201_CREATED, "Availability added", data.get_availability_details())
 
 @router.get("/get-availability/{mate_id}")
 def get_availability(mate_id: str):
@@ -51,12 +53,15 @@ def add_review(body: ReviewCreation):
     from app import controller
     mate = controller.search_mate_by_id(body.mate_id)
     if mate == None:
+        controller.add_log(False, "?", "add_review", "No Item", "?", "Mate not found")
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
-    customer = controller.search_customer_by_id(Body.user_id)
+    customer = controller.search_customer_by_id(body.user_id)
     if customer == None:
+        controller.add_log(False, "?", "add_review", "No Item", mate, "Custoemr not found")
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Customer not found")
     review = mate.add_review_mate(customer, body.message, int(body.star))
     if review:
+        controller.add_log(True, customer, "add_review", review, mate, "Added review")
         return res.success_response_status(status.HTTP_200_OK, "Added Review Successfully", data=review.get_review_details())
     return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")
 

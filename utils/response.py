@@ -6,8 +6,6 @@ def success_response_status(status: status, message: str, data=None):
         status_code=status,
         content={"message": message, "data": data},
     ) 
-    from app import controller
-    controller.add_log(status, message, data)
     return res
 
 def error_response_status(status: status, message: str):

@@ -1,5 +1,4 @@
 import datetime
-
 from internal.account import UserAccount
 from internal.availability import Availability
 from internal.review import Review

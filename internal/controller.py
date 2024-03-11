@@ -3,6 +3,7 @@ import datetime
 
 from internal.account import UserAccount, Account
 from internal.admin import Admin
+from internal.log import Log
 from internal.booking import Booking
 from internal.mate import Mate
 from internal.customer import Customer
@@ -69,6 +70,7 @@ class Controller:
         account_2.add_availability(datetime.date(2024, 3, 4), "I'm available")
         # print(account_2.availability_list)
         account_2.add_review_mate(account_1, "good", 4)
+        self.add_booking(account_1, account_2, Date(year=2024, month=3, day=4))
         # booking, transaction = self.add_booking(account_1, account_2, Date(year=2024, month=3, day=4))
         # print("booking: ", booking.id)    
         # self.pay(str(booking.id))
@@ -99,6 +101,8 @@ class Controller:
         print(f'Admin ID : {self.__admin.id}')
         print(f'Admin username : {self.__admin._username}')
         print(f'Admin password : {self.__admin._password}')
+        self.edit_display_name(tmp6, "Narak")
+        print(self.__log_list)
         # self.add_customer("test1", "test1")
         # self.add_mate("test2", "test2")
         # self.add_customer("test3", "test3")
@@ -429,6 +433,8 @@ class Controller:
         return booking, pledge_transaction
     
     def get_booking(self, customer: Customer) -> list[Booking]:
+        if not isinstance(customer, Customer):
+            return []
         booking_list = []
         for booking in self.__booking_list:
             if booking.customer == customer:
@@ -437,6 +443,11 @@ class Controller:
 
     def delete_booking(self, booking: Booking, account: UserAccount) -> Union[Tuple[Booking, Transaction], Booking, None]:
         transaction: Transaction = None
+        if not isinstance(booking, Booking):
+            return None
+        if not isinstance(account, Account):
+            return None
+
         if isinstance(account, Mate):
             if booking.payment.pay(account, booking.customer) == False:
                 return None
@@ -449,12 +460,26 @@ class Controller:
                 return booking, transaction
             return booking
         return None
+    
+    def get_all_transaction(self):
+        transaction = []
+        for account in self.account_list:
+            transaction = transaction + account.transaction_list
+        return transaction
+    
+    def get_all_booking(self):
+        booking_list = []
+        for booking in self.__booking_list:
+            booking_list.append(booking)
+        return booking_list
 
     def add_post(self, writer: Mate, description: str, picture: str) -> Post | None:
         if not isinstance(description, str) or not isinstance(picture, str) or not isinstance(writer, Mate):
+            self.add_log(False, writer, "add_post" ,"No Item", writer, "Instance Error")
             return None
         post = Post(writer, description, picture)
         self.__post_list.append(post)
+        self.add_log(True, writer, "add_post" ,post, writer, "Added Post")
         return post
     
     def get_post(self):
@@ -463,16 +488,50 @@ class Controller:
         return self.__post_list
 
     def edit_display_name(self, account: Account, new_display_name: str) -> Account:
+        if not isinstance(account, Account) or not isinstance(new_display_name, str):
+            self.add_log(False, account, "edit_display_name" , "No Item", account, "Instance Error")
+            return None
+        self.add_log(True, account, "edit_display_name" ,new_display_name, account, "Edited name")
         account.display_name = new_display_name
         return account
     
     def edit_pic_url(self, account: UserAccount, new_pic_url: str) -> UserAccount:
+        if not isinstance(account, Account) or not isinstance(new_pic_url, str):
+            self.add_log(False, account, "edit_pic_url" ,"No Item", account, "Instance Error")
+            return None
+        self.add_log(True, account, "edit_pic_url" ,new_pic_url, account, "Edited Pic")
         account.pic_url = new_pic_url
         return account
 
     def edit_money(self, account: UserAccount, new_money: str) -> UserAccount:
+        if not isinstance(account, Account) or not isinstance(new_money, str):
+            self.add_log(False, account, "edit_money" ,"No Item", account, "instanec Error")
+            return None
+        self.add_log(True, account, "edit_money" ,new_money, account, "Adjusted Money")
         account.amount = new_money
         return account
+    
+    def edit_age(self, account: Account, new_age: int) -> Account:
+        if not isinstance(account, Account) or not(isinstance(new_age,int)):
+            self.add_log(False, account, "edit_age" ,"No Item", account, "Instance Error")
+        account.age = new_age
+        self.add_log(True, account, "edit_age" ,new_age, account, "Edited Age")
+        return account
+
+    def edit_location(self, account: Account, new_location: str) -> Account:
+        if not isinstance(account, Account) or not(isinstance(new_location,str)):
+            self.add_log(False, account, "edit_location" ,"No Item", account, "Instance Error")
+        account.location = new_location
+        self.add_log(True, account, "edit_location" ,new_location, account, "Edited Location")
+        return account
+    
+    # def edit_gender(self, account: UserAccount, new_money: str) -> UserAccount:
+    #     if not isinstance(account, Account) or not isinstance(new_money, str):
+    #         self.add_log(False, account, "edit_money" ,"", None)
+    #         return None
+    #     self.add_log(True, account, "edit_money" ,new_money, None)
+    #     account.amount = new_money
+    #     return account
     
     def get_leaderboard(self) -> list[Mate]:
         mate_list = self.get_mates()
@@ -481,8 +540,8 @@ class Controller:
         sorted_mates = sorted(mate_list, key=lambda mate: (mate.get_average_review_star(), mate.get_review_amount(), mate.timestamp), reverse=True)
         return sorted_mates[:10]
     
-    def add_log(self, status: int, message: str, data: dict) -> None:
-        self.__log_list.append({"status": status, "message": message, "data": data})
+    def add_log(self, success, actor, action, item, target, msg) -> None:
+        self.__log_list.append(Log(success, actor, action, item, target, msg))
 
     def create_admin(self) -> Admin | None:
         if isinstance(self.__admin, Admin):
@@ -498,10 +557,6 @@ class Controller:
     def get_admin(self) -> Admin:
         return self.__admin
     
-    def edit_age(self, account: Account, new_age: int) -> Account:
-        account.age = new_age
-        return account
-
-    def edit_location(self, account: Account, new_location: str) -> Account:
-        account.location = new_location
-        return account
+    @property
+    def log_list(self):
+        return self.__log_list
