@@ -414,6 +414,7 @@ class Controller:
         self.add_log(True, mate, "Create Transaction", f"Transaction {payment.amount}", customer, "Create Transaction Succesfully")
         booking.status = "Success"
         self.add_log(True, customer, "Paid Booking", "Booking", customer, "Paid Booking -> Booking status 'Success' ")
+        mate.add_rent_count()
         return transaction
     
     def get_account_by_name(self, name: str) -> UserAccount | None:

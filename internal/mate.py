@@ -77,7 +77,8 @@ class Mate(UserAccount):
             return None
         self.__review_list.remove(review)
         return review
-    
+    def add_rent_count(self):
+        self.__rented_count =+ 1
     def get_review_amount(self) -> int:
         return len(self.__review_list)
     
