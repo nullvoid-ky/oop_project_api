@@ -83,6 +83,7 @@ class Controller:
         account_4: Mate = self.search_account_by_id(account_4_details['id'])
         account_5: Mate = self.search_account_by_id(account_5_details['id'])
         account_6: Mate = self.search_account_by_id(account_6_details['id'])
+        account_6.price = 1000
 
         account_2.add_review_mate(account_1, "So Good", 5)
         account_2.add_review_mate(account_1, "So Good", 4)
