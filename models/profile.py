@@ -14,3 +14,6 @@ class EditAgeModel(BaseModel):
 
 class EditLocationModel(BaseModel):
     location: str
+
+class EditPriceModel(BaseModel):
+    price: int

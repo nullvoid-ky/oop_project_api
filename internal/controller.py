@@ -518,6 +518,14 @@ class Controller:
         account.amount = new_money
         return account
     
+    def edit_price(self, account: UserAccount, new_price: int) -> UserAccount:
+        if not isinstance(account, Account) or not isinstance(new_price, int):
+            self.add_log(False, account, "edit_price" ,"No Item", account, "instance Error")
+            return None
+        self.add_log(True, account, "edit_price" ,new_price, account, "Adjusted price")
+        account.price = new_price
+        return account
+    
     def edit_age(self, account: Account, new_age: int) -> Account:
         if not isinstance(account, Account) or not(isinstance(new_age,int)):
             self.add_log(False, account, "edit_age" ,"No Item", account, "Instance Error")

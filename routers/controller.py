@@ -2,7 +2,7 @@ from fastapi import APIRouter, status, Depends, Body
 from typing import Union, Tuple
 
 from models.post import PostModel
-from models.profile import EditDisplayNameModel, EditPicUrlModel, EditMoneyModel, EditAgeModel, EditLocationModel
+from models.profile import EditDisplayNameModel, EditPicUrlModel, EditMoneyModel, EditAgeModel, EditLocationModel, EditPriceModel
 from models.mate import MateModel, SearchMateModel
 from internal.booking import Booking
 from internal.transaction import Transaction
@@ -226,6 +226,15 @@ def edit_money(body: EditMoneyModel):
     edited_account: UserAccount = controller.edit_money(account, body.amount)
     return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=edited_account.get_account_details())
 
+@router.put("/edit-price", dependencies=[Depends(verify_token), Depends(verify_mate)])
+def edit_price(body: EditPriceModel):
+    from app import controller
+    account: UserAccount = controller.search_account_by_id(Body.user_id)
+    if account == None:
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit displayname Error")
+    edited_account: UserAccount = controller.edit_price(account, body.price)
+    return res.success_response_status(status.HTTP_200_OK, "Edit Price Success",  data=edited_account.get_account_details())
+    
 @router.get("/get-leaderboard")
 def get_leaderboard():
     rank = 1
