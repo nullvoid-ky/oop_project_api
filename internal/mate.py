@@ -3,6 +3,7 @@ from internal.account import UserAccount
 from internal.availability import Availability
 from internal.review import Review
 from internal.customer import Customer
+
 class Mate(UserAccount):
     def __init__(self, username: str, password: str, gender: str, location: str, price: int=0):
         super().__init__(username, password, gender, location)
@@ -47,19 +48,6 @@ class Mate(UserAccount):
                 self.__availability_list.remove(availability)
                 return availability
         return None
-
-    def confirm_booking(self):
-        pass
-    
-    def update_availability(self):
-        pass
-    
- 
-    def withdraw(self):
-        pass
-    
-    def set_availability(self):
-        pass
 
     def is_availability_slot_valid(self):
         return len(self.__availability_list) < self.__max_availability

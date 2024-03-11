@@ -18,13 +18,16 @@ from models.availability import AvailabilityModel
 import utils.response as res
 from dependencies import verify_token, verify_customer, verify_mate, verify_admin
 from datetime import datetime, date
+from fastapi import Query
+import json
+
 router = APIRouter(
     prefix="/controller",
     tags=["controller"],
-    dependencies=[Depends(verify_token)]
+    # dependencies=[Depends(verify_token)]
 )
 
-@router.post("/add-booking", dependencies=[Depends(verify_customer)])
+@router.post("/add-booking", dependencies=[Depends(verify_customer), Depends(verify_token)])
 def add_booking(body: MateModel):
     from app import controller
     customer: UserAccount = controller.search_customer_by_id(Body.user_id)
@@ -43,7 +46,7 @@ def add_booking(body: MateModel):
     controller.add_log(True, customer, "Add Booking", "Booking", mate, "Booking Completed")
     return res.success_response_status(status.HTTP_200_OK, "Booked Successfully", data={"booking": booking.get_booking_details(), "transaction": transaction.get_transaction_details()})
 
-@router.post("/pay", dependencies=[Depends(verify_customer)])
+@router.post("/pay", dependencies=[Depends(verify_customer), Depends(verify_token)])
 def pay(body: BookingModel):
     from app import controller
     transaction: Transaction = controller.pay(body.booking_id)
@@ -59,7 +62,7 @@ def get_mates():
         return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in mate_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in add mate")
 
-@router.get("/get-customers")
+@router.get("/get-customers", dependencies=[Depends(verify_token)])
 def get_mates():
     from app import controller
     customer_list = controller.get_customers()
@@ -93,16 +96,25 @@ def get_mate_by_avalibility():
         return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in mate_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "mate not found")
 
-@router.post("/search-mate-by-condition")
-def get_mate_by_condition(body: SearchMateModel):
+@router.get("/search-mate-by-condition")
+def get_mate_by_condition(
+    name: str = Query(...),
+    location: str = Query(...),
+    gender_list: list[str] = Query(...),
+    age: int = Query(...),
+    availability: bool = Query(...)
+):
     from app import controller
-    print(body.name, body.location, body.gender_list, body.age, body.availability)
-    mate_list = controller.search_mate_by_condition(body.name, body.location, body.gender_list, body.age, body.availability)
+    print(gender_list)
+    print(type(gender_list))
+    gender_list = json.loads(gender_list[0])
+    print(name, location, gender_list, age, availability)
+    mate_list = controller.search_mate_by_condition(name, location, gender_list, age, availability)
     if isinstance(mate_list, list):
         return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in mate_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "mate not found")
 
-@router.post("/add-post", dependencies=[Depends(verify_mate)])
+@router.post("/add-post", dependencies=[Depends(verify_mate), Depends(verify_token)])
 def add_post(body: PostModel):
     from app import controller
     mate: Mate = controller.search_mate_by_id(Body.user_id)
@@ -130,7 +142,7 @@ def get_booking():
         return res.success_response_status(status.HTTP_200_OK, "Get Booking Success", data=[booking.get_booking_details() for booking in booking_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in get booking")
 
-@router.get("/get-booking", dependencies=[Depends(verify_customer)])
+@router.get("/get-booking", dependencies=[Depends(verify_customer), Depends(verify_token)])
 def get_booking():
     from app import controller
     customer: UserAccount = controller.search_customer_by_id(Body.user_id)
@@ -139,7 +151,7 @@ def get_booking():
         return res.success_response_status(status.HTTP_200_OK, "Get Booking Success", data=[booking.get_booking_details() for booking in booking_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in get booking")
 
-@router.get("/get-booking-by-id/{booking_id}")
+@router.get("/get-booking-by-id/{booking_id}", dependencies=[Depends(verify_token)])
 def get_booking_by_id(booking_id: str):
     from app import controller
     result: Booking = controller.search_booking_by_id(booking_id)
@@ -163,7 +175,7 @@ def get_user_profile(user_id: str):
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "UserAccount not found")
     return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())
 
-@router.delete("/delete-booking/{booking_id}", dependencies=[Depends(verify_customer)])
+@router.delete("/delete-booking/{booking_id}", dependencies=[Depends(verify_customer), Depends(verify_token)])
 def delete_booking(booking_id: str):
     from app import controller
     booking: Booking = controller.search_booking_by_id(booking_id)
@@ -181,19 +193,22 @@ def delete_booking(booking_id: str):
     controller.add_log(False, "?", "Delete Booking", "No Item", "?", "Booking Error Not Found")
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in delete booking")
 
-@router.post("/add-chat-room", dependencies=[Depends(verify_customer)])
+@router.post("/add-chat-room", dependencies=[Depends(verify_customer), Depends(verify_token)])
 def add_chat_room(body: AddChatRoomModel):
     from app import controller
     account_1: UserAccount = controller.search_account_by_id(Body.user_id)
     account_2: UserAccount = controller.search_account_by_id(body.receiver_id)
     chat_room: ChatRoomManeger = controller.add_chat_room(account_1, account_2)
+    for chat in controller.get_chat_list(account_1):
+        if chat.get_chat_room_details() == chat_room.get_chat_room_details():
+            return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Chat Room already exist")
     if chat_room == None:
         controller.add_log(False, account_1, "Add Chat Room (Create Chat Room)", "No Item", account_2, "Created Failed")
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "UserAccount not found")
     controller.add_log(True, account_1, "Add Chat Room (Create Chat Room)", "Chat", account_2, "Created Successfully")
     return res.success_response_status(status.HTTP_200_OK, "Add Chat Room Success", data=chat_room.get_chat_room_details())
 
-@router.put("/edit-display-name")
+@router.put("/edit-display-name", dependencies=[Depends(verify_token)])
 def edit_display_name(body: EditDisplayNameModel):
     from app import controller
     account: UserAccount = controller.search_account_by_id(Body.user_id)
@@ -202,7 +217,7 @@ def edit_display_name(body: EditDisplayNameModel):
     edited_account: UserAccount = controller.edit_display_name(account, body.display_name)
     return res.success_response_status(status.HTTP_200_OK, "Edit displayname Success",  data=edited_account.get_account_details())
     
-@router.put("/edit-pic-url")
+@router.put("/edit-pic-url", dependencies=[Depends(verify_token)])
 def edit_pic_url(body: EditPicUrlModel):
     from app import controller
     account: UserAccount = controller.search_account_by_id(Body.user_id)
@@ -211,7 +226,7 @@ def edit_pic_url(body: EditPicUrlModel):
     edited_account: UserAccount = controller.edit_pic_url(account, body.url)
     return res.success_response_status(status.HTTP_200_OK, "Edit pic url Success",  data=edited_account.get_account_details())
     
-@router.put("/edit-money")
+@router.put("/edit-money", dependencies=[Depends(verify_token)])
 def edit_money(body: EditMoneyModel):
     from app import controller
     account: UserAccount = controller.search_account_by_id(Body.user_id)
@@ -238,7 +253,7 @@ def get_leaderboard():
         return res.success_response_status(status.HTTP_200_OK, "Get Leaderboard Success", data=send_data)
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "UserAccount not found")
 
-@router.post("/add-amount", dependencies=[Depends(verify_customer)])
+@router.post("/add-amount", dependencies=[Depends(verify_customer), Depends(verify_token)])
 def add_amount(body: EditMoneyModel):
     from app import controller
     account: Account = controller.search_account_by_id(Body.user_id)
@@ -251,7 +266,7 @@ def add_amount(body: EditMoneyModel):
     controller.add_log(True, account, "Add Amount", "Money", account, "Added Successfully")
     return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=transaction.get_transaction_details())
 
-@router.post("/del-amount", dependencies=[Depends(verify_mate)])
+@router.post("/del-amount", dependencies=[Depends(verify_mate), Depends(verify_token)])
 def del_amount(body: EditMoneyModel):
     from app import controller
     account: Account = controller.search_account_by_id(Body.user_id)
@@ -264,7 +279,7 @@ def del_amount(body: EditMoneyModel):
     controller.add_log(True, account, "Delete Amount", "Money", account, "Delete Successfully")
     return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=transaction.get_transaction_details())
 
-@router.get("/get-log")
+@router.get("/get-log", dependencies=[Depends(verify_token)])
 def get_log():
     from app import controller
     log_list = controller.get_log()
@@ -272,7 +287,7 @@ def get_log():
         return res.success_response_status(status.HTTP_200_OK, "Get Log Success", data=controller.get_log())
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in get log")
 
-@router.get("/get-transaction")
+@router.get("/get-transaction", dependencies=[Depends(verify_token)])
 def get_transaction():
     from app import controller
     account: Account = controller.search_account_by_id(Body.user_id)
@@ -289,7 +304,7 @@ def get_transaction_by_admin():
         return res.success_response_status(status.HTTP_200_OK, "Get Transaction Success", data=[transaction.get_transaction_details() for transaction in transaction_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in get transaction")
 
-@router.put("/edit-age")
+@router.put("/edit-age", dependencies=[Depends(verify_token)])
 def edit_age(body: EditAgeModel):
     from app import controller
     account: Account = controller.search_account_by_id(Body.user_id)
@@ -298,7 +313,7 @@ def edit_age(body: EditAgeModel):
     edited_account: Account = controller.edit_age(account, body.age)
     return res.success_response_status(status.HTTP_200_OK, "Edit Age Success",  data=edited_account.get_account_details())
 
-@router.put("/edit-location")
+@router.put("/edit-location", dependencies=[Depends(verify_token)])
 def edit_location(body: EditLocationModel):
     from app import controller
     account: Account = controller.search_account_by_id(Body.user_id)
@@ -307,10 +322,11 @@ def edit_location(body: EditLocationModel):
     edited_account: Account = controller.edit_location(account, body.location)
     return res.success_response_status(status.HTTP_200_OK, "Edit Location Success",  data=edited_account.get_account_details()) 
 
-@router.get("/logs")
+@router.get("/get-logs")
 def get_log():
     from app import controller
     log_list = controller.log_list
+    print(log_list)
     if len(log_list) == 0:
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Get Log Error")
     return res.success_response_status(status.HTTP_200_OK, "Get Log Success", data=[log.get_log_details() for log in log_list])
