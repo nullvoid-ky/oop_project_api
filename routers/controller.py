@@ -185,10 +185,10 @@ def delete_booking(booking_id: str):
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Booking or UserAccount not found")
     deleted_booking: Union[Tuple[Booking, Transaction], Booking, None] = controller.delete_booking(booking, account)
     if isinstance(deleted_booking, tuple):
-        controller.add_log(True, "?", "Delete Booking", "Booking", delete_booking[0], "Delete Booking Succes")
+        controller.add_log(True, "?", "Delete Booking", "Booking", "?", "Delete Booking Succes")
         return res.success_response_status(status.HTTP_200_OK, "Delete Booking Success", data={"booking": deleted_booking[0].get_booking_details(), "transaction": deleted_booking[1].get_transaction_details()})
     elif isinstance(deleted_booking, Booking):
-        controller.add_log(True, "?", "Delete Booking", "Booking", delete_booking, "Delete Booking Succes")
+        controller.add_log(True, "?", "Delete Booking", "Booking", "?", "Delete Booking Succes")
         return res.success_response_status(status.HTTP_200_OK, "Delete Booking Success", data=deleted_booking.get_booking_details())
     controller.add_log(False, "?", "Delete Booking", "No Item", "?", "Booking Error Not Found")
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in delete booking")

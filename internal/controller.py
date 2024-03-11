@@ -470,6 +470,7 @@ class Controller:
             if booking.payment.pay(account, booking.customer) == False:
                 return None
             transaction: Transaction = Transaction(account, booking.customer, booking.payment.amount)
+            print("\n\n\n\n DETAIL\n\n",transaction, "\n\n\n\n")
         if isinstance(booking, Booking):
             booking.mate.booked_customer = None
             booking.status = "Failed"
