@@ -55,7 +55,7 @@ def add_review(body: ReviewCreation):
     if mate == None:
         controller.add_log(False, "?", "add_review", "No Item", "?", "Mate not found")
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
-    customer = controller.search_customer_by_id(body.user_id)
+    customer = controller.search_customer_by_id(Body.user_id)
     if customer == None:
         controller.add_log(False, "?", "add_review", "No Item", mate, "Custoemr not found")
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Customer not found")

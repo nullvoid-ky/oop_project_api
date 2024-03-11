@@ -65,12 +65,12 @@ class Controller:
         account_2.pic_url = "https://i1.sndcdn.com/artworks-ubBjVp0Z50ZykDdG-lU7NWg-t500x500.jpg"
         account_1.amount = 0    
         account_2.price = 1000
-        chat_room = self.add_chat_room(account_1, account_2)
-        print("chat_room: ", chat_room.get_chat_room_details())
+        # chat_room = self.add_chat_room(account_1, account_2)
+        # print("chat_room: ", chat_room.get_chat_room_details())
         account_2.add_availability(datetime.date(2024, 3, 4), "I'm available")
         # print(account_2.availability_list)
         account_2.add_review_mate(account_1, "good", 4)
-        self.add_booking(account_1, account_2, Date(year=2024, month=3, day=4))
+        # self.add_booking(account_1, account_2, Date(year=2024, month=3, day=4))
         # booking, transaction = self.add_booking(account_1, account_2, Date(year=2024, month=3, day=4))
         # print("booking: ", booking.id)    
         # self.pay(str(booking.id))
@@ -83,6 +83,7 @@ class Controller:
         account_4: Mate = self.search_account_by_id(account_4_details['id'])
         account_5: Mate = self.search_account_by_id(account_5_details['id'])
         account_6: Mate = self.search_account_by_id(account_6_details['id'])
+        account_6.price = 1000
 
         account_2.add_review_mate(account_1, "So Good", 5)
         account_2.add_review_mate(account_1, "So Good", 4)
@@ -150,6 +151,10 @@ class Controller:
         if not (isinstance(account_1, UserAccount) and isinstance(account_2, UserAccount)):
             return None
         chat_room: ChatRoomManeger = ChatRoomManeger(account_1, account_2)
+        for chat in self.__chat_room_list:
+            if str(chat.account_1.id) == str(chat_room.account_1.id) and str(chat.account_2.id) == str(chat_room.account_2.id):
+                print("add chat: " ,chat.get_chat_room_details(), chat_room.get_chat_room_details())
+                return None
         self.__chat_room_list.append(chat_room)
         return chat_room
 
@@ -445,12 +450,12 @@ class Controller:
         self.__booking_list.append(booking)
         return booking, pledge_transaction
     
-    def get_booking(self, customer: Customer) -> list[Booking]:
-        if not isinstance(customer, Customer):
+    def get_booking(self, account: Account) -> list[Booking]:
+        if not isinstance(account, Account):
             return []
         booking_list = []
         for booking in self.__booking_list:
-            if booking.customer == customer:
+            if booking.customer == account or booking.mate == account:
                 booking_list.append(booking)
         return booking_list
 
@@ -522,6 +527,14 @@ class Controller:
             return None
         self.add_log(True, account, "edit_money" ,new_money, account, "Adjusted Money")
         account.amount = new_money
+        return account
+    
+    def edit_price(self, account: UserAccount, new_price: int) -> UserAccount:
+        if not isinstance(account, Account) or not isinstance(new_price, int):
+            self.add_log(False, account, "edit_price" ,"No Item", account, "instance Error")
+            return None
+        self.add_log(True, account, "edit_price" ,new_price, account, "Adjusted price")
+        account.price = new_price
         return account
     
     def edit_age(self, account: Account, new_age: int) -> Account:

@@ -2,7 +2,7 @@ from fastapi import APIRouter, status, Depends, Body
 from typing import Union, Tuple
 
 from models.post import PostModel
-from models.profile import EditDisplayNameModel, EditPicUrlModel, EditMoneyModel, EditAgeModel, EditLocationModel
+from models.profile import EditDisplayNameModel, EditPicUrlModel, EditMoneyModel, EditAgeModel, EditLocationModel, EditPriceModel
 from models.mate import MateModel, SearchMateModel
 from internal.booking import Booking
 from internal.transaction import Transaction
@@ -142,11 +142,11 @@ def get_booking():
         return res.success_response_status(status.HTTP_200_OK, "Get Booking Success", data=[booking.get_booking_details() for booking in booking_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in get booking")
 
-@router.get("/get-booking", dependencies=[Depends(verify_customer), Depends(verify_token)])
+@router.get("/get-booking", dependencies=[Depends(verify_token)])
 def get_booking():
     from app import controller
-    customer: UserAccount = controller.search_customer_by_id(Body.user_id)
-    booking_list: list = controller.get_booking(customer)
+    account: Account = controller.search_account_by_id(Body.user_id)
+    booking_list: list = controller.get_booking(account)
     if isinstance(booking_list, list):
         return res.success_response_status(status.HTTP_200_OK, "Get Booking Success", data=[booking.get_booking_details() for booking in booking_list])
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in get booking")
@@ -175,7 +175,7 @@ def get_user_profile(user_id: str):
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "UserAccount not found")
     return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())
 
-@router.delete("/delete-booking/{booking_id}", dependencies=[Depends(verify_customer), Depends(verify_token)])
+@router.delete("/delete-booking/{booking_id}", dependencies=[Depends(verify_token)])
 def delete_booking(booking_id: str):
     from app import controller
     booking: Booking = controller.search_booking_by_id(booking_id)
@@ -199,9 +199,6 @@ def add_chat_room(body: AddChatRoomModel):
     account_1: UserAccount = controller.search_account_by_id(Body.user_id)
     account_2: UserAccount = controller.search_account_by_id(body.receiver_id)
     chat_room: ChatRoomManeger = controller.add_chat_room(account_1, account_2)
-    for chat in controller.get_chat_list(account_1):
-        if chat.get_chat_room_details() == chat_room.get_chat_room_details():
-            return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Chat Room already exist")
     if chat_room == None:
         controller.add_log(False, account_1, "Add Chat Room (Create Chat Room)", "No Item", account_2, "Created Failed")
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "UserAccount not found")
@@ -235,6 +232,15 @@ def edit_money(body: EditMoneyModel):
     edited_account: UserAccount = controller.edit_money(account, body.amount)
     return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=edited_account.get_account_details())
 
+@router.put("/edit-price", dependencies=[Depends(verify_token), Depends(verify_mate)])
+def edit_price(body: EditPriceModel):
+    from app import controller
+    account: UserAccount = controller.search_account_by_id(Body.user_id)
+    if account == None:
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit displayname Error")
+    edited_account: UserAccount = controller.edit_price(account, body.price)
+    return res.success_response_status(status.HTTP_200_OK, "Edit Price Success",  data=edited_account.get_account_details())
+    
 @router.get("/get-leaderboard")
 def get_leaderboard():
     rank = 1
