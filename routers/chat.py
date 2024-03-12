@@ -18,7 +18,7 @@ def edit_message(body: EditMessageModel):
     if chat_room is None:
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Chat Room not found")
     message = chat_room.search_message_by_id(body.message_id)
-    if message is None:
+    if message is None or str(message.sender.id) != Body.user_id:
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Message not found")
     message.set_text(body.new_text)
     return res.success_response_status(status.HTTP_200_OK, "Edit message Success", message.get_message_details())
