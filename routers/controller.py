@@ -275,7 +275,7 @@ def add_amount(body: EditMoneyModel):
 def del_amount(body: EditMoneyModel):
     from app import controller
     account = controller.search_mate_by_id(Body.user_id)
-    if body.amount < 0 and account.amount < body.amount:
+    if body.amount < 0 or account.amount < body.amount:
         controller.add_log(True, account, "Delete  Amount", "Money", account, "Delete Failed, Amount is Negative")
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
     if account == None:
