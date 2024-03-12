@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status, Body
 import datetime
+
 from models.review import *
-from models.post import PostModel
 from models.availability import AvailabilityModel
 import utils.response as res
 from dependencies import verify_token, verify_mate
@@ -15,6 +15,8 @@ router = APIRouter(
 @router.post("/add-availability", dependencies=[Depends(verify_mate)])
 def add_availability(body: AvailabilityModel):
     from app import controller
+    if datetime(body.date.year, body.date.month, body.date.day) < datetime.now().date():
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Invalid date")
     mate = controller.search_mate_by_id(Body.user_id)
     if mate == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
