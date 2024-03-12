@@ -258,9 +258,10 @@ def get_leaderboard():
 @router.post("/add-amount", dependencies=[Depends(verify_customer), Depends(verify_token)])
 def add_amount(body: EditMoneyModel):
     from app import controller
+    account = controller.search_customer_by_id(Body.user_id)
     if body.amount < 0:
+        controller.add_log(True, account, "Add Amount", "Money", account, "Added Failed, Amount is Negative")
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
-    account: Account = controller.search_account_by_id(Body.user_id)
     if account == None:
         controller.add_log(True, account, "Add Amount", "Money", account, "Added Failed, Account Not Found")
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
@@ -273,10 +274,10 @@ def add_amount(body: EditMoneyModel):
 @router.post("/del-amount", dependencies=[Depends(verify_mate), Depends(verify_token)])
 def del_amount(body: EditMoneyModel):
     from app import controller
-    if body.amount < 0:
+    account = controller.search_mate_by_id(Body.user_id)
+    if body.amount < 0 and account.amount < body.amount:
         controller.add_log(True, account, "Delete  Amount", "Money", account, "Delete Failed, Amount is Negative")
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
-    account: Account = controller.search_account_by_id(Body.user_id)
     if account == None:
         controller.add_log(True, account, "Delete  Amount", "Money", account, "Delete Failed, Account Not Found")
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
