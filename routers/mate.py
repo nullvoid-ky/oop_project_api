@@ -15,7 +15,7 @@ router = APIRouter(
 @router.post("/add-availability", dependencies=[Depends(verify_mate)])
 def add_availability(body: AvailabilityModel):
     from app import controller
-    if datetime(body.date.year, body.date.month, body.date.day) < datetime.now().date():
+    if datetime(body.date.year, body.date.month, body.date.day).date() < datetime.now().date():
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Invalid date")
     mate = controller.search_mate_by_id(Body.user_id)
     if mate == None:
@@ -23,7 +23,7 @@ def add_availability(body: AvailabilityModel):
     if mate.search_availability(body.date.year, body.date.month, body.date.day):
         controller.add_log(False, mate, "add_availability", "No Item", mate, "Already Existed Availability")
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Availability already exists")
-    data = mate.add_availability(datetime.date(body.date.year, body.date.month, body.date.day), body.detail)
+    data = mate.add_availability(date(body.date.year, body.date.month, body.date.day), body.detail)
     controller.add_log(True, mate, "add_availability", data, mate, "Added Availability")
     return res.success_response_status(status.HTTP_201_CREATED, "Availability added", data.get_availability_details())
 
