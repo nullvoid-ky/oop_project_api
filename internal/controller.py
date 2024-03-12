@@ -360,7 +360,7 @@ class Controller:
             account_list_by_gender_female = self.get_mate_by_gender("female") if self.get_mate_by_gender("female") != None else []
         account_list_by_gender = set(account_list_by_gender_male).union(account_list_by_gender_female)
 
-        common_accounts = set(account_list_by_name)  # Convert the first list to a set
+        common_accounts = set(account_list_by_name) 
         common_accounts.intersection_update(account_list_by_availability)
         common_accounts.intersection_update(account_list_by_location)
         common_accounts.intersection_update(account_list_by_gender)
@@ -399,13 +399,6 @@ class Controller:
             self.add_log(False, customer, "Pay", "No Item", mate, "Paid Failed")
             return None
         self.add_log(True, customer, "Pay", "Money", mate, "Paid Succesfully")
-        if self.add_chat_room(customer, mate) == None:
-            self.add_log(False, customer, "Create Chat", "No Item", mate, "Crate Chat Failed")
-            self.add_log(False, mate, "Create Transaction", "No Item", customer, "Create Transaction Failed")
-            self.add_log(False, customer, "Create Transaction", "No Item", mate, "Create Transaction Failed")
-            self.add_log(False, customer, "Paid Booking", "No Item", customer, "Pay Booking Failed ")
-            return None
-        self.add_log(False, customer, "Create Chat", "Chat", mate, "Create Chat Failed")
         transaction: Transaction = Transaction(customer, mate, payment.amount)
         customer.add_transaction(transaction)
         mate.add_transaction(transaction)
@@ -442,6 +435,16 @@ class Controller:
             return None
         booked_customer: Account = mate.book(date.year, date.month, date.day)
         if booked_customer == None:
+            self.add_log(False, customer, "Create Chat", "No Item", mate, "Create Chat Failed Already Booked")
+            self.add_log(False, customer, "Paid Booking", "No Item", customer, "Pay Booking Failed  Already Booked")
+            self.add_log(False, mate, "Create Transaction", "No Item", customer, "Create Transaction Failed Already Booked")
+            self.add_log(False, customer, "Create Transaction", "No Item", mate, "Create Transaction Failed Already Booked")
+            return None
+        if self.add_chat_room(customer, mate) == None:
+            self.add_log(False, customer, "Create Chat", "No Item", mate, "Create Chat Failed")
+            self.add_log(False, customer, "Paid Booking", "No Item", customer, "Pay Booking Failed ")
+            self.add_log(False, mate, "Create Transaction", "No Item", customer, "Create Transaction Failed")
+            self.add_log(False, customer, "Create Transaction", "No Item", mate, "Create Transaction Failed")
             return None
         pledge_transaction: Transaction = Transaction(customer, mate, pledge_payment.amount)   
         customer.add_transaction(pledge_transaction)
