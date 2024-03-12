@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, status, Body
-import datetime
+from datetime import datetime
 
 from models.review import *
 from models.availability import AvailabilityModel
