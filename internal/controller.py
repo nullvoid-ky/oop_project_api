@@ -520,14 +520,6 @@ class Controller:
         self.add_log(True, account, "edit_pic_url" ,new_pic_url, account, "Edited Pic")
         account.pic_url = new_pic_url
         return account
-
-    def edit_money(self, account: UserAccount, new_money: str) -> UserAccount:
-        if not isinstance(account, Account) or not isinstance(new_money, str):
-            self.add_log(False, account, "edit_money" ,"No Item", account, "instanec Error")
-            return None
-        self.add_log(True, account, "edit_money" ,new_money, account, "Adjusted Money")
-        account.amount = new_money
-        return account
     
     def edit_price(self, account: UserAccount, new_price: int) -> UserAccount:
         if not isinstance(account, Account) or not isinstance(new_price, int):

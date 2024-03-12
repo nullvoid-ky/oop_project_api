@@ -50,6 +50,7 @@ def add_review(body: ReviewCreation):
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Customer not found")
     review = mate.add_review_mate(customer, body.message, int(body.star))
     if review:
+        mate.__review_customer_list.append(customer)
         controller.add_log(True, customer, "add_review", review, mate, "Added review")
         return res.success_response_status(status.HTTP_200_OK, "Added Review Successfully", data=review.get_review_details())
     return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")

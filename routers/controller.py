@@ -232,8 +232,8 @@ def edit_money(body: EditMoneyModel):
 def edit_price(body: EditPriceModel):
     from app import controller
     account: UserAccount = controller.search_account_by_id(Body.user_id)
-    if account == None:
-        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit displayname Error")
+    if account == None or body.price < 0:
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit price Error")
     edited_account: UserAccount = controller.edit_price(account, body.price)
     return res.success_response_status(status.HTTP_200_OK, "Edit Price Success",  data=edited_account.get_account_details())
     
@@ -258,6 +258,8 @@ def get_leaderboard():
 @router.post("/add-amount", dependencies=[Depends(verify_customer), Depends(verify_token)])
 def add_amount(body: EditMoneyModel):
     from app import controller
+    if body.amount < 0:
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
     account: Account = controller.search_account_by_id(Body.user_id)
     if account == None:
         controller.add_log(True, account, "Add Amount", "Money", account, "Added Failed, Account Not Found")
@@ -271,6 +273,9 @@ def add_amount(body: EditMoneyModel):
 @router.post("/del-amount", dependencies=[Depends(verify_mate), Depends(verify_token)])
 def del_amount(body: EditMoneyModel):
     from app import controller
+    if body.amount < 0:
+        controller.add_log(True, account, "Delete  Amount", "Money", account, "Delete Failed, Amount is Negative")
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
     account: Account = controller.search_account_by_id(Body.user_id)
     if account == None:
         controller.add_log(True, account, "Delete  Amount", "Money", account, "Delete Failed, Account Not Found")
@@ -310,7 +315,7 @@ def get_transaction_by_admin():
 def edit_age(body: EditAgeModel):
     from app import controller
     account: Account = controller.search_account_by_id(Body.user_id)
-    if account == None:
+    if account == None or body.age > 100 or body.age < 18:
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit Age Error")
     edited_account: Account = controller.edit_age(account, body.age)
     return res.success_response_status(status.HTTP_200_OK, "Edit Age Success",  data=edited_account.get_account_details())
