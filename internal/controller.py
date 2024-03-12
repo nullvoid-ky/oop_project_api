@@ -1,6 +1,6 @@
 from typing import Tuple, Union
 import datetime
-
+import random
 from internal.account import UserAccount, Account
 from internal.admin import Admin
 from internal.log import Log
@@ -26,6 +26,28 @@ class Controller:
         self.__log_list: list = []
 
     def add_instance(self):
+        list_account = []
+        pic = [
+            "https://scontent.fbkk7-2.fna.fbcdn.net/v/t1.6435-9/88084836_650751815753229_7681623277470482432_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeE--vgVrwNlxbLVILQAZS6wRxpIA82isENHGkgDzaKwQ1pQRhAgdpct1vJ4aFTIKAysNofNufAoNkgZis1ii8Bz&_nc_ohc=f0x5aRknOTQAX_03nNk&_nc_ht=scontent.fbkk7-2.fna&oh=00_AfA8OaJ4pblg_vu6hGvuN8x5OGc5nS1Aj_FB-X1lzuuf-w&oe=6617A870",
+            "https://scontent.fbkk7-2.fna.fbcdn.net/v/t1.18169-9/27867860_753890224816631_6749414623592887104_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeEKWFF_ZyoVfqk0aoxJylxFuX9biATegu65f1uIBN6C7u-CeRWdF2cGrEhrZy29003EAl74rQsOPlkWjxQdpa9x&_nc_ohc=w07Yuoc-S0gAX_aFSIa&_nc_ht=scontent.fbkk7-2.fna&oh=00_AfByCb1B2SXbHrxz7GSo1AMT1U-ilQon8ZiL0pI0kfOvNQ&oe=661796C4",
+            "https://scontent.fbkk7-2.fna.fbcdn.net/v/t39.30808-6/326219729_714444603594519_6151769270196173809_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeF8jV-489FiJuI6iA_3mV9ZX4-p8xZmUmxfj6nzFmZSbGDJpoNHLWdEPjxTjAbVpgRwY31O7fcyrBYxOo3TptL6&_nc_ohc=3Khg_qrDKK0AX98O6tn&_nc_ht=scontent.fbkk7-2.fna&oh=00_AfCseXMq5CtxeHEN7dagDdhEBA1zUniHb34Xw9NNN_BjPg&oe=65F5D4B8",
+            "https://scontent.cdninstagram.com/v/t51.29350-15/244758079_1359084524493527_1075954552904740204_n.jpg?stp=dst-jpg_e35&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi44OTl4ODk5LnNkciJ9&_nc_ht=scontent.cdninstagram.com&_nc_cat=111&_nc_ohc=XGLDAk3Q55QAX_-8h_q&edm=APs17CUBAAAA&ccb=7-5&ig_cache_key=MjY4MDUxNzAwMzA1MDg5MDkwNg%3D%3D.2-ccb7-5&oh=00_AfARaHhAcFIlBle8hJuq0GbbppZlNhJKuYiNAhiyHfWYEg&oe=65F4070D&_nc_sid=10d13b","https://scontent.fbkk7-3.fna.fbcdn.net/v/t39.30808-6/329423989_1293093041644520_7826831612166118390_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeH-kcapY-rPOwDthZFo6-ymMp0PP_a2logynQ8_9raWiI1crFErqocZ84KpNzTdYurfRzB-b81N5jR1apVwsxGe&_nc_ohc=t27VXezPqyoAX-vy1OQ&_nc_ht=scontent.fbkk7-3.fna&oh=00_AfDivGyHGywhYHGhAoNh7pHFhhz20hfCotAd0LBxOGYiUA&oe=65F506AF"
+        ]
+        for index in range(0,50):
+            role = "mate" if random.randint(0,1) else "customer"
+            gender = 'male' if random.randint(0,1) else 'female'
+            list_account.append(register(f"account_{index}","password", role, gender))
+            create_token(str(list_account[index]["id"]), role)
+        for account in list_account:
+            account = self.search_account_by_id(account['id'])
+            pic_num = random.randint(0, len(pic)-1)
+            account.pic_url = pic[pic_num]
+
+            account.amount = 100000
+            account.price = random.randint(10,100)*100
+            if isinstance(account, Mate):
+                account.add_availability(datetime.date(2024, 6, 4), f"I'm available laew naja")
+
         temp_detail_1 = register("temporaryaccount1", "qwer", "mate", "female")
         temp_detail_2 = register("temporaryaccount2", "qwer", "mate", "male")
         temp_detail_3 = register("temporaryaccount3", "qwer", "mate", "male")
