@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status, Body
 import datetime
+
 from models.review import *
-from models.post import PostModel
 from models.availability import AvailabilityModel
 import utils.response as res
 from dependencies import verify_token, verify_mate
@@ -12,18 +12,11 @@ router = APIRouter(
     dependencies=[Depends(verify_token)]
 )
 
-@router.post("/add-post", dependencies=[Depends(verify_mate)])
-def add_post(body: PostModel):
-    from app import controller
-    mate = controller.search_mate_by_id(Body.user_id)
-    if mate == None:
-        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
-    data = mate.add_post(body.description, body.picture, body.timestamp)
-    return res.success_response_status(status.HTTP_201_CREATED, "Post created", data.get_post_details())
-
 @router.post("/add-availability", dependencies=[Depends(verify_mate)])
 def add_availability(body: AvailabilityModel):
     from app import controller
+    if datetime(body.date.year, body.date.month, body.date.day) < datetime.now().date():
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Invalid date")
     mate = controller.search_mate_by_id(Body.user_id)
     if mate == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
@@ -59,6 +52,7 @@ def add_review(body: ReviewCreation):
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Customer not found")
     review = mate.add_review_mate(customer, body.message, int(body.star))
     if review:
+        mate.__review_customer_list.append(customer)
         controller.add_log(True, customer, "add_review", review, mate, "Added review")
         return res.success_response_status(status.HTTP_200_OK, "Added Review Successfully", data=review.get_review_details())
     return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Incomplete")
@@ -102,14 +96,3 @@ def get_user_profile(user_id: str):
     if account == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "UserAccount not found")
     return res.success_response_status(status.HTTP_200_OK, "Get Profile Success", data=account.get_account_details())
-
-@router.get("/get-success-booking/{mate_id}")
-def get_success_booking(mate_id: str):
-    from app import controller
-    mate = controller.search_mate_by_id(mate_id)
-    if mate == None:
-        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
-    booking_list = mate.get_success_booking()
-    if len(booking_list) == 0:
-        return res.error_response_status(status.HTTP_404_NOT_FOUND, "No success booking")
-    return res.success_response_status(status.HTTP_200_OK, "Get success booking success", data=[booking.get_booking_details() for booking in booking_list])
