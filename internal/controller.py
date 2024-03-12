@@ -10,11 +10,19 @@ from internal.customer import Customer
 from internal.payment import Payment
 from internal.transaction import Transaction
 from internal.chat_room_manager import ChatRoomManeger
-from utils.auth import register
-from dependencies import create_token
 from internal.post import Post
 from models.mate import Date
 import datetime
+import jwt
+import os
+from fastapi import HTTPException, Body, Depends, WebSocketException, status
+from typing import Annotated
+from dotenv import load_dotenv
+from argon2 import PasswordHasher
+
+ph = PasswordHasher()
+
+load_dotenv()
 
 class Controller:
     def __init__(self) -> None:
@@ -24,6 +32,88 @@ class Controller:
         self.__chat_room_list: list[ChatRoomManeger] = []
         self.__admin = None
         self.__log_list: list = []
+
+    def register(self, username: str, password: str, role: str, gender: str, location : str= "Bangkok") -> dict | None:
+        account: Account = self.search_account_by_username(username)
+        if account == None and username != "admin":
+            hashed_password: str = ph.hash(password)
+            if role == "customer":
+                new_account: UserAccount = self.add_customer(username, hashed_password, gender, location)
+                if gender == "male":
+                    new_account.add_pic_url("../img/customer_male.svg")
+                else:
+                    new_account.add_pic_url("../img/customer_female.svg")
+            elif role == "mate":
+                new_account: UserAccount = self.add_mate(username, hashed_password, gender, location)
+                if gender == "male":
+                    new_account.add_pic_url("../img/mate_male.svg")
+                else:
+                    new_account.add_pic_url("../img/mate_female.svg")
+            else:
+                self.add_log(False, "?", "register", "No Item", "?", "Role Error")
+                return None
+            self.add_log(True, new_account, "register", "Account", new_account, "Register Account Successfully")
+            return new_account.get_account_details()
+        self.add_log(False, account, "register", "No Item", "?", "Existed Account")
+        return None
+
+    def login(self, username: str, password: str) -> dict | None:
+        account: Account = self.search_account_by_username(username)
+        if account == None:
+            self.add_log(False, account, "login", "No Item", account, "Account Not Found")
+            return None
+        try:
+            ph.verify(account.password, password)
+            self.add_log(True, account, "login", "Login Account", account, "Login Account Successfully")
+            return account.get_account_details()
+        except:
+            self.add_log(False, account, "login", "No Item", account, "Login Account Error")
+            return None
+
+    def create_token(self, user_id: str, role: str) -> str:
+        token: str = jwt.encode(payload={ "user_id": user_id, "role": role }, key=os.environ['JWT_SECRET'], algorithm="HS256")
+        return token
+
+    def verify_token_websocket(self, x_token: str) -> str:
+        try:
+            payload: dict = jwt.decode(x_token, os.getenv('JWT_SECRET'), algorithms=["HS256"])
+            return payload["user_id"]
+        except jwt.ExpiredSignatureError:
+            raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION, reason="Token has expired")
+        except jwt.InvalidTokenError:
+            raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION, reason="Invalid token")
+        
+    def verify_token(self, x_token: str) -> dict:
+        try:
+            payload: dict = jwt.decode(x_token, os.getenv('JWT_SECRET'), algorithms=["HS256"])
+            Body.user_id = payload["user_id"]
+            Body.role = payload["role"]
+            return payload
+        except jwt.ExpiredSignatureError:
+            raise HTTPException(status_code=400, detail="Token has expired")
+        except jwt.InvalidTokenError:
+            raise HTTPException(status_code=400, detail="Invalid token")
+    
+    def verify_customer(self, payload: dict = Depends(verify_token)):
+        if "role" not in payload:
+            raise HTTPException(status_code=400, detail="Role not found in token")
+        if payload["role"] != "customer":
+            raise HTTPException(status_code=403, detail="Only customers are allowed")
+        return payload
+
+    def verify_mate(self, payload: dict = Depends(verify_token)):
+        if "role" not in payload:
+            raise HTTPException(status_code=400, detail="Role not found in token")
+        if payload["role"] != "mate":
+            raise HTTPException(status_code=403, detail="Only mates are allowed")
+        return payload
+
+    def verify_admin(self, payload: dict = Depends(verify_token)):
+        if "role" not in payload:
+            raise HTTPException(status_code=400, detail="Role not found in token")
+        if payload["role"] != "admin":
+            raise HTTPException(status_code=403, detail="Only admins are allowed")
+        return payload
 
     def add_instance(self):
         list_account = []
@@ -36,8 +126,8 @@ class Controller:
         for index in range(0,50):
             role = "mate" if random.randint(0,1) else "customer"
             gender = 'male' if random.randint(0,1) else 'female'
-            list_account.append(register(f"account_{index}","password", role, gender))
-            create_token(str(list_account[index]["id"]), role)
+            list_account.append(self.register(f"account_{index}","password", role, gender))
+            self.create_token(str(list_account[index]["id"]), role)
         for account in list_account:
             account = self.search_account_by_id(account['id'])
             pic_num = random.randint(0, len(pic)-1)
@@ -48,18 +138,18 @@ class Controller:
             if isinstance(account, Mate):
                 account.add_availability(datetime.date(2024, 6, 4), f"I'm available laew naja")
 
-        temp_detail_1 = register("temporaryaccount1", "qwer", "mate", "female")
-        temp_detail_2 = register("temporaryaccount2", "qwer", "mate", "male")
-        temp_detail_3 = register("temporaryaccount3", "qwer", "mate", "male")
-        temp_detail_4 = register("temporaryaccount4", "qwer", "mate", "male")
-        temp_detail_5 = register("temporaryaccount5", "qwer", "mate", "female")
-        temp_detail_6 = register("temporaryaccount6", "qwer", "mate", "female")
-        print(("temp_1"), create_token(str(temp_detail_1['id']), "mate"))
-        print(("temp_2"), create_token(str(temp_detail_2['id']), "mate"))
-        print(("temp_3"), create_token(str(temp_detail_3['id']), "mate"))
-        print(("temp_4"), create_token(str(temp_detail_4['id']), "mate"))
-        print(("temp_5"), create_token(str(temp_detail_5['id']), "mate"))
-        print(("temp_6"), create_token(str(temp_detail_6['id']), "mate"))
+        temp_detail_1 = self.register("temporaryaccount1", "qwer", "mate", "female")
+        temp_detail_2 = self.register("temporaryaccount2", "qwer", "mate", "male")
+        temp_detail_3 = self.register("temporaryaccount3", "qwer", "mate", "male")
+        temp_detail_4 = self.register("temporaryaccount4", "qwer", "mate", "male")
+        temp_detail_5 = self.register("temporaryaccount5", "qwer", "mate", "female")
+        temp_detail_6 = self.register("temporaryaccount6", "qwer", "mate", "female")
+        print(("temp_1"), self.create_token(str(temp_detail_1['id']), "mate"))
+        print(("temp_2"), self.create_token(str(temp_detail_2['id']), "mate"))
+        print(("temp_3"), self.create_token(str(temp_detail_3['id']), "mate"))
+        print(("temp_4"), self.create_token(str(temp_detail_4['id']), "mate"))
+        print(("temp_5"), self.create_token(str(temp_detail_5['id']), "mate"))
+        print(("temp_6"), self.create_token(str(temp_detail_6['id']), "mate"))
         tmp1 = self.search_account_by_id(temp_detail_1['id'])
         tmp2 = self.search_account_by_id(temp_detail_2['id'])
         tmp3 = self.search_account_by_id(temp_detail_3['id'])
@@ -78,10 +168,10 @@ class Controller:
         for i in range(5):
             tmp5.add_availability(datetime.date(2024, 3, 4+i), f"I'm available laew {i}")
 
-        account_1_details = register("ganThepro", "1234", "customer", "male")
-        print("account_1_token :", create_token(str(account_1_details['id']), "customer"))
-        account_2_details = register("ganThepro2", "1234", "mate", "female")
-        print("account_2_token :", create_token(str(account_2_details['id']), "mate"))
+        account_1_details = self.register("ganThepro", "1234", "customer", "male")
+        print("account_1_token :", self.create_token(str(account_1_details['id']), "customer"))
+        account_2_details = self.register("ganThepro2", "1234", "mate", "female")
+        print("account_2_token :", self.create_token(str(account_2_details['id']), "mate"))
         account_1: Customer = self.search_account_by_id(account_1_details['id'])
         account_2: Mate = self.search_account_by_id(account_2_details['id'])
         account_2.pic_url = "https://i1.sndcdn.com/artworks-ubBjVp0Z50ZykDdG-lU7NWg-t500x500.jpg"
@@ -99,9 +189,9 @@ class Controller:
         # print(account_2.get_success_booking(self.__booking_list))
         print(account_2.id)
 
-        account_4_details: Mate = register("ganThepro3", "1234", "mate", "female")
-        account_5_details: Mate = register("ganThepro4", "1234", "mate", "male")
-        account_6_details: Mate = register("yok", "1234", "mate", "male")
+        account_4_details: Mate = self.register("ganThepro3", "1234", "mate", "female")
+        account_5_details: Mate = self.register("ganThepro4", "1234", "mate", "male")
+        account_6_details: Mate = self.register("yok", "1234", "mate", "male")
         account_4: Mate = self.search_account_by_id(account_4_details['id'])
         account_5: Mate = self.search_account_by_id(account_5_details['id'])
         account_6: Mate = self.search_account_by_id(account_6_details['id'])
