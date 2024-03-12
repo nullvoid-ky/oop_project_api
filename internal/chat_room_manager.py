@@ -54,7 +54,7 @@ class ChatRoomManeger:
 
     def search_message_by_id(self, message_id: str) -> Message | None:
         for message in self.__message_list:
-            if message.id == message_id:
+            if str(message.id) == message_id:
                 return message
         return None
 
