@@ -468,7 +468,6 @@ class Controller:
             return None
         if not isinstance(account, Account):
             return None
-
         if isinstance(account, Mate):
             if booking.payment.pay(account, booking.customer) == False:
                 return None
