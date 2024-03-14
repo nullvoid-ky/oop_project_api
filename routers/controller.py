@@ -291,8 +291,11 @@ def del_amount(body: EditMoneyModel):
 def get_log():
     from app import controller
     log_list = controller.get_log()
+    result = []
+    for item in log_list:
+        result.append(item.get_log_details())
     if isinstance(log_list, list):
-        return res.success_response_status(status.HTTP_200_OK, "Get Log Success", data=log_list)
+        return res.success_response_status(status.HTTP_200_OK, "Get Log Success", data=result)
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in get log")
 
 @router.get("/get-transaction", dependencies=[Depends(verify_token)])
