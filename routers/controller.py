@@ -287,7 +287,7 @@ def del_amount(body: EditMoneyModel):
     controller.add_log(True, account, "Delete Amount", "Money", account, "Delete Successfully")
     return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=transaction.get_transaction_details())
 
-@router.get("/get-log", dependencies=[Depends(verify_token)])
+@router.get("/get-logs", dependencies=[Depends(verify_token)])
 def get_log():
     from app import controller
     log_list = controller.get_log()
