@@ -146,6 +146,8 @@ test.py
 .dmypy.json
 dmypy.json
 
+api_env/
+
 # Pyre type checker
 .pyre/
 
