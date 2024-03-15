@@ -495,7 +495,7 @@ class Controller:
                 return chat_room
         return None
 
-    def pay(self, booking_id: str) -> Transaction:
+    def pay(self, booking_id: str) -> Transaction | None:
         booking: Booking = self.search_booking_by_id(booking_id)
         customer: Customer = self.search_customer_by_id(str(booking.customer.id))
         if customer == None:
