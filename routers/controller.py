@@ -2,8 +2,8 @@ from fastapi import APIRouter, status, Depends, Body
 from typing import Union, Tuple
 
 from models.post import PostModel
-from models.profile import EditDisplayNameModel, EditPicUrlModel, EditMoneyModel, EditAgeModel, EditLocationModel
-from models.mate import MateModel, SearchMateModel
+from models.profile import EditDisplayNameModel, EditPicUrlModel, EditMoneyModel, EditAgeModel, EditLocationModel, EditPriceModel
+from models.mate import MateModel
 from internal.booking import Booking
 from internal.transaction import Transaction
 from internal.account import UserAccount, Account
@@ -14,17 +14,14 @@ from models.post import PostModel
 from models.mate import MateModel
 from models.booking import BookingModel
 from models.chat_room import AddChatRoomModel
-from models.availability import AvailabilityModel
 import utils.response as res
 from dependencies import verify_token, verify_customer, verify_mate, verify_admin
-from datetime import datetime, date
 from fastapi import Query
 import json
 
 router = APIRouter(
     prefix="/controller",
     tags=["controller"],
-    # dependencies=[Depends(verify_token)]
 )
 
 @router.post("/add-booking", dependencies=[Depends(verify_customer), Depends(verify_token)])
@@ -105,10 +102,7 @@ def get_mate_by_condition(
     availability: bool = Query(...)
 ):
     from app import controller
-    print(gender_list)
-    print(type(gender_list))
     gender_list = json.loads(gender_list[0])
-    print(name, location, gender_list, age, availability)
     mate_list = controller.search_mate_by_condition(name, location, gender_list, age, availability)
     if isinstance(mate_list, list):
         return res.success_response_status(status.HTTP_200_OK, "Get Mate Success", data=[{'account_detail' : acc.get_account_details()} for acc in mate_list])
@@ -118,6 +112,8 @@ def get_mate_by_condition(
 def add_post(body: PostModel):
     from app import controller
     mate: Mate = controller.search_mate_by_id(Body.user_id)
+    if mate == None:   
+        return res.error_response_status(status.HTTP_404_NOT_FOUND, "Mate not found")
     post: Post = controller.add_post(mate, body.description, body.picture)
     if post == None:
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in add post")
@@ -181,12 +177,16 @@ def delete_booking(booking_id: str):
     booking: Booking = controller.search_booking_by_id(booking_id)
     account: UserAccount = controller.search_account_by_id(Body.user_id)
     if booking == None or account == None:
+        controller.add_log(False, "?", "Delete Booking", "No Item", "?", "Booking Error Not Found")
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "Booking or UserAccount not found")
     deleted_booking: Union[Tuple[Booking, Transaction], Booking, None] = controller.delete_booking(booking, account)
     if isinstance(deleted_booking, tuple):
+        controller.add_log(True, "?", "Delete Booking", "Booking", "?", "Delete Booking Succes")
         return res.success_response_status(status.HTTP_200_OK, "Delete Booking Success", data={"booking": deleted_booking[0].get_booking_details(), "transaction": deleted_booking[1].get_transaction_details()})
     elif isinstance(deleted_booking, Booking):
+        controller.add_log(True, "?", "Delete Booking", "Booking", "?", "Delete Booking Succes")
         return res.success_response_status(status.HTTP_200_OK, "Delete Booking Success", data=deleted_booking.get_booking_details())
+    controller.add_log(False, "?", "Delete Booking", "No Item", "?", "Booking Error Not Found")
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in delete booking")
 
 @router.post("/add-chat-room", dependencies=[Depends(verify_customer), Depends(verify_token)])
@@ -196,7 +196,9 @@ def add_chat_room(body: AddChatRoomModel):
     account_2: UserAccount = controller.search_account_by_id(body.receiver_id)
     chat_room: ChatRoomManeger = controller.add_chat_room(account_1, account_2)
     if chat_room == None:
+        controller.add_log(False, account_1, "Add Chat Room (Create Chat Room)", "No Item", account_2, "Created Failed")
         return res.error_response_status(status.HTTP_404_NOT_FOUND, "UserAccount not found")
+    controller.add_log(True, account_1, "Add Chat Room (Create Chat Room)", "Chat", account_2, "Created Successfully")
     return res.success_response_status(status.HTTP_200_OK, "Add Chat Room Success", data=chat_room.get_chat_room_details())
 
 @router.put("/edit-display-name", dependencies=[Depends(verify_token)])
@@ -226,6 +228,15 @@ def edit_money(body: EditMoneyModel):
     edited_account: UserAccount = controller.edit_money(account, body.amount)
     return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=edited_account.get_account_details())
 
+@router.put("/edit-price", dependencies=[Depends(verify_token), Depends(verify_mate)])
+def edit_price(body: EditPriceModel):
+    from app import controller
+    account: UserAccount = controller.search_account_by_id(Body.user_id)
+    if account == None or body.price < 0:
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit price Error")
+    edited_account: UserAccount = controller.edit_price(account, body.price)
+    return res.success_response_status(status.HTTP_200_OK, "Edit Price Success",  data=edited_account.get_account_details())
+    
 @router.get("/get-leaderboard")
 def get_leaderboard():
     rank = 1
@@ -247,29 +258,44 @@ def get_leaderboard():
 @router.post("/add-amount", dependencies=[Depends(verify_customer), Depends(verify_token)])
 def add_amount(body: EditMoneyModel):
     from app import controller
-    account: Account = controller.search_account_by_id(Body.user_id)
+    account = controller.search_customer_by_id(Body.user_id)
+    if body.amount < 0:
+        controller.add_log(True, account, "Add Amount", "Money", account, "Added Failed, Amount is Negative")
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
     if account == None:
+        controller.add_log(True, account, "Add Amount", "Money", account, "Added Failed, Account Not Found")
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
     account.amount = account.amount + body.amount
     transaction: Transaction = account.add_transaction(Transaction(account, account, body.amount))
+    controller.add_log(True, account, "Add Transaction", f"Transaction {body.amount}", account, "Create Transaction Successfully")
+    controller.add_log(True, account, "Add Amount", "Money", account, "Added Successfully")
     return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=transaction.get_transaction_details())
 
 @router.post("/del-amount", dependencies=[Depends(verify_mate), Depends(verify_token)])
 def del_amount(body: EditMoneyModel):
     from app import controller
-    account: Account = controller.search_account_by_id(Body.user_id)
+    account = controller.search_mate_by_id(Body.user_id)
+    if body.amount < 0 or account.amount < body.amount:
+        controller.add_log(True, account, "Delete  Amount", "Money", account, "Delete Failed, Amount is Negative")
+        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
     if account == None:
+        controller.add_log(True, account, "Delete  Amount", "Money", account, "Delete Failed, Account Not Found")
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit money Error")
     account.amount = account.amount - body.amount
     transaction: Transaction = account.add_transaction(Transaction(account, account, body.amount))
+    controller.add_log(True, account, "Add Transaction", f"Transaction {body.amount}", account, "Create Transaction Successfully")
+    controller.add_log(True, account, "Delete Amount", "Money", account, "Delete Successfully")
     return res.success_response_status(status.HTTP_200_OK, "Edit money Success",  data=transaction.get_transaction_details())
 
-@router.get("/get-log", dependencies=[Depends(verify_token)])
+@router.get("/get-logs", dependencies=[Depends(verify_token)])
 def get_log():
     from app import controller
     log_list = controller.get_log()
+    result = []
+    for item in log_list:
+        result.append(item.get_log_details())
     if isinstance(log_list, list):
-        return res.success_response_status(status.HTTP_200_OK, "Get Log Success", data=controller.get_log())
+        return res.success_response_status(status.HTTP_200_OK, "Get Log Success", data=result)
     return res.error_response_status(status.HTTP_404_NOT_FOUND, "Error in get log")
 
 @router.get("/get-transaction", dependencies=[Depends(verify_token)])
@@ -293,7 +319,7 @@ def get_transaction_by_admin():
 def edit_age(body: EditAgeModel):
     from app import controller
     account: Account = controller.search_account_by_id(Body.user_id)
-    if account == None:
+    if account == None or body.age > 100 or body.age < 18:
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit Age Error")
     edited_account: Account = controller.edit_age(account, body.age)
     return res.success_response_status(status.HTTP_200_OK, "Edit Age Success",  data=edited_account.get_account_details())
@@ -306,12 +332,3 @@ def edit_location(body: EditLocationModel):
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Edit Location Error")
     edited_account: Account = controller.edit_location(account, body.location)
     return res.success_response_status(status.HTTP_200_OK, "Edit Location Success",  data=edited_account.get_account_details()) 
-
-@router.get("/get-logs")
-def get_log():
-    from app import controller
-    log_list = controller.log_list
-    print(log_list)
-    if len(log_list) == 0:
-        return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Get Log Error")
-    return res.success_response_status(status.HTTP_200_OK, "Get Log Success", data=[log.get_log_details() for log in log_list])

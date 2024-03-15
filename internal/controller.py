@@ -1,6 +1,12 @@
 from typing import Tuple, Union
 import datetime
+import jwt
+import os
+from fastapi import HTTPException, Body, Depends, WebSocketException, status
+from dotenv import load_dotenv
+from argon2 import PasswordHasher
 
+import random
 from internal.account import UserAccount, Account
 from internal.admin import Admin
 from internal.log import Log
@@ -10,11 +16,12 @@ from internal.customer import Customer
 from internal.payment import Payment
 from internal.transaction import Transaction
 from internal.chat_room_manager import ChatRoomManeger
-from utils.auth import register
-from dependencies import create_token
 from internal.post import Post
 from models.mate import Date
-import datetime
+
+ph = PasswordHasher()
+
+load_dotenv()
 
 class Controller:
     def __init__(self) -> None:
@@ -25,19 +32,123 @@ class Controller:
         self.__admin = None
         self.__log_list: list = []
 
+    def register(self, username: str, password: str, role: str, gender: str, location : str= "Bangkok") -> dict | None:
+        account: Account = self.search_account_by_username(username)
+        if account == None and username != "admin":
+            hashed_password: str = ph.hash(password)
+            if role == "customer":
+                new_account: UserAccount = self.add_customer(username, hashed_password, gender, location)
+                if gender == "male":
+                    new_account.add_pic_url("../img/customer_male.svg")
+                else:
+                    new_account.add_pic_url("../img/customer_female.svg")
+            elif role == "mate":
+                new_account: UserAccount = self.add_mate(username, hashed_password, gender, location)
+                if gender == "male":
+                    new_account.add_pic_url("../img/mate_male.svg")
+                else:
+                    new_account.add_pic_url("../img/mate_female.svg")
+            else:
+                self.add_log(False, "?", "register", "No Item", "?", "Role Error")
+                return None
+            self.add_log(True, new_account, "register", "Account", new_account, "Register Account Successfully")
+            return new_account.get_account_details()
+        self.add_log(False, account, "register", "No Item", "?", "Existed Account")
+        return None
+
+    def login(self, username: str, password: str) -> dict | None:
+        account: Account = self.search_account_by_username(username)
+        if account == None:
+            self.add_log(False, account, "login", "No Item", account, "Account Not Found")
+            return None
+        try:
+            ph.verify(account.password, password)
+            self.add_log(True, account, "login", "Login Account", account, "Login Account Successfully")
+            return account.get_account_details()
+        except:
+            self.add_log(False, account, "login", "No Item", account, "Login Account Error")
+            return None
+
+    def create_token(self, user_id: str, role: str) -> str:
+        token: str = jwt.encode(payload={ "user_id": user_id, "role": role }, key=os.environ['JWT_SECRET'], algorithm="HS256")
+        return token
+
+    def verify_token_websocket(self, x_token: str) -> str:
+        try:
+            payload: dict = jwt.decode(x_token, os.getenv('JWT_SECRET'), algorithms=["HS256"])
+            return payload["user_id"]
+        except jwt.ExpiredSignatureError:
+            raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION, reason="Token has expired")
+        except jwt.InvalidTokenError:
+            raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION, reason="Invalid token")
+        
+    def verify_token(self, x_token: str) -> dict:
+        try:
+            payload: dict = jwt.decode(x_token, os.getenv('JWT_SECRET'), algorithms=["HS256"])
+            Body.user_id = payload["user_id"]
+            Body.role = payload["role"]
+            return payload
+        except jwt.ExpiredSignatureError:
+            raise HTTPException(status_code=400, detail="Token has expired")
+        except jwt.InvalidTokenError:
+            raise HTTPException(status_code=400, detail="Invalid token")
+    
+    def verify_customer(self, payload: dict = Depends(verify_token)):
+        if "role" not in payload:
+            raise HTTPException(status_code=400, detail="Role not found in token")
+        if payload["role"] != "customer":
+            raise HTTPException(status_code=403, detail="Only customers are allowed")
+        return payload
+
+    def verify_mate(self, payload: dict = Depends(verify_token)):
+        if "role" not in payload:
+            raise HTTPException(status_code=400, detail="Role not found in token")
+        if payload["role"] != "mate":
+            raise HTTPException(status_code=403, detail="Only mates are allowed")
+        return payload
+
+    def verify_admin(self, payload: dict = Depends(verify_token)):
+        if "role" not in payload:
+            raise HTTPException(status_code=400, detail="Role not found in token")
+        if payload["role"] != "admin":
+            raise HTTPException(status_code=403, detail="Only admins are allowed")
+        return payload
+
     def add_instance(self):
-        temp_detail_1 = register("temporaryaccount1", "qwer", "mate", "female")
-        temp_detail_2 = register("temporaryaccount2", "qwer", "mate", "male")
-        temp_detail_3 = register("temporaryaccount3", "qwer", "mate", "male")
-        temp_detail_4 = register("temporaryaccount4", "qwer", "mate", "male")
-        temp_detail_5 = register("temporaryaccount5", "qwer", "mate", "female")
-        temp_detail_6 = register("temporaryaccount6", "qwer", "mate", "female")
-        print(("temp_1"), create_token(str(temp_detail_1['id']), "mate"))
-        print(("temp_2"), create_token(str(temp_detail_2['id']), "mate"))
-        print(("temp_3"), create_token(str(temp_detail_3['id']), "mate"))
-        print(("temp_4"), create_token(str(temp_detail_4['id']), "mate"))
-        print(("temp_5"), create_token(str(temp_detail_5['id']), "mate"))
-        print(("temp_6"), create_token(str(temp_detail_6['id']), "mate"))
+        list_account = []
+        pic = [
+            "https://scontent.fbkk7-2.fna.fbcdn.net/v/t1.6435-9/88084836_650751815753229_7681623277470482432_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeE--vgVrwNlxbLVILQAZS6wRxpIA82isENHGkgDzaKwQ1pQRhAgdpct1vJ4aFTIKAysNofNufAoNkgZis1ii8Bz&_nc_ohc=f0x5aRknOTQAX_03nNk&_nc_ht=scontent.fbkk7-2.fna&oh=00_AfA8OaJ4pblg_vu6hGvuN8x5OGc5nS1Aj_FB-X1lzuuf-w&oe=6617A870",
+            "https://scontent.fbkk7-2.fna.fbcdn.net/v/t1.18169-9/27867860_753890224816631_6749414623592887104_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeEKWFF_ZyoVfqk0aoxJylxFuX9biATegu65f1uIBN6C7u-CeRWdF2cGrEhrZy29003EAl74rQsOPlkWjxQdpa9x&_nc_ohc=w07Yuoc-S0gAX_aFSIa&_nc_ht=scontent.fbkk7-2.fna&oh=00_AfByCb1B2SXbHrxz7GSo1AMT1U-ilQon8ZiL0pI0kfOvNQ&oe=661796C4",
+            "https://scontent.fbkk7-2.fna.fbcdn.net/v/t39.30808-6/326219729_714444603594519_6151769270196173809_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeF8jV-489FiJuI6iA_3mV9ZX4-p8xZmUmxfj6nzFmZSbGDJpoNHLWdEPjxTjAbVpgRwY31O7fcyrBYxOo3TptL6&_nc_ohc=3Khg_qrDKK0AX98O6tn&_nc_ht=scontent.fbkk7-2.fna&oh=00_AfCseXMq5CtxeHEN7dagDdhEBA1zUniHb34Xw9NNN_BjPg&oe=65F5D4B8",
+            "https://scontent.cdninstagram.com/v/t51.29350-15/244758079_1359084524493527_1075954552904740204_n.jpg?stp=dst-jpg_e35&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi44OTl4ODk5LnNkciJ9&_nc_ht=scontent.cdninstagram.com&_nc_cat=111&_nc_ohc=XGLDAk3Q55QAX_-8h_q&edm=APs17CUBAAAA&ccb=7-5&ig_cache_key=MjY4MDUxNzAwMzA1MDg5MDkwNg%3D%3D.2-ccb7-5&oh=00_AfARaHhAcFIlBle8hJuq0GbbppZlNhJKuYiNAhiyHfWYEg&oe=65F4070D&_nc_sid=10d13b","https://scontent.fbkk7-3.fna.fbcdn.net/v/t39.30808-6/329423989_1293093041644520_7826831612166118390_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeH-kcapY-rPOwDthZFo6-ymMp0PP_a2logynQ8_9raWiI1crFErqocZ84KpNzTdYurfRzB-b81N5jR1apVwsxGe&_nc_ohc=t27VXezPqyoAX-vy1OQ&_nc_ht=scontent.fbkk7-3.fna&oh=00_AfDivGyHGywhYHGhAoNh7pHFhhz20hfCotAd0LBxOGYiUA&oe=65F506AF"
+        ]
+        for index in range(0,50):
+            role = "mate" if random.randint(0,1) else "customer"
+            gender = 'male' if random.randint(0,1) else 'female'
+            list_account.append(self.register(f"account_{index}","password", role, gender))
+            self.create_token(str(list_account[index]["id"]), role)
+        for account in list_account:
+            account = self.search_account_by_id(account['id'])
+            pic_num = random.randint(0, len(pic)-1)
+            account.pic_url = pic[pic_num]
+
+            account.amount = 100000
+            account.price = random.randint(10,100)*100
+            if isinstance(account, Mate):
+                account.add_availability(datetime.date(2024, 6, 4), f"I'm available laew naja")
+
+        temp_detail_1 = self.register("temporaryaccount1", "qwer", "mate", "female")
+        temp_detail_2 = self.register("temporaryaccount2", "qwer", "mate", "male")
+        temp_detail_3 = self.register("temporaryaccount3", "qwer", "mate", "male")
+        temp_detail_4 = self.register("temporaryaccount4", "qwer", "mate", "male")
+        temp_detail_5 = self.register("temporaryaccount5", "qwer", "mate", "female")
+        temp_detail_6 = self.register("temporaryaccount6", "qwer", "mate", "female")
+        print(("temp_1"), self.create_token(str(temp_detail_1['id']), "mate"))
+        print(("temp_2"), self.create_token(str(temp_detail_2['id']), "mate"))
+        print(("temp_3"), self.create_token(str(temp_detail_3['id']), "mate"))
+        print(("temp_4"), self.create_token(str(temp_detail_4['id']), "mate"))
+        print(("temp_5"), self.create_token(str(temp_detail_5['id']), "mate"))
+        print(("temp_6"), self.create_token(str(temp_detail_6['id']), "mate"))
         tmp1 = self.search_account_by_id(temp_detail_1['id'])
         tmp2 = self.search_account_by_id(temp_detail_2['id'])
         tmp3 = self.search_account_by_id(temp_detail_3['id'])
@@ -56,10 +167,10 @@ class Controller:
         for i in range(5):
             tmp5.add_availability(datetime.date(2024, 3, 4+i), f"I'm available laew {i}")
 
-        account_1_details = register("ganThepro", "1234", "customer", "male")
-        print("account_1_token :", create_token(str(account_1_details['id']), "customer"))
-        account_2_details = register("ganThepro2", "1234", "mate", "female")
-        print("account_2_token :", create_token(str(account_2_details['id']), "mate"))
+        account_1_details = self.register("ganThepro", "1234", "customer", "male")
+        print("account_1_token :", self.create_token(str(account_1_details['id']), "customer"))
+        account_2_details = self.register("ganThepro2", "1234", "mate", "female")
+        print("account_2_token :", self.create_token(str(account_2_details['id']), "mate"))
         account_1: Customer = self.search_account_by_id(account_1_details['id'])
         account_2: Mate = self.search_account_by_id(account_2_details['id'])
         account_2.pic_url = "https://i1.sndcdn.com/artworks-ubBjVp0Z50ZykDdG-lU7NWg-t500x500.jpg"
@@ -77,9 +188,9 @@ class Controller:
         # print(account_2.get_success_booking(self.__booking_list))
         print(account_2.id)
 
-        account_4_details: Mate = register("ganThepro3", "1234", "mate", "female")
-        account_5_details: Mate = register("ganThepro4", "1234", "mate", "male")
-        account_6_details: Mate = register("yok", "1234", "mate", "male")
+        account_4_details: Mate = self.register("ganThepro3", "1234", "mate", "female")
+        account_5_details: Mate = self.register("ganThepro4", "1234", "mate", "male")
+        account_6_details: Mate = self.register("yok", "1234", "mate", "male")
         account_4: Mate = self.search_account_by_id(account_4_details['id'])
         account_5: Mate = self.search_account_by_id(account_5_details['id'])
         account_6: Mate = self.search_account_by_id(account_6_details['id'])
@@ -360,7 +471,7 @@ class Controller:
             account_list_by_gender_female = self.get_mate_by_gender("female") if self.get_mate_by_gender("female") != None else []
         account_list_by_gender = set(account_list_by_gender_male).union(account_list_by_gender_female)
 
-        common_accounts = set(account_list_by_name)  # Convert the first list to a set
+        common_accounts = set(account_list_by_name) 
         common_accounts.intersection_update(account_list_by_availability)
         common_accounts.intersection_update(account_list_by_location)
         common_accounts.intersection_update(account_list_by_gender)
@@ -387,22 +498,26 @@ class Controller:
     def pay(self, booking_id: str) -> Transaction:
         booking: Booking = self.search_booking_by_id(booking_id)
         customer: Customer = self.search_customer_by_id(str(booking.customer.id))
+        if customer == None:
+            self.add_log(False, "?", "Paid Booking", "No Item", "?", "UserAccount Not Found")
+            return None
         mate: Mate = self.search_mate_by_id(str(booking.mate.id))
         if mate == None or customer == None or booking == None:
-            print("mate or customer not found")
+            self.add_log(False, customer, "Paid Booking", "No Item", customer, "Booking Not Found")
             return None
         payment: Payment = booking.payment
         if payment.pay(customer, mate) == False:
-            print("payment failed")
+            self.add_log(False, customer, "Pay", "No Item", mate, "Paid Failed")
             return None
-        if self.add_chat_room(customer, mate) == None:
-            print("chat room failed")
-            return None
+        self.add_log(True, customer, "Pay", "Money", mate, "Paid Succesfully")
         transaction: Transaction = Transaction(customer, mate, payment.amount)
         customer.add_transaction(transaction)
         mate.add_transaction(transaction)
+        self.add_log(True, customer, "Create Transaction", f"Transaction {payment.amount}", mate, "Create Transaction Succesfully")
+        self.add_log(True, mate, "Create Transaction", f"Transaction {payment.amount}", customer, "Create Transaction Succesfully")
         booking.status = "Success"
-        print("booking: ", booking)
+        self.add_log(True, customer, "Paid Booking", "Booking", customer, "Paid Booking -> Booking status 'Success' ")
+        mate.add_rent_count()
         return transaction
     
     def get_account_by_name(self, name: str) -> UserAccount | None:
@@ -431,6 +546,16 @@ class Controller:
             return None
         booked_customer: Account = mate.book(date.year, date.month, date.day)
         if booked_customer == None:
+            self.add_log(False, customer, "Create Chat", "No Item", mate, "Create Chat Failed Already Booked")
+            self.add_log(False, customer, "Paid Booking", "No Item", customer, "Pay Booking Failed  Already Booked")
+            self.add_log(False, mate, "Create Transaction", "No Item", customer, "Create Transaction Failed Already Booked")
+            self.add_log(False, customer, "Create Transaction", "No Item", mate, "Create Transaction Failed Already Booked")
+            return None
+        if self.add_chat_room(customer, mate) == None:
+            self.add_log(False, customer, "Create Chat", "No Item", mate, "Create Chat Failed")
+            self.add_log(False, customer, "Paid Booking", "No Item", customer, "Pay Booking Failed ")
+            self.add_log(False, mate, "Create Transaction", "No Item", customer, "Create Transaction Failed")
+            self.add_log(False, customer, "Create Transaction", "No Item", mate, "Create Transaction Failed")
             return None
         pledge_transaction: Transaction = Transaction(customer, mate, pledge_payment.amount)   
         customer.add_transaction(pledge_transaction)
@@ -454,11 +579,11 @@ class Controller:
             return None
         if not isinstance(account, Account):
             return None
-
         if isinstance(account, Mate):
             if booking.payment.pay(account, booking.customer) == False:
                 return None
             transaction: Transaction = Transaction(account, booking.customer, booking.payment.amount)
+            print("\n\n\n\n DETAIL\n\n",transaction, "\n\n\n\n")
         if isinstance(booking, Booking):
             booking.mate.booked_customer = None
             booking.status = "Failed"
@@ -509,13 +634,13 @@ class Controller:
         self.add_log(True, account, "edit_pic_url" ,new_pic_url, account, "Edited Pic")
         account.pic_url = new_pic_url
         return account
-
-    def edit_money(self, account: UserAccount, new_money: str) -> UserAccount:
-        if not isinstance(account, Account) or not isinstance(new_money, str):
-            self.add_log(False, account, "edit_money" ,"No Item", account, "instanec Error")
+    
+    def edit_price(self, account: UserAccount, new_price: int) -> UserAccount:
+        if not isinstance(account, Account) or not isinstance(new_price, int):
+            self.add_log(False, account, "edit_price" ,"No Item", account, "instance Error")
             return None
-        self.add_log(True, account, "edit_money" ,new_money, account, "Adjusted Money")
-        account.amount = new_money
+        self.add_log(True, account, "edit_price" ,new_price, account, "Adjusted price")
+        account.price = new_price
         return account
     
     def edit_age(self, account: Account, new_age: int) -> Account:

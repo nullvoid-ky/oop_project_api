@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends, Body
 from fastapi import status
 
-from models.message import MessageModel, EditMessageModel
-from models.chat_room import DeleteChatRoomModel
+from models.message import EditMessageModel
 from dependencies import verify_token
 import utils.response as res
 
@@ -12,15 +11,6 @@ router = APIRouter(
     dependencies=[Depends(verify_token)]
 )
     
-# @router.delete("/delete-message")
-# def delete_message(body: DeleteMessageModel):
-#     from app import controller
-#     msg_list = controller.delete_message(Body.user_id, body.receiver_id, body.message_id)
-#     if isinstance(msg_list, list):
-#         return res.success_response_status(status.HTTP_200_OK, "Delete message Success", [{'id': str(msg.id), "text": msg.get_text(), "timestamp": msg.get_timestamp(), "is_edit": msg.is_edit} for msg in msg_list])
-#     else:
-#         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Send message Error")
-    
 @router.put("/edit-message/{chat_room_id}")
 def edit_message(body: EditMessageModel):
     from app import controller
@@ -28,7 +18,7 @@ def edit_message(body: EditMessageModel):
     if chat_room is None:
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Chat Room not found")
     message = chat_room.search_message_by_id(body.message_id)
-    if message is None:
+    if message is None or str(message.sender.id) != Body.user_id:
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "Message not found")
     message.set_text(body.new_text)
     return res.success_response_status(status.HTTP_200_OK, "Edit message Success", message.get_message_details())
@@ -47,17 +37,7 @@ def get_chat_rooms():
     account = controller.search_account_by_id(Body.user_id)
     if account is None:
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "UserAccount not found")
-    # chat_list = controller.get_chat_list(account)
     chat_list = controller.get_receiver_chat_room_detail(account)
     if chat_list is None:
         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "No Chat Room")
     return res.success_response_status(status.HTTP_200_OK, "Get Chat Room Success", chat_list)
-    
-# @router.delete("/delete-chat-room")
-# def delete_chat_room(body: DeleteChatRoomModel):
-#     from app import controller
-#     chat = controller.delete_chat_room(Body.user_id, body.receiver_id)
-#     if isinstance(chat, list):
-#         return res.success_response_status(status.HTTP_200_OK, "Delete Chat Room Success", chat)
-#     else:
-#         return res.error_response_status(status.HTTP_400_BAD_REQUEST, "No Chat Room To Delete")

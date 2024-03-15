@@ -1,9 +1,8 @@
 from datetime import datetime   
-from internal.customer import Customer
-from internal.mate import Mate
+from internal.account import UserAccount
 
 class Transaction:
-    def __init__(self, sender: Customer, recipient: Mate, amount: int) -> None:
+    def __init__(self, sender: UserAccount, recipient: UserAccount, amount: int) -> None:
         self.__sender = sender
         self.__recipient = recipient
         self.__amount = amount

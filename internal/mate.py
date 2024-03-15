@@ -12,10 +12,14 @@ class Mate(UserAccount):
         self.__price = price
         self.__rented_count = 0
         self.__max_availability = 6
+        self.__review_customer_list: list[Customer] = []
 
     @property
     def availability_list(self) -> list[Availability]:
         return self.__availability_list
+    @property   
+    def review_customer_list(self) -> list[Customer]:
+        return self.__review_customer_list
     @property
     def price(self) -> int:
         return self.__price
@@ -59,14 +63,16 @@ class Mate(UserAccount):
         if len(self.__review_list):
             return round(sum / len(self.__review_list), 1)
         return -1.0
-        
-    def search_review_by_id(self, review_id) -> Review | None:
+
+    def search_review_by_id(self, review_id: str) -> Review | None:
         for review in self.__review_list:
             if review.validate_id(review_id):
                 return review
         return None
-    
-    def add_review_mate(self, reviewer: Customer, message: str, star: int) -> Review:
+
+    def add_review_mate(self, reviewer: Customer, message: str, star: int) -> Review | None:
+        if reviewer in self.__review_customer_list:
+            return None
         review: Review = Review(reviewer, message, star)
         self.__review_list.append(review)
         return review
@@ -77,7 +83,8 @@ class Mate(UserAccount):
             return None
         self.__review_list.remove(review)
         return review
-    
+    def add_rent_count(self):
+        self.__rented_count =+ 1
     def get_review_amount(self) -> int:
         return len(self.__review_list)
     

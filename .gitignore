@@ -140,6 +140,10 @@ test.py
 
 # mkdocs documentation
 /site
+/app_env
+
+dockerfile
+docker-compose.yaml
 
 # mypy
 .mypy_cache/
