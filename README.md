@@ -1,4 +1,9 @@
-01076106 Object Oriented Programming Project : 2/2566
+# 01076106 Object Oriented Programming Project : 2/2566
 ภาควิชาวิศวกรรมคอมพิวเตอร์ คณะวิศวกรรมศาสตร์
 สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง
 
+สมาชิก Assiztech (www.github.com/ASSIZTech)
+66010056
+66010239
+66010357
+66010473
